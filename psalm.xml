@@ -5,7 +5,9 @@
     totallyTyped="false"
 >
     <projectFiles>
-        <directory name="hooks" />
+        <directory name="lib" />
+        <directory name="tests" />
+        <directory name="www" />
     </projectFiles>
 
     <issueHandlers>
