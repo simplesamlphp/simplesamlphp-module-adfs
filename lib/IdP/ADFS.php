@@ -166,7 +166,7 @@ MSG;
 
     /**
      * @param string $url
-     * @param \DOMElement $wresult
+     * @param string $wresult
      * @param string $wctx
      * @return void
      */
