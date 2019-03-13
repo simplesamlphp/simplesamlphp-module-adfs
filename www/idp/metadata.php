@@ -153,16 +153,14 @@ try {
         $t->data['available_certs'] = $availableCerts;
         $certdata = [];
         foreach (array_keys($availableCerts) as $availableCert) {
-            if (!is_null($availableCert)) {
-                $certdata[$availableCert]['name'] = $availableCert;
-                $certdata[$availableCert]['url'] = \SimpleSAML\Module::getModuleURL('saml/idp/certs.php').
-                    '/'.$availableCert;
+            $certdata[$availableCert]['name'] = $availableCert;
+            $certdata[$availableCert]['url'] = \SimpleSAML\Module::getModuleURL('saml/idp/certs.php').
+                '/'.$availableCert;
 
-                $certdata[$availableCert]['comment'] = '';
-                if ($availableCerts[$availableCert]['certFingerprint'][0] === 'afe71c28ef740bc87425be13a2263d37971da1f9') {
-                    $certdata[$availableCert]['comment'] = 'This is the default certificate.'.
-                        ' Generate a new certificate if this is a production system.';
-                }
+            $certdata[$availableCert]['comment'] = '';
+            if ($availableCerts[$availableCert]['certFingerprint'][0] === 'afe71c28ef740bc87425be13a2263d37971da1f9') {
+                $certdata[$availableCert]['comment'] = 'This is the default certificate.'.
+                    ' Generate a new certificate if this is a production system.';
             }
         }
         $t->data['certdata'] = $certdata;
@@ -177,9 +175,11 @@ try {
         header('Content-Type: application/xml');
 
         // make sure to export only the md:EntityDescriptor
-        $metaxml = substr($metaxml, 0 || strpos($metaxml, '<md:EntityDescriptor'));
+        $i = strpos($metaxml, '<md:EntityDescriptor');
+        $metaxml = substr($metaxml, $i ? $i : 0);
         // 22 = strlen('</md:EntityDescriptor>')
-        $metaxml = substr($metaxml, 0, 0 || strrpos($metaxml, '</md:EntityDescriptor>') + 22);
+        $i = strrpos($metaxml, '</md:EntityDescriptor>');
+        $metaxml = substr($metaxml, 0, $i ? $i + 22 : 0);
         echo $metaxml;
 
         exit(0);

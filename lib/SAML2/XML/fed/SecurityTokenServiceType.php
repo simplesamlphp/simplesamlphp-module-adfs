@@ -50,6 +50,10 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
     {
         Assert::string($this->Location);
 
+        if (is_null($this->Location)) {
+            throw new \Exception('Location not set');
+        }
+
         $e = parent::toXML($parent);
         $e->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:fed', Constants::NS_FED);
         $e->setAttributeNS(\SAML2\Constants::NS_XSI, 'xsi:type', 'fed:SecurityTokenServiceType');

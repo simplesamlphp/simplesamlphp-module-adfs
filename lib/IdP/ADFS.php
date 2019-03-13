@@ -128,7 +128,7 @@ MSG;
      * @param string $key
      * @param string $cert
      * @param string $algo
-     * @return \DOMElement
+     * @return string
      */
     private static function signResponse($response, $key, $cert, $algo)
     {
@@ -166,7 +166,7 @@ MSG;
 
     /**
      * @param string $url
-     * @param string $wresult
+     * @param \DOMElement $wresult
      * @param string $wctx
      * @return void
      */
