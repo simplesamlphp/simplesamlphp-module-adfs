@@ -338,7 +338,7 @@ MSG;
         // this implies an override to normal sp notification
         if (isset($_GET['wreply']) && !empty($_GET['wreply'])) {
             $idp->doLogoutRedirect(\SimpleSAML\Utils\HTTP::checkURLAllowed($_GET['wreply']));
-            assert(false);
+            throw new \Exception("Code should never be reached");
         }
 
         $state = [
