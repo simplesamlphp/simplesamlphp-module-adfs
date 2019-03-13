@@ -18,12 +18,11 @@
     },
     "autoload": {
         "psr-4": {
-            "SimpleSAML\\modules\\adfs\\": "lib/"
+            "SimpleSAML\\Module\\adfs\\": "lib/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\SimpleSAML\\modules\\adfs\\TestFiles\\": "tests/files",
             "SimpleSAML\\Test\\Utils\\": "vendor/simplesamlphp/simplesamlphp/tests/Utils"
         }
     },
