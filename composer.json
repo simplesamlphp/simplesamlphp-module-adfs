@@ -23,7 +23,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\SimpleSAML\\modules\\riak\\TestFiles\\": "tests/files",
+            "Tests\\SimpleSAML\\modules\\adfs\\TestFiles\\": "tests/files",
             "SimpleSAML\\Test\\Utils\\": "vendor/simplesamlphp/simplesamlphp/tests/Utils"
         }
     },
