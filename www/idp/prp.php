@@ -19,7 +19,7 @@ if (isset($_GET['wa'])) {
     } elseif ($_GET['wa'] === 'wsignin1.0') {
         \SimpleSAML\Module\adfs\IdP\ADFS::receiveAuthnRequest($idp);
     }
-    assert(false);
+    throw new \Exception("Code should never be reached");
 } elseif (isset($_GET['assocId'])) {
     // logout response from ADFS SP
     $assocId = $_GET['assocId']; // Association ID of the SP that sent the logout response

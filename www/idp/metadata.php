@@ -1,5 +1,7 @@
 <?php
 
+use Webmozart\Assert\Assert;
+
 // load configuration and metadata
 $config = \SimpleSAML\Configuration::getInstance();
 $metadata = \SimpleSAML\Metadata\MetaDataStorageHandler::getMetadataHandler();
@@ -46,7 +48,7 @@ try {
 
     if ($idpmeta->hasValue('https.certificate')) {
         $httpsCert = \SimpleSAML\Utils\Crypto::loadPublicKey($idpmeta, true, 'https.');
-        assert(isset($httpsCert['certData']));
+        Assert::keyExists($httpsCert, 'certData');
         $availableCerts['https.crt'] = $httpsCert;
         $keys[] = [
             'type'            => 'X509Certificate',
