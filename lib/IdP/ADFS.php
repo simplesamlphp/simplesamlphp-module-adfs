@@ -10,7 +10,7 @@ use SimpleSAML\Utils\Crypto;
 class ADFS
 {
     /**
-     * @param \SimpleSAML\IdP @idp
+     * @param \SimpleSAML\IdP $idp
      * @return void
      * @throws \SimpleSAML\Error\Error
      */
