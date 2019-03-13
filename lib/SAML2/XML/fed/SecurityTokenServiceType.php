@@ -2,6 +2,8 @@
 
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
+use Webmozart\Assert\Assert;
+
 /**
  * Class representing SecurityTokenServiceType RoleDescriptor.
  *
@@ -45,7 +47,7 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
      */
     public function toXML(\DOMElement $parent)
     {
-        assert(is_string($this->Location));
+        Assert::string($this->Location);
 
         $e = parent::toXML($parent);
         $e->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:fed', Constants::NS_FED);
