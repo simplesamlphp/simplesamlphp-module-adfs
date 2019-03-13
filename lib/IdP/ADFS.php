@@ -9,6 +9,11 @@ use SimpleSAML\Utils\Crypto;
 
 class ADFS
 {
+    /**
+     * @param \SimpleSAML\IdP @idp
+     * @return void
+     * @throws \SimpleSAML\Error\Error
+     */
     public static function receiveAuthnRequest(\SimpleSAML\IdP $idp)
     {
         try {
@@ -41,6 +46,15 @@ class ADFS
         $idp->handleAuthenticationRequest($state);
     }
 
+
+    /**
+     * @param string $issuer
+     * @param string $target
+     * @param string $nameid
+     * @param array $attributes
+     * @param int $assertionLifetime
+     * @return string
+     */
     private static function generateResponse($issuer, $target, $nameid, $attributes, $assertionLifetime)
     {
         $issueInstant = \SimpleSAML\Utils\Time::generateTimestamp();
@@ -108,6 +122,14 @@ MSG;
         return $result;
     }
 
+
+    /**
+     * @param string $response
+     * @param string $key
+     * @param string $cert
+     * @param string $algo
+     * @return \DOMElement
+     */
     private static function signResponse($response, $key, $cert, $algo)
     {
         $objXMLSecDSig = new XMLSecurityDSig();
@@ -115,6 +137,11 @@ MSG;
         $objXMLSecDSig->setCanonicalMethod(XMLSecurityDSig::EXC_C14N);
         $responsedom = \SAML2\DOMDocumentFactory::fromString(str_replace("\r", "", $response));
         $firstassertionroot = $responsedom->getElementsByTagName('Assertion')->item(0);
+
+        if (is_null($firstassertionroot)) {
+            throw new \Exception("No assertion found in response.");
+        }
+
         $objXMLSecDSig->addReferenceList(
             [$firstassertionroot],
             XMLSecurityDSig::SHA256,
@@ -129,11 +156,20 @@ MSG;
             $public_cert = file_get_contents($cert);
             $objXMLSecDSig->add509Cert($public_cert, true);
         }
+
+        /** @var \DOMElement $objXMLSecDSig->sigNode */
         $newSig = $responsedom->importNode($objXMLSecDSig->sigNode, true);
         $firstassertionroot->appendChild($newSig);
         return $responsedom->saveXML();
     }
 
+
+    /**
+     * @param string $url
+     * @param string $wresult
+     * @param string $wctx
+     * @return void
+     */
     private static function postResponse($url, $wresult, $wctx)
     {
         $config = \SimpleSAML\Configuration::getInstance();
@@ -193,6 +229,7 @@ MSG;
             $hasNewCert = true;
         }
 
+        /** @var array $certInfo */
         $certInfo = Crypto::loadPublicKey($config, true);
         $keys[] = [
             'type' => 'X509Certificate',
@@ -203,6 +240,7 @@ MSG;
         ];
 
         if ($config->hasValue('https.certificate')) {
+            /** @var array $httpsCert */
             $httpsCert = Crypto::loadPublicKey($config, true, 'https.');
             $keys[] = [
                 'type' => 'X509Certificate',
@@ -223,7 +261,7 @@ MSG;
             );
 
             if (!$config->hasValue('OrganizationURL')) {
-                throw new \SimpleSAMl\Error\Exception('If OrganizationName is set, OrganizationURL must also be set.');
+                throw new \SimpleSAML\Error\Exception('If OrganizationName is set, OrganizationURL must also be set.');
             }
             $metadata['OrganizationURL'] = $config->getLocalizedString('OrganizationURL');
         }
@@ -271,6 +309,11 @@ MSG;
     }
 
 
+    /**
+     * @param array $state
+     * @throws \Exception
+     * @return void
+     */
     public static function sendResponse(array $state)
     {
         $spMetadata = $state["SPMetadata"];
@@ -323,6 +366,12 @@ MSG;
         ADFS::postResponse($wreply, $wresult, $wctx);
     }
 
+
+    /**
+     * @param \SimpleSAML\IdP $idp
+     * @param array $state
+     * @return void
+     */
     public static function sendLogoutResponse(\SimpleSAML\IdP $idp, array $state)
     {
         // NB:: we don't know from which SP the logout request came from
@@ -332,6 +381,12 @@ MSG;
         );
     }
 
+
+    /**
+     * @param \SimpleSAML\IdP $idp
+     * @throws \Exception
+     * @return void
+     */
     public static function receiveLogoutMessage(\SimpleSAML\IdP $idp)
     {
         // if a redirect is to occur based on wreply, we will redirect to url as
@@ -351,7 +406,15 @@ MSG;
         $idp->handleLogoutRequest($state, $assocId);
     }
 
-    // accepts an association array, and returns a URL that can be accessed to terminate the association
+
+    /**
+     * accepts an association array, and returns a URL that can be accessed to terminate the association
+     *
+     * @param \SimpleSAML\IdP $idp
+     * @param array $association
+     * @param string $relayState
+     * @return string
+     */
     public static function getLogoutURL(\SimpleSAML\IdP $idp, array $association, $relayState)
     {
         $metadata = \SimpleSAML\Metadata\MetaDataStorageHandler::getMetadataHandler();

@@ -37,6 +37,7 @@ try {
         $hasNewCert = false;
     }
 
+    /** @var array $certInfo */
     $certInfo = \SimpleSAML\Utils\Crypto::loadPublicKey($idpmeta, true);
     $availableCerts['idp.crt'] = $certInfo;
     $keys[] = [
@@ -47,6 +48,7 @@ try {
     ];
 
     if ($idpmeta->hasValue('https.certificate')) {
+        /** @var array $httpsCert */
         $httpsCert = \SimpleSAML\Utils\Crypto::loadPublicKey($idpmeta, true, 'https.');
         Assert::keyExists($httpsCert, 'certData');
         $availableCerts['https.crt'] = $httpsCert;
@@ -151,14 +153,16 @@ try {
         $t->data['available_certs'] = $availableCerts;
         $certdata = [];
         foreach (array_keys($availableCerts) as $availableCert) {
-            $certdata[$availableCert]['name'] = $availableCert;
-            $certdata[$availableCert]['url'] = \SimpleSAML\Module::getModuleURL('saml/idp/certs.php').
-                '/'.$availableCert;
+            if (!is_null($availableCert)) {
+                $certdata[$availableCert]['name'] = $availableCert;
+                $certdata[$availableCert]['url'] = \SimpleSAML\Module::getModuleURL('saml/idp/certs.php').
+                    '/'.$availableCert;
 
-            $certdata[$availableCert]['comment'] = '';
-            if ($availableCerts[$availableCert]['certFingerprint'][0] === 'afe71c28ef740bc87425be13a2263d37971da1f9') {
-                $certdata[$availableCert]['comment'] = 'This is the default certificate.'.
-                    ' Generate a new certificate if this is a production system.';
+                $certdata[$availableCert]['comment'] = '';
+                if ($availableCerts[$availableCert]['certFingerprint'][0] === 'afe71c28ef740bc87425be13a2263d37971da1f9') {
+                    $certdata[$availableCert]['comment'] = 'This is the default certificate.'.
+                        ' Generate a new certificate if this is a production system.';
+                }
             }
         }
         $t->data['certdata'] = $certdata;
@@ -173,9 +177,9 @@ try {
         header('Content-Type: application/xml');
 
         // make sure to export only the md:EntityDescriptor
-        $metaxml = substr($metaxml, strpos($metaxml, '<md:EntityDescriptor'));
+        $metaxml = substr($metaxml, 0 || strpos($metaxml, '<md:EntityDescriptor'));
         // 22 = strlen('</md:EntityDescriptor>')
-        $metaxml = substr($metaxml, 0, strrpos($metaxml, '</md:EntityDescriptor>') + 22);
+        $metaxml = substr($metaxml, 0, 0 || strrpos($metaxml, '</md:EntityDescriptor>') + 22);
         echo $metaxml;
 
         exit(0);
