@@ -37,6 +37,7 @@ try {
         $hasNewCert = false;
     }
 
+    /** @var array $certInfo */
     $certInfo = \SimpleSAML\Utils\Crypto::loadPublicKey($idpmeta, true);
     $availableCerts['idp.crt'] = $certInfo;
     $keys[] = [
@@ -47,6 +48,7 @@ try {
     ];
 
     if ($idpmeta->hasValue('https.certificate')) {
+        /** @var array $httpsCert */
         $httpsCert = \SimpleSAML\Utils\Crypto::loadPublicKey($idpmeta, true, 'https.');
         Assert::keyExists($httpsCert, 'certData');
         $availableCerts['https.crt'] = $httpsCert;
@@ -173,9 +175,11 @@ try {
         header('Content-Type: application/xml');
 
         // make sure to export only the md:EntityDescriptor
-        $metaxml = substr($metaxml, strpos($metaxml, '<md:EntityDescriptor'));
+        $i = strpos($metaxml, '<md:EntityDescriptor');
+        $metaxml = substr($metaxml, $i ? $i : 0);
         // 22 = strlen('</md:EntityDescriptor>')
-        $metaxml = substr($metaxml, 0, strrpos($metaxml, '</md:EntityDescriptor>') + 22);
+        $i = strrpos($metaxml, '</md:EntityDescriptor>');
+        $metaxml = substr($metaxml, 0, $i ? $i + 22 : 0);
         echo $metaxml;
 
         exit(0);
