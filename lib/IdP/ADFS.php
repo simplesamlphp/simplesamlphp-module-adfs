@@ -4,8 +4,12 @@ namespace SimpleSAML\Module\adfs\IdP;
 
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
+use SAML2\Constants;
+
 use SimpleSAML\Utils\Config\Metadata;
 use SimpleSAML\Utils\Crypto;
+use SimpleSAML\Utils\HTTP;
+use SimpleSAML\Utils\Time;
 
 class ADFS
 {
@@ -40,7 +44,7 @@ class ADFS
         ];
 
         if (isset($query['wreply']) && !empty($query['wreply'])) {
-            $state['adfs:wreply'] = \SimpleSAML\Utils\HTTP::checkURLAllowed($query['wreply']);
+            $state['adfs:wreply'] = HTTP::checkURLAllowed($query['wreply']);
         }
 
         $idp->handleAuthenticationRequest($state);
@@ -57,12 +61,18 @@ class ADFS
      */
     private static function generateResponse($issuer, $target, $nameid, $attributes, $assertionLifetime)
     {
-        $issueInstant = \SimpleSAML\Utils\Time::generateTimestamp();
-        $notBefore = \SimpleSAML\Utils\Time::generateTimestamp(time() - 30);
-        $assertionExpire = \SimpleSAML\Utils\Time::generateTimestamp(time() + $assertionLifetime);
+        $issueInstant = Time::generateTimestamp();
+        $notBefore = Time::generateTimestamp(time() - 30);
+        $assertionExpire = Time::generateTimestamp(time() + $assertionLifetime);
         $assertionID = \SimpleSAML\Utils\Random::generateID();
         $nameidFormat = 'http://schemas.xmlsoap.org/claims/UPN';
         $nameid = htmlspecialchars($nameid);
+
+        if (HTTP::isHTTPS()) {
+            $method = Constants::AC_PASSWORD_PROTECTED_TRANSPORT;
+        } else {
+            $method = Constants::AC_PASSWORD;
+        }
 
         $result = <<<MSG
 <wst:RequestSecurityTokenResponse xmlns:wst="http://schemas.xmlsoap.org/ws/2005/02/trust">
@@ -73,7 +83,7 @@ class ADFS
                     <saml:Audience>$target</saml:Audience>
                 </saml:AudienceRestrictionCondition>
             </saml:Conditions>
-            <saml:AuthenticationStatement AuthenticationMethod="urn:oasis:names:tc:SAML:1.0:am:unspecified" AuthenticationInstant="$issueInstant">
+            <saml:AuthenticationStatement AuthenticationMethod="$method" AuthenticationInstant="$issueInstant">
                 <saml:Subject>
                     <saml:NameIdentifier Format="$nameidFormat">$nameid</saml:NameIdentifier>
                 </saml:Subject>
@@ -202,15 +212,15 @@ MSG;
             'entityid' => $entityid,
             'SingleSignOnService' => [
                 [
-                    'Binding' => \SAML2\Constants::BINDING_HTTP_REDIRECT,
+                    'Binding' => Constants::BINDING_HTTP_REDIRECT,
                     'Location' => $endpoint,
                 ]
             ],
             'SingleLogoutService' => [
-                'Binding' => \SAML2\Constants::BINDING_HTTP_REDIRECT,
+                'Binding' => Constants::BINDING_HTTP_REDIRECT,
                 'Location' => $endpoint,
             ],
-            'NameIDFormat' => $config->getString('NameIDFormat', \SAML2\Constants::NAMEID_TRANSIENT),
+            'NameIDFormat' => $config->getString('NameIDFormat', Constants::NAMEID_TRANSIENT),
             'contacts' => [],
         ];
 
@@ -376,8 +386,8 @@ MSG;
     {
         // NB:: we don't know from which SP the logout request came from
         $idpMetadata = $idp->getConfig();
-        \SimpleSAML\Utils\HTTP::redirectTrustedURL(
-            $idpMetadata->getValue('redirect-after-logout', \SimpleSAML\Utils\HTTP::getBaseURL())
+        HTTP::redirectTrustedURL(
+            $idpMetadata->getValue('redirect-after-logout', HTTP::getBaseURL())
         );
     }
 
@@ -392,7 +402,7 @@ MSG;
         // if a redirect is to occur based on wreply, we will redirect to url as
         // this implies an override to normal sp notification
         if (isset($_GET['wreply']) && !empty($_GET['wreply'])) {
-            $idp->doLogoutRedirect(\SimpleSAML\Utils\HTTP::checkURLAllowed($_GET['wreply']));
+            $idp->doLogoutRedirect(HTTP::checkURLAllowed($_GET['wreply']));
             throw new \Exception("Code should never be reached");
         }
 
