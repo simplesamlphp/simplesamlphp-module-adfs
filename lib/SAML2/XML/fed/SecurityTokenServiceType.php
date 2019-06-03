@@ -2,8 +2,6 @@
 
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
-use Webmozart\Assert\Assert;
-
 /**
  * Class representing SecurityTokenServiceType RoleDescriptor.
  *
@@ -48,7 +46,7 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
      */
     public function toXML(\DOMElement $parent)
     {
-        Assert::string($this->Location);
+        assert(is_string($this->Location));
 
         if (is_null($this->Location)) {
             throw new \Exception('Location not set');
