@@ -33,10 +33,10 @@
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "^1.17",
-        "phpunit/phpunit": "~5.7"
+        "simplesamlphp/simplesamlphp-test-framework": "^0.0.10"
     },
     "support": {
-        "issues": "https://github.com/tvdijen/simplesamlphp-module-adfs/issues",
-        "source": "https://github.com/tvdijen/simplesamlphp-module-adfs"
+        "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
+        "source": "https://github.com/simplesamlphp/simplesamlphp-module-adfs"
     }
 }
