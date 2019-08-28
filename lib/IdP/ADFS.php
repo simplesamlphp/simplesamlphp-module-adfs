@@ -186,12 +186,30 @@ MSG;
     private static function postResponse($url, $wresult, $wctx)
     {
         $config = \SimpleSAML\Configuration::getInstance();
+        $newui = $config->getBoolean('usenewui', false);
+
+        // Remove this in SSP 2.0 when Twig has become the default
+        if ($newui === false) {
+            $config = \SimpleSAML\Configuration::loadFromArray(['usenewui' => true]);
+        }
+
         $t = new \SimpleSAML\XHTML\Template($config, 'adfs:postResponse.twig');
         $t->data['baseurlpath'] = \SimpleSAML\Module::getModuleURL('adfs');
         $t->data['url'] = $url;
         $t->data['wresult'] = $wresult;
         $t->data['wctx'] = $wctx;
-        $t->show();
+
+        // Remove the IF-part in SSP 2.0 when Twig has become the default
+        if ($newui === false) {
+            $twig = $t->getTwig();
+            if (!isset($twig)) {
+                throw new \Exception('Even though we explicitly configure that we want Twig, the Template class does not give us Twig. This is a bug.');
+            }
+            $result = $twig->render('adfs:postResponse.twig', $t->data);
+            echo $result;
+        } else {
+            $t->show();
+        }
     }
 
 
