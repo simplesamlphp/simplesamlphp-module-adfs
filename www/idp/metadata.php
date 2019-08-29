@@ -145,8 +145,6 @@ try {
     $metaxml = \SimpleSAML\Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
 
     if ($output_xhtml) {
-        $defaultidp = $config->getString('default-adfs-idp', null);
-
         $t = new \SimpleSAML\XHTML\Template($config, 'metadata.php', 'admin');
 
         $t->data['clipboard.js'] = true;
@@ -169,7 +167,6 @@ try {
         $t->data['metaurl'] = \SimpleSAML\Utils\HTTP::getSelfURLNoQuery();
         $t->data['metadata'] = htmlspecialchars($metaxml);
         $t->data['metadataflat'] = htmlspecialchars($metaflat);
-        $t->data['defaultidp'] = $defaultidp;
         $t->show();
     } else {
         header('Content-Type: application/xml');
