@@ -186,28 +186,30 @@ MSG;
     private static function postResponse($url, $wresult, $wctx)
     {
         $config = \SimpleSAML\Configuration::getInstance();
-        $newui = $config->getBoolean('usenewui', false);
+        $usenewui = $config->getBoolean('usenewui', false);
+        if ($usenewui === false) {
+            $wresult = htmlspecialchars($wresult);
+            $wctx = htmlspecialchars($wctx);
 
-        // Remove this in SSP 2.0 when Twig has become the default
-        if ($newui === false) {
-            $config = \SimpleSAML\Configuration::loadFromArray(['usenewui' => true]);
-        }
-
-        $t = new \SimpleSAML\XHTML\Template($config, 'adfs:postResponse.twig');
-        $t->data['baseurlpath'] = \SimpleSAML\Module::getModuleURL('adfs');
-        $t->data['url'] = $url;
-        $t->data['wresult'] = $wresult;
-        $t->data['wctx'] = $wctx;
-
-        // Remove the IF-part in SSP 2.0 when Twig has become the default
-        if ($newui === false) {
-            $twig = $t->getTwig();
-            if (!isset($twig)) {
-                throw new \Exception('Even though we explicitly configure that we want Twig, the Template class does not give us Twig. This is a bug.');
-            }
-            $result = $twig->render('adfs:postResponse.twig', $t->data);
-            echo $result;
+            $post = <<<MSG
+    <body onload="document.forms[0].submit()">
+        <form method="post" action="$url">
+            <input type="hidden" name="wa" value="wsignin1.0">
+            <input type="hidden" name="wresult" value="$wresult">
+            <input type="hidden" name="wctx" value="$wctx">
+            <noscript>
+                <input type="submit" value="Continue">
+            </noscript>
+        </form>
+    </body>
+MSG;
+            echo $post;
         } else {
+            $t = new \SimpleSAML\XHTML\Template($config, 'adfs:postResponse.twig');
+            $t->data['baseurlpath'] = \SimpleSAML\Module::getModuleURL('adfs');
+            $t->data['url'] = $url;
+            $t->data['wresult'] = $wresult;
+            $t->data['wctx'] = $wctx;
             $t->show();
         }
     }
