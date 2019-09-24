@@ -138,7 +138,7 @@ MSG;
      * @param string $key
      * @param string $cert
      * @param string $algo
-     * @param string $passphrase
+     * @param string|null $passphrase
      * @return string
      */
     private static function signResponse($response, $key, $cert, $algo, $passphrase)
