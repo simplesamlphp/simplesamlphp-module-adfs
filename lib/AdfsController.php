@@ -137,7 +137,7 @@ class AdfsController
 
             $metaArray['NameIDFormat'] = $idpmeta->getString(
                 'NameIDFormat',
-                Constants::NAMEID_TRANSIEN
+                Constants::NAMEID_TRANSIENT
             );
 
             if ($idpmeta->hasValue('OrganizationName')) {

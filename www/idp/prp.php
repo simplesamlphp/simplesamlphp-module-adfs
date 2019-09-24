@@ -17,6 +17,6 @@ $config = Configuration::getInstance();
 $session = Session::getSessionFromRequest();
 $request = Request::createFromGlobals();
 
-$controller = new StatisticsController($config, $session);
+$controller = new AdfsController($config, $session);
 $t = $controller->prp($request);
 $t->send();
