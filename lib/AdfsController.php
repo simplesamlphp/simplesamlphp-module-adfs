@@ -178,11 +178,11 @@ class AdfsController
             $metaBuilder = new Metadata\SAMLBuilder($idpentityid);
             $metaBuilder->addSecurityTokenServiceType($metaArray);
             $metaBuilder->addOrganizationInfo($metaArray);
-            $technicalContactEmail = $config->getString('technicalcontact_email', null);
+            $technicalContactEmail = $this->config->getString('technicalcontact_email', null);
             if ($technicalContactEmail && $technicalContactEmail !== 'na@example.org') {
                 $metaBuilder->addContact('technical', Utils\Config\Metadata::getContact([
                     'emailAddress' => $technicalContactEmail,
-                    'name'         => $config->getString('technicalcontact_name', null),
+                    'name'         => $this->config->getString('technicalcontact_name', null),
                     'contactType'  => 'technical',
                 ]));
             }
@@ -196,7 +196,7 @@ class AdfsController
             $metaxml = Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
 
             if ($output_xhtml) {
-                $t = new Template($config, 'metadata.php', 'admin');
+                $t = new Template($this->config, 'metadata.php', 'admin');
 
                 $t->data['clipboard.js'] = true;
                 $t->data['available_certs'] = $availableCerts;
