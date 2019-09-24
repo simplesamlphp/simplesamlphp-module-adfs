@@ -255,12 +255,14 @@ class AdfsController
         if (isset($_GET['wa'])) {
             if ($_GET['wa'] === 'wsignout1.0') {
                 return new StreamedResponse(
+                    /** @return void */
                     function () use ($idp) {
                         ADFS::receiveLogoutMessage($idp);
                     }
                 );
             } elseif ($_GET['wa'] === 'wsignin1.0') {
                 return new StreamedResponse(
+                    /** @return void */
                     function () use ($idp) {
                         ADFS::receiveAuthnRequest($idp);
                     }
@@ -274,6 +276,7 @@ class AdfsController
             $logoutError = null; // null on success, or an instance of a \SimpleSAML\Error\Exception on failure.
 
             return new StreamedResponse(
+                /** @return void */
                 function () use ($idp, $assocId, $relayState, $logoutError) {
                     $idp->handleLogoutResponse($assocId, $relayState, $logoutError);
                 }
