@@ -268,7 +268,7 @@ class AdfsController
                     }
                 );
             }
-            throw new \Exception("Code should never be reached");
+            throw new SspError\BadRequest("Unsupported value for 'wa' specified in request.");
         } elseif (isset($_GET['assocId'])) {
             // logout response from ADFS SP
             $assocId = $_GET['assocId']; // Association ID of the SP that sent the logout response
@@ -282,5 +282,6 @@ class AdfsController
                 }
             );
         }
+        throw new SspError\BadRequest("Missing parameter 'wa' or 'assocId' in request.");
     }
 }
