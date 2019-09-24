@@ -53,7 +53,7 @@ class AdfsController
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Symfony\Component\HttpFoundation\Response|\SimpleSAML\XHTML\Template
      */
     public function metadata(Request $request)
     {
