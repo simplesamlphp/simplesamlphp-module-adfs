@@ -111,7 +111,7 @@ class AdfsController
                 ];
             }
 
-            $adfs_service_location = Module::getModuleURL('adfs').'/idp/prp.php';
+            $adfs_service_location = Module::getModuleURL('adfs') . '/idp/prp.php';
             $metaArray = [
                 'metadata-set'        => 'adfs-idp-remote',
                 'entityid'            => $idpentityid,
@@ -173,7 +173,7 @@ class AdfsController
                 $metaArray['RegistrationInfo'] = $idpmeta->getArray('RegistrationInfo');
             }
 
-            $metaflat = '$metadata['.var_export($idpentityid, true).'] = '.var_export($metaArray, true).';';
+            $metaflat = '$metadata[' . var_export($idpentityid, true) . '] = ' . var_export($metaArray, true) . ';';
 
             $metaBuilder = new Metadata\SAMLBuilder($idpentityid);
             $metaBuilder->addSecurityTokenServiceType($metaArray);
@@ -203,12 +203,12 @@ class AdfsController
                 $certdata = [];
                 foreach (array_keys($availableCerts) as $availableCert) {
                     $certdata[$availableCert]['name'] = $availableCert;
-                    $certdata[$availableCert]['url'] = Module::getModuleURL('saml/idp/certs.php').
-                        '/'.$availableCert;
+                    $certdata[$availableCert]['url'] = Module::getModuleURL('saml/idp/certs.php') .
+                        '/' . $availableCert;
 
                     $certdata[$availableCert]['comment'] = '';
                     if ($availableCerts[$availableCert]['certFingerprint'][0] === 'afe71c28ef740bc87425be13a2263d37971da1f9') {
-                        $certdata[$availableCert]['comment'] = 'This is the default certificate.'.
+                        $certdata[$availableCert]['comment'] = 'This is the default certificate.' .
                             ' Generate a new certificate if this is a production system.';
                     }
                 }
@@ -250,7 +250,7 @@ class AdfsController
         Logger::info('ADFS - IdP.prp: Accessing ADFS IdP endpoint prp');
 
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
-        $idp = IdP::getById('adfs:'.$idpEntityId);
+        $idp = IdP::getById('adfs:' . $idpEntityId);
 
         if (isset($_GET['wa'])) {
             if ($_GET['wa'] === 'wsignout1.0') {
