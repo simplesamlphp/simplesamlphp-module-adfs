@@ -2,8 +2,6 @@
 
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
-use Webmozart\Assert\Assert;
-
 /**
  * Class representing fed Endpoint.
  *
@@ -20,11 +18,8 @@ class Endpoint
      * @param string $address
      * @return \DOMElement
      */
-    public static function appendXML(\DOMElement $parent, $name, $address)
+    public static function appendXML(\DOMElement $parent, string $name, string $address)
     {
-        Assert::string($name);
-        Assert::string($address);
-
         $e = $parent->ownerDocument->createElement($name);
         $parent->appendChild($e);
 

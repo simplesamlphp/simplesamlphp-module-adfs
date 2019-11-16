@@ -22,9 +22,9 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
     /**
      * The Location of Services.
      *
-     * @var string|null $Location
+     * @var string $Location
      */
-    public $Location = null;
+    public $Location;
 
 
     /**
@@ -35,6 +35,7 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
     public function __construct(\DOMElement $xml = null)
     {
         parent::__construct('RoleDescriptor', $xml);
+
         if ($xml === null) {
             return;
         }
@@ -48,11 +49,7 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
      */
     public function toXML(\DOMElement $parent)
     {
-        Assert::string($this->Location);
-
-        if (is_null($this->Location)) {
-            throw new \Exception('Location not set');
-        }
+        Assert::notEmpty($this->Location, 'Location not set');
 
         $e = parent::toXML($parent);
         $e->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:fed', Constants::NS_FED);
@@ -68,10 +65,12 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
     /**
      * Get the location of this service.
      *
-     * @return string|null The full URL where this service can be reached.
+     * @return string The full URL where this service can be reached.
      */
     public function getLocation()
     {
+        Assert::notEmpty($this->Location, 'Location not set');
+
         return $this->Location;
     }
 
