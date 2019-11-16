@@ -3,6 +3,7 @@
     name="SimpleSAMLphp ADFS module"
     useDocblockTypes="true"
     totallyTyped="false"
+    hideExternalErrors="true"
 >
     <projectFiles>
         <directory name="lib" />
