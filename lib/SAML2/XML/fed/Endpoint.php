@@ -2,6 +2,8 @@
 
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
+use DOMElement;
+
 /**
  * Class representing fed Endpoint.
  *
@@ -18,7 +20,7 @@ class Endpoint
      * @param string $address
      * @return \DOMElement
      */
-    public static function appendXML(\DOMElement $parent, string $name, string $address)
+    public static function appendXML(DOMElement $parent, string $name, string $address): DOMElement
     {
         $e = $parent->ownerDocument->createElement($name);
         $parent->appendChild($e);

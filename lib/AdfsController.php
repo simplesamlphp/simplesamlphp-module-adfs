@@ -55,7 +55,7 @@ class AdfsController
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \Symfony\Component\HttpFoundation\Response|\SimpleSAML\XHTML\Template
      */
-    public function metadata(Request $request)
+    public function metadata(Request $request): Response
     {
         if (!$this->config->getBoolean('enable.adfs-idp', false)) {
             throw new SspError\Error('NOACCESS');
@@ -196,7 +196,7 @@ class AdfsController
             $metaxml = Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
 
             if ($output_xhtml) {
-                $t = new Template($this->config, 'metadata.php', 'admin');
+                $t = new Template($this->config, 'metadata.twig', 'admin');
 
                 $t->data['clipboard.js'] = true;
                 $t->data['available_certs'] = $availableCerts;
@@ -245,7 +245,7 @@ class AdfsController
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function prp(Request $request)
+    public function prp(Request $request): Response
     {
         Logger::info('ADFS - IdP.prp: Accessing ADFS IdP endpoint prp');
 

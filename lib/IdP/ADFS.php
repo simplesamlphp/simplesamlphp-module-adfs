@@ -5,10 +5,15 @@ namespace SimpleSAML\Module\adfs\IdP;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\Constants;
-use SimpleSAML\Utils\Config\Metadata;
-use SimpleSAML\Utils\Crypto;
-use SimpleSAML\Utils\HTTP;
-use SimpleSAML\Utils\Time;
+use SAML2\DOMDocumentFactory;
+use SimpleSAML\Configuration;
+use SimpleSAML\Error;
+use SimpleSAML\IdP;
+use SimpleSAML\Logger;
+use SimpleSAML\Metadata\MetaDataStorageHandler;
+use SimpleSAML\Module;
+use SimpleSAML\Utils;
+use SimpleSAML\XHTML\Template;
 
 class ADFS
 {
@@ -17,7 +22,7 @@ class ADFS
      * @return void
      * @throws \SimpleSAML\Error\Error
      */
-    public static function receiveAuthnRequest(\SimpleSAML\IdP $idp)
+    public static function receiveAuthnRequest(IdP $idp): void
     {
         try {
             parse_str($_SERVER['QUERY_STRING'], $query);
@@ -25,16 +30,16 @@ class ADFS
             $requestid = $query['wctx'];
             $issuer = $query['wtrealm'];
 
-            $metadata = \SimpleSAML\Metadata\MetaDataStorageHandler::getMetadataHandler();
+            $metadata = MetaDataStorageHandler::getMetadataHandler();
             $spMetadata = $metadata->getMetaDataConfig($issuer, 'adfs-sp-remote');
 
-            \SimpleSAML\Logger::info('ADFS - IdP.prp: Incoming Authentication request: ' . $issuer . ' id ' . $requestid);
+            Logger::info('ADFS - IdP.prp: Incoming Authentication request: ' . $issuer . ' id ' . $requestid);
         } catch (\Exception $exception) {
-            throw new \SimpleSAML\Error\Error('PROCESSAUTHNREQUEST', $exception);
+            throw new Error\Error('PROCESSAUTHNREQUEST', $exception);
         }
 
         $state = [
-            'Responder' => ['\SimpleSAML\Module\adfs\IdP\ADFS', 'sendResponse'],
+            'Responder' => [ADFS::class, 'sendResponse'],
             'SPMetadata' => $spMetadata->toArray(),
             'ForceAuthn' => false,
             'isPassive' => false,
@@ -43,7 +48,7 @@ class ADFS
         ];
 
         if (isset($query['wreply']) && !empty($query['wreply'])) {
-            $state['adfs:wreply'] = HTTP::checkURLAllowed($query['wreply']);
+            $state['adfs:wreply'] = Utils\HTTP::checkURLAllowed($query['wreply']);
         }
 
         $idp->handleAuthenticationRequest($state);
@@ -58,16 +63,21 @@ class ADFS
      * @param int $assertionLifetime
      * @return string
      */
-    private static function generateResponse($issuer, $target, $nameid, $attributes, $assertionLifetime)
-    {
-        $issueInstant = Time::generateTimestamp();
-        $notBefore = Time::generateTimestamp(time() - 30);
-        $assertionExpire = Time::generateTimestamp(time() + $assertionLifetime);
-        $assertionID = \SimpleSAML\Utils\Random::generateID();
+    private static function generateResponse(
+        string $issuer,
+        string $target,
+        string $nameid,
+        array $attributes,
+        int $assertionLifetime
+    ): string {
+        $issueInstant = Utils\Time::generateTimestamp();
+        $notBefore = Utils\Time::generateTimestamp(time() - 30);
+        $assertionExpire = Utils\Time::generateTimestamp(time() + $assertionLifetime);
+        $assertionID = Utils\Random::generateID();
         $nameidFormat = 'http://schemas.xmlsoap.org/claims/UPN';
         $nameid = htmlspecialchars($nameid);
 
-        if (HTTP::isHTTPS()) {
+        if (Utils\HTTP::isHTTPS()) {
             $method = Constants::AC_PASSWORD_PROTECTED_TRANSPORT;
         } else {
             $method = Constants::AC_PASSWORD;
@@ -98,7 +108,7 @@ MSG;
                 continue;
             }
 
-            list($namespace, $name) = \SimpleSAML\Utils\Attributes::getAttributeNamespace(
+            list($namespace, $name) = Utils\Attributes::getAttributeNamespace(
                 $name,
                 'http://schemas.xmlsoap.org/claims'
             );
@@ -140,12 +150,17 @@ MSG;
      * @param string|null $passphrase
      * @return string
      */
-    private static function signResponse($response, $key, $cert, $algo, $passphrase)
-    {
+    private static function signResponse(
+        string $response,
+        string $key,
+        string $cert,
+        string $algo,
+        string $passphrase = null
+    ): string {
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = ['AssertionID'];
         $objXMLSecDSig->setCanonicalMethod(XMLSecurityDSig::EXC_C14N);
-        $responsedom = \SAML2\DOMDocumentFactory::fromString(str_replace("\r", "", $response));
+        $responsedom = DOMDocumentFactory::fromString(str_replace("\r", "", $response));
         $firstassertionroot = $responsedom->getElementsByTagName('Assertion')->item(0);
 
         if (is_null($firstassertionroot)) {
@@ -183,15 +198,15 @@ MSG;
      * @param string $wctx
      * @return void
      */
-    private static function postResponse($url, $wresult, $wctx)
+    private static function postResponse(string $url, string $wresult, string $wctx): void
     {
-        $config = \SimpleSAML\Configuration::getInstance();
-        $t = new \SimpleSAML\XHTML\Template($config, 'adfs:postResponse.twig');
-        $t->data['baseurlpath'] = \SimpleSAML\Module::getModuleURL('adfs');
+        $config = Configuration::getInstance();
+        $t = new Template($config, 'adfs:postResponse.twig');
+        $t->data['baseurlpath'] = Module::getModuleURL('adfs');
         $t->data['url'] = $url;
         $t->data['wresult'] = $wresult;
         $t->data['wctx'] = $wctx;
-        $t->show();
+        $t->send();
     }
 
 
@@ -204,12 +219,12 @@ MSG;
      * @throws \SimpleSAML\Error\Exception
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
-    public static function getHostedMetadata($entityid)
+    public static function getHostedMetadata(string $entityid): array
     {
-        $handler = \SimpleSAML\Metadata\MetaDataStorageHandler::getMetadataHandler();
+        $handler = MetaDataStorageHandler::getMetadataHandler();
         $config = $handler->getMetaDataConfig($entityid, 'adfs-idp-hosted');
 
-        $endpoint = \SimpleSAML\Module::getModuleURL('adfs/idp/prp.php');
+        $endpoint = Module::getModuleURL('adfs/idp/prp.php');
         $metadata = [
             'metadata-set' => 'adfs-idp-hosted',
             'entityid' => $entityid,
@@ -229,7 +244,7 @@ MSG;
 
         // add certificates
         $keys = [];
-        $certInfo = Crypto::loadPublicKey($config, false, 'new_');
+        $certInfo = Utils\Crypto::loadPublicKey($config, false, 'new_');
         $hasNewCert = false;
         if ($certInfo !== null) {
             $keys[] = [
@@ -243,7 +258,7 @@ MSG;
         }
 
         /** @var array $certInfo */
-        $certInfo = Crypto::loadPublicKey($config, true);
+        $certInfo = Utils\Crypto::loadPublicKey($config, true);
         $keys[] = [
             'type' => 'X509Certificate',
             'signing' => true,
@@ -254,7 +269,7 @@ MSG;
 
         if ($config->hasValue('https.certificate')) {
             /** @var array $httpsCert */
-            $httpsCert = Crypto::loadPublicKey($config, true, 'https.');
+            $httpsCert = Utils\Crypto::loadPublicKey($config, true, 'https.');
             $keys[] = [
                 'type' => 'X509Certificate',
                 'signing' => true,
@@ -274,7 +289,7 @@ MSG;
             );
 
             if (!$config->hasValue('OrganizationURL')) {
-                throw new \SimpleSAML\Error\Exception('If OrganizationName is set, OrganizationURL must also be set.');
+                throw new Error\Exception('If OrganizationName is set, OrganizationURL must also be set.');
             }
             $metadata['OrganizationURL'] = $config->getLocalizedString('OrganizationURL');
         }
@@ -289,7 +304,7 @@ MSG;
             $metadata['EntityAttributes'] = $config->getArray('EntityAttributes');
 
             // check for entity categories
-            if (Metadata::isHiddenFromDiscovery($metadata)) {
+            if (Utils\Config\Metadata::isHiddenFromDiscovery($metadata)) {
                 $metadata['hide.from.discovery'] = true;
             }
         }
@@ -307,7 +322,7 @@ MSG;
         }
 
         // add contact information
-        $globalConfig = \SimpleSAML\Configuration::getInstance();
+        $globalConfig = Configuration::getInstance();
         $email = $globalConfig->getString('technicalcontact_email', false);
         if ($email && $email !== 'na@example.org') {
             $contact = [
@@ -315,7 +330,7 @@ MSG;
                 'name' => $globalConfig->getString('technicalcontact_name', null),
                 'contactType' => 'technical',
             ];
-            $metadata['contacts'][] = Metadata::getContact($contact);
+            $metadata['contacts'][] = Utils\Config\Metadata::getContact($contact);
         }
 
         return $metadata;
@@ -327,11 +342,11 @@ MSG;
      * @throws \Exception
      * @return void
      */
-    public static function sendResponse(array $state)
+    public static function sendResponse(array $state): void
     {
         $spMetadata = $state["SPMetadata"];
         $spEntityId = $spMetadata['entityid'];
-        $spMetadata = \SimpleSAML\Configuration::loadFromArray(
+        $spMetadata = Configuration::loadFromArray(
             $spMetadata,
             '$metadata[' . var_export($spEntityId, true) . ']'
         );
@@ -345,16 +360,16 @@ MSG;
             }
             $nameid = $attributes[$nameidattribute][0];
         } else {
-            $nameid = \SimpleSAML\Utils\Random::generateID();
+            $nameid = Utils\Random::generateID();
         }
 
-        $idp = \SimpleSAML\IdP::getByState($state);
+        $idp = IdP::getByState($state);
         $idpMetadata = $idp->getConfig();
         $idpEntityId = $idpMetadata->getString('entityid');
 
         $idp->addAssociation([
             'id' => 'adfs:' . $spEntityId,
-            'Handler' => '\SimpleSAML\Module\adfs\IdP\ADFS',
+            'Handler' => ADFS::class,
             'adfs:entityID' => $spEntityId,
         ]);
 
@@ -365,8 +380,8 @@ MSG;
 
         $response = ADFS::generateResponse($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
-        $privateKeyFile = \SimpleSAML\Utils\Config::getCertPath($idpMetadata->getString('privatekey'));
-        $certificateFile = \SimpleSAML\Utils\Config::getCertPath($idpMetadata->getString('certificate'));
+        $privateKeyFile = Utils\Config::getCertPath($idpMetadata->getString('privatekey'));
+        $certificateFile = Utils\Config::getCertPath($idpMetadata->getString('certificate'));
         $passphrase = $idpMetadata->getString('privatekey_pass', null);
 
         $algo = $spMetadata->getString('signature.algorithm', null);
@@ -386,12 +401,12 @@ MSG;
      * @param array $state
      * @return void
      */
-    public static function sendLogoutResponse(\SimpleSAML\IdP $idp, array $state)
+    public static function sendLogoutResponse(IdP $idp, array $state): void
     {
         // NB:: we don't know from which SP the logout request came from
         $idpMetadata = $idp->getConfig();
-        HTTP::redirectTrustedURL(
-            $idpMetadata->getValue('redirect-after-logout', HTTP::getBaseURL())
+        Utils\HTTP::redirectTrustedURL(
+            $idpMetadata->getValue('redirect-after-logout', Utils\HTTP::getBaseURL())
         );
     }
 
@@ -401,17 +416,17 @@ MSG;
      * @throws \Exception
      * @return void
      */
-    public static function receiveLogoutMessage(\SimpleSAML\IdP $idp)
+    public static function receiveLogoutMessage(IdP $idp): void
     {
         // if a redirect is to occur based on wreply, we will redirect to url as
         // this implies an override to normal sp notification
         if (isset($_GET['wreply']) && !empty($_GET['wreply'])) {
-            $idp->doLogoutRedirect(HTTP::checkURLAllowed($_GET['wreply']));
+            $idp->doLogoutRedirect(Utils\HTTP::checkURLAllowed($_GET['wreply']));
             throw new \Exception("Code should never be reached");
         }
 
         $state = [
-            'Responder' => ['\SimpleSAML\Module\adfs\IdP\ADFS', 'sendLogoutResponse'],
+            'Responder' => [ADFS::class, 'sendLogoutResponse'],
         ];
         $assocId = null;
         // TODO: verify that this is really no problem for:
@@ -429,11 +444,11 @@ MSG;
      * @param string $relayState
      * @return string
      */
-    public static function getLogoutURL(\SimpleSAML\IdP $idp, array $association, $relayState)
+    public static function getLogoutURL(IdP $idp, array $association, string $relayState): string
     {
-        $metadata = \SimpleSAML\Metadata\MetaDataStorageHandler::getMetadataHandler();
+        $metadata = MetaDataStorageHandler::getMetadataHandler();
         $spMetadata = $metadata->getMetaDataConfig($association['adfs:entityID'], 'adfs-sp-remote');
-        $returnTo = \SimpleSAML\Module::getModuleURL(
+        $returnTo = Module::getModuleURL(
             'adfs/idp/prp.php?assocId=' . urlencode($association["id"]) . '&relayState=' . urlencode($relayState)
         );
         return $spMetadata->getValue('prp') . '?wa=wsignoutcleanup1.0&wreply=' . urlencode($returnTo);

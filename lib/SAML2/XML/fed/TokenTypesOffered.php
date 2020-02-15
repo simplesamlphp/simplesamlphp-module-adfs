@@ -2,6 +2,8 @@
 
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
+use DOMElement;
+
 /**
  * Class representing fed TokenTypesOffered.
  *
@@ -16,7 +18,7 @@ class TokenTypesOffered
      * @param \DOMElement $parent  The element we should append this endpoint to.
      * @return \DOMElement
      */
-    public static function appendXML(\DOMElement $parent)
+    public static function appendXML(DOMElement $parent): DOMElement
     {
         $e = $parent->ownerDocument->createElementNS(Constants::NS_FED, 'fed:TokenTypesOffered');
         $parent->appendChild($e);

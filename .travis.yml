@@ -10,8 +10,6 @@ stages:
 ################
 
 php:
-  - 7.0
-  - 7.1
   - 7.2
   - 7.3
   - 7.4
@@ -44,22 +42,6 @@ jobs:
     ##########################
     #  Pre-conditions stage  #
     ##########################
-
-    - stage: pre-conditions
-      env: Syntax check PHP
-      php: 7.0
-      before_script:
-        - composer install
-      script:
-        - vendor/bin/check-syntax-php.sh
-
-    - stage: pre-conditions
-      env: Syntax check PHP
-      php: 7.1
-      before_script:
-        - composer install
-      script:
-        - vendor/bin/check-syntax-php.sh
 
     - stage: pre-conditions
       env: Syntax check PHP
