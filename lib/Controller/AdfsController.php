@@ -1,6 +1,6 @@
 <?php
 
-namespace SimpleSAML\Module\adfs;
+namespace SimpleSAML\Module\adfs\Controller;
 
 use SAML2\Constants;
 use SimpleSAML\Configuration;
