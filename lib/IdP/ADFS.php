@@ -192,6 +192,8 @@ MSG;
         $t->data['wresult'] = $wresult;
         $t->data['wctx'] = $wctx;
         $t->show();
+
+        exit;
     }
 
 
