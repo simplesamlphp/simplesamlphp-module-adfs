@@ -3,7 +3,7 @@
 $metadata['urn:federation:localhost'] = [
     'prp' => 'https://localhost/adfs/ls/',
     'simplesaml.nameidattribute' => 'uid',
-    // Some WS-Fed relying parties applications set the session lifetime to to the assertion lifetime
+    // Some WS-Fed relying parties applications set the session lifetime to the assertion lifetime
     // 'assertion.lifetime' => 3600,
     'authproc' => [
         50 => [
