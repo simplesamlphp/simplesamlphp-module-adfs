@@ -7,8 +7,8 @@
 >
     <projectFiles>
         <directory name="lib" />
+        <directory name="metadata-templates" />
         <directory name="tests" />
-        <directory name="www" />
     </projectFiles>
 
     <issueHandlers>
@@ -29,5 +29,11 @@
         <MissingParamType errorLevel="info" />
         <UnusedClass errorLevel="info" />
         <PossiblyUnusedMethod errorLevel="info" />
+
+        <PossiblyUndefinedGlobalVariable>
+            <errorLevel type="suppress">
+                <file name="metadata-templates/*.php" />
+            </errorLevel>
+        </PossiblyUndefinedGlobalVariable>
     </issueHandlers>
 </psalm>

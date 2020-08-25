@@ -2,8 +2,8 @@
 $finder = PhpCsFixer\Finder::create()
     ->in([
         __DIR__ . '/lib',
+        __DIR__ . '/metadata-templates',
         __DIR__ . '/tests',
-        __DIR__ . '/www/idp',
     ])
 ;
 return PhpCsFixer\Config::create()
