@@ -37,6 +37,9 @@ class AdfsController
     /** @var \SimpleSAML\Session */
     protected $session;
 
+    /** @var \SimpleSAML\Utils\Crypto */
+    protected $cryptoUtils;
+
     /**
      * AdfsController constructor.
      *
@@ -48,6 +51,7 @@ class AdfsController
         $this->config = $config;
         $this->metadata = Metadata\MetaDataStorageHandler::getMetadataHandler();
         $this->session = $session;
+        $this->cryptoUtils = new Utils\Crypto();
     }
 
 
@@ -63,7 +67,8 @@ class AdfsController
 
         // check if valid local session exists
         if ($this->config->getBoolean('admin.protectmetadata', false)) {
-            Utils\Auth::requireAdmin();
+            $authUtils = new Utils\Auth();
+            $this->authUtils->requireAdmin();
         }
 
         try {
@@ -73,7 +78,7 @@ class AdfsController
 
             $availableCerts = [];
             $keys = [];
-            $certInfo = Utils\Crypto::loadPublicKey($idpmeta, false, 'new_');
+            $certInfo = $this->cryptoUtils->loadPublicKey($idpmeta, false, 'new_');
 
             if ($certInfo !== null) {
                 $availableCerts['new_idp.crt'] = $certInfo;
@@ -89,7 +94,7 @@ class AdfsController
             }
 
             /** @var array $certInfo */
-            $certInfo = Utils\Crypto::loadPublicKey($idpmeta, true);
+            $certInfo = $this->cryptoUtils->loadPublicKey($idpmeta, true);
             $availableCerts['idp.crt'] = $certInfo;
             $keys[] = [
                 'type'            => 'X509Certificate',
@@ -100,7 +105,7 @@ class AdfsController
 
             if ($idpmeta->hasValue('https.certificate')) {
                 /** @var array $httpsCert */
-                $httpsCert = Utils\Crypto::loadPublicKey($idpmeta, true, 'https.');
+                $httpsCert = $this->cryptoUtils->loadPublicKey($idpmeta, true, 'https.');
                 Assert::keyExists($httpsCert, 'certData');
                 $availableCerts['https.crt'] = $httpsCert;
                 $keys[] = [

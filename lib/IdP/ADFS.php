@@ -103,12 +103,13 @@ class ADFS
                 </saml:Subject>
 MSG;
 
+        $attrUtils = new Utils\Attributes();
         foreach ($attributes as $name => $values) {
             if ((!is_array($values)) || (count($values) == 0)) {
                 continue;
             }
 
-            list($namespace, $name) = Utils\Attributes::getAttributeNamespace(
+            list($namespace, $name) = $attrUtils->getAttributeNamespace(
                 $name,
                 'http://schemas.xmlsoap.org/claims'
             );
@@ -222,6 +223,7 @@ MSG;
     public static function getHostedMetadata(string $entityid): array
     {
         $handler = MetaDataStorageHandler::getMetadataHandler();
+        $cryptoUtils = new Utils\Crypto();
         $config = $handler->getMetaDataConfig($entityid, 'adfs-idp-hosted');
 
         $endpoint = Module::getModuleURL('adfs/idp/prp.php');
@@ -244,7 +246,7 @@ MSG;
 
         // add certificates
         $keys = [];
-        $certInfo = Utils\Crypto::loadPublicKey($config, false, 'new_');
+        $certInfo = $cryptoUtils->loadPublicKey($config, false, 'new_');
         $hasNewCert = false;
         if ($certInfo !== null) {
             $keys[] = [
@@ -258,7 +260,7 @@ MSG;
         }
 
         /** @var array $certInfo */
-        $certInfo = Utils\Crypto::loadPublicKey($config, true);
+        $certInfo = $cryptoUtils->loadPublicKey($config, true);
         $keys[] = [
             'type' => 'X509Certificate',
             'signing' => true,
@@ -269,7 +271,7 @@ MSG;
 
         if ($config->hasValue('https.certificate')) {
             /** @var array $httpsCert */
-            $httpsCert = Utils\Crypto::loadPublicKey($config, true, 'https.');
+            $httpsCert = $cryptoUtils->loadPublicKey($config, true, 'https.');
             $keys[] = [
                 'type' => 'X509Certificate',
                 'signing' => true,
@@ -380,8 +382,9 @@ MSG;
 
         $response = ADFS::generateResponse($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
-        $privateKeyFile = Utils\Config::getCertPath($idpMetadata->getString('privatekey'));
-        $certificateFile = Utils\Config::getCertPath($idpMetadata->getString('certificate'));
+        $configUtils = new Utils\Config();
+        $privateKeyFile = $configUtils->getCertPath($idpMetadata->getString('privatekey'));
+        $certificateFile = $configUtils->getCertPath($idpMetadata->getString('certificate'));
         $passphrase = $idpMetadata->getString('privatekey_pass', null);
 
         $algo = $spMetadata->getString('signature.algorithm', null);
