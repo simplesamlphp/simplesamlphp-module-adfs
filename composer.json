@@ -29,7 +29,7 @@
     "require": {
         "php": ">=7.4",
         "simplesamlphp/composer-module-installer": "^1.1.7",
-        "simplesamlphp/assert": "^0.0.13"
+        "simplesamlphp/assert": "^0.1.0"
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "dev-master",
