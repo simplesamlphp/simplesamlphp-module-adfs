@@ -19,7 +19,6 @@ class ADFS
 {
     /**
      * @param \SimpleSAML\IdP $idp
-     * @return void
      * @throws \SimpleSAML\Error\Error
      */
     public static function receiveAuthnRequest(IdP $idp): void
@@ -197,7 +196,6 @@ MSG;
      * @param string $url
      * @param string $wresult
      * @param string $wctx
-     * @return void
      */
     private static function postResponse(string $url, string $wresult, string $wctx): void
     {
@@ -342,7 +340,6 @@ MSG;
     /**
      * @param array $state
      * @throws \Exception
-     * @return void
      */
     public static function sendResponse(array $state): void
     {
@@ -402,7 +399,6 @@ MSG;
     /**
      * @param \SimpleSAML\IdP $idp
      * @param array $state
-     * @return void
      */
     public static function sendLogoutResponse(IdP $idp, array $state): void
     {
@@ -417,7 +413,6 @@ MSG;
     /**
      * @param \SimpleSAML\IdP $idp
      * @throws \Exception
-     * @return void
      */
     public static function receiveLogoutMessage(IdP $idp): void
     {

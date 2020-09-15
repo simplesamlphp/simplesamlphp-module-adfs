@@ -81,7 +81,6 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
      * Set the location of this service.
      *
      * @param string $location The full URL where this service can be reached.
-     * @return void
      */
     public function setLocation(string $location): void
     {
