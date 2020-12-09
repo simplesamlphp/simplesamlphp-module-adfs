@@ -138,7 +138,7 @@ MSG;
 </wst:RequestSecurityTokenResponse>
 MSG;
 
-        return $result;
+    return trim(preg_replace('/^\s+|\r|\n/m', '', $result));
     }
 
 
