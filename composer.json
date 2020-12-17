@@ -3,7 +3,7 @@
     "description": "A module that implements the WS-federation IDP",
     "type": "simplesamlphp-module",
     "keywords": ["simplesamlphp", "adfs"],
-    "license": "LGPL-3.0-or-later",
+    "license": "LGPL-2.1-or-later",
     "authors": [
         {
             "name": "Tim van Dijen",
@@ -27,13 +27,13 @@
         }
     },
     "require": {
-        "php": ">=7.1",
-        "simplesamlphp/composer-module-installer": "~1.1",
-        "simplesamlphp/assert": "^0.0.13"
+        "php": ">=7.4",
+        "simplesamlphp/composer-module-installer": "^1.1.7",
+        "simplesamlphp/assert": "^0.1.0"
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "dev-master",
-        "simplesamlphp/simplesamlphp-test-framework": "^0.1.2"
+        "simplesamlphp/simplesamlphp-test-framework": "^0.2.7"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
