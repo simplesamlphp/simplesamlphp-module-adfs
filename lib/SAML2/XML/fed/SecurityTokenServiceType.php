@@ -46,7 +46,7 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
      * @param \DOMElement $parent  The element we should add this contact to.
      * @return \DOMElement  The new ContactPerson-element.
      */
-    public function toXML(\DOMElement $parent)
+    public function toXML(\DOMElement $parent): \DOMElement
     {
         Assert::string($this->Location);
 
