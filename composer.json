@@ -32,7 +32,7 @@
         "simplesamlphp/assert": "^0.0.13"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp": "^1.19-RC1",
+        "simplesamlphp/simplesamlphp": "dev-master",
         "simplesamlphp/simplesamlphp-test-framework": "^0.1.2"
     },
     "support": {
