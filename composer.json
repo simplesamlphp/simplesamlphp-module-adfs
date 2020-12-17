@@ -33,7 +33,7 @@
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "dev-master",
-        "simplesamlphp/simplesamlphp-test-framework": "^0.2.7"
+        "simplesamlphp/simplesamlphp-test-framework": "^1.0.4"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
