@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.com/simplesamlphp/simplesamlphp-module-adfs.svg?branch=master)](https://travis-ci.com/simplesamlphp/simplesamlphp-module-adfs)
+![Build Status](https://github.com/simplesamlphp/simplesamlphp-module-adfs/workflows/CI/badge.svg?branch=master)
+[![Coverage Status](https://codecov.io/gh/simplesamlphp/simplesamlphp-module-adfs/branch/master/graph/badge.svg)](https://codecov.io/gh/simplesamlphp/simplesamlphp-module-adfs)
 
 # Usage
 
