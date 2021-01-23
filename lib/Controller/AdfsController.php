@@ -29,16 +29,16 @@ use Webmozart\Assert\Assert;
 class AdfsController
 {
     /** @var \SimpleSAML\Configuration */
-    protected $config;
+    protected Configuration $config;
 
     /** @var \SimpleSAML\Metadata\MetaDataStorageHandler */
-    protected $metadata;
+    protected Metadata\MetaDataStorageHandler $metadata;
 
     /** @var \SimpleSAML\Session */
-    protected $session;
+    protected Session $session;
 
     /** @var \SimpleSAML\Utils\Crypto */
-    protected $cryptoUtils;
+    protected Utils\Crypto $cryptoUtils;
 
     /**
      * AdfsController constructor.

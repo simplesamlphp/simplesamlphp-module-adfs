@@ -19,14 +19,14 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
      *
      * @var string[] $protocolSupportEnumeration
      */
-    public $protocolSupportEnumeration = [Constants::NS_FED];
+    public array $protocolSupportEnumeration = [Constants::NS_FED];
 
     /**
      * The Location of Services.
      *
      * @var string $Location
      */
-    public $Location = '';
+    public string $Location = '';
 
 
     /**
