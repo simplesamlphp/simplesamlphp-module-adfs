@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $projectRoot = dirname(__DIR__);
 /** @psalm-suppress UnresolvableInclude */
 require_once($projectRoot . '/vendor/autoload.php');

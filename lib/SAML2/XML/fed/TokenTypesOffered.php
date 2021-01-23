@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
 use DOMElement;
