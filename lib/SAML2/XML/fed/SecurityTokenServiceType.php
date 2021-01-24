@@ -6,7 +6,7 @@ namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
 use DOMElement;
 use SAML2\Constants as SAML2_Const;
-use Webmozart\Assert\Assert;
+use SimpleSAML\Assert\Assert;
 
 /**
  * Class representing SecurityTokenServiceType RoleDescriptor.

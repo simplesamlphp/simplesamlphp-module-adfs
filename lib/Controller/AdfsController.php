@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\Controller;
 
 use SAML2\Constants;
+use SimpleSAML\Assert\Assert;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error as SspError;
 use SimpleSAML\IdP;
@@ -19,7 +20,6 @@ use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Webmozart\Assert\Assert;
 
 /**
  * Controller class for the adfs module.
