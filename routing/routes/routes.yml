@@ -1,6 +1,6 @@
 adfs-metadata:
-    path:       /metadata
+    path:       /idp/metadata.php
     defaults:   { _controller: 'SimpleSAML\Module\adfs\Controller\AdfsController::metadata' }
 adfs-prp:
-    path:       /prp
+    path:       /idp/prp.php
     defaults:   { _controller: 'SimpleSAML\Module\adfs\Controller\AdfsController::prp' }
