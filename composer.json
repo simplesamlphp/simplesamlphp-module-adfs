@@ -33,7 +33,8 @@
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "dev-master",
-        "simplesamlphp/simplesamlphp-test-framework": "^1.1.0"
+        "simplesamlphp/simplesamlphp-test-framework": "^1.1.0",
+        "ext-curl": "*"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",

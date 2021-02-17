@@ -28,7 +28,7 @@ class ADFS
         try {
             parse_str($_SERVER['QUERY_STRING'], $query);
 
-            $requestid = $query['wctx'];
+            $requestid = $query['wctx'] ?? null;
             $issuer = $query['wtrealm'];
 
             $metadata = MetaDataStorageHandler::getMetadataHandler();
@@ -202,9 +202,9 @@ MSG;
     /**
      * @param string $url
      * @param string $wresult
-     * @param string $wctx
+     * @param ?string $wctx
      */
-    private static function postResponse(string $url, string $wresult, string $wctx): void
+    private static function postResponse(string $url, string $wresult, ?string $wctx): void
     {
         $config = Configuration::getInstance();
         $t = new Template($config, 'adfs:postResponse.twig');
@@ -213,6 +213,8 @@ MSG;
         $t->data['wresult'] = $wresult;
         $t->data['wctx'] = $wctx;
         $t->send();
+        // Idp->postAuthProc expects this function to exit
+        exit();
     }
 
 
