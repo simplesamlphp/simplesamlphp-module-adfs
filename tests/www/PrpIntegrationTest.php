@@ -9,7 +9,6 @@ use SimpleSAML\TestUtils\BuiltInServer;
 
 class PrpIntegrationTest extends TestCase
 {
-
     /**
      * @var \SimpleSAML\TestUtils\BuiltInServer
      */
