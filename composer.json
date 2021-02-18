@@ -29,7 +29,8 @@
     "require": {
         "php": ">=7.4 || ^8.0",
         "simplesamlphp/composer-module-installer": "^1.1.7",
-        "simplesamlphp/assert": "^0.2.6"
+        "simplesamlphp/assert": "^0.2.7"
+        "simplesamlphp/xml-security": "~0.3.3"
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "dev-master",
