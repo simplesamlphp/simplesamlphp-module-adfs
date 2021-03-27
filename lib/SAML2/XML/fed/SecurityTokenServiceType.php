@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
 use DOMElement;
-use SAML2\Constants as SAML2_Const;
+use SAML2\XML\md\RoleDescriptor;
 use SimpleSAML\Assert\Assert;
 
 /**
@@ -14,7 +14,7 @@ use SimpleSAML\Assert\Assert;
  * @package SimpleSAMLphp
  */
 
-class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
+class SecurityTokenServiceType extends RoleDescriptor
 {
     /**
      * List of supported protocols.
@@ -57,7 +57,7 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
 
         $e = parent::toXML($parent);
         $e->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:fed', Constants::NS_FED);
-        $e->setAttributeNS(SAML2_Const::NS_XSI, 'xsi:type', 'fed:SecurityTokenServiceType');
+        $e->setAttributeNS(Constants::NS_XSI, 'xsi:type', 'fed:SecurityTokenServiceType');
         TokenTypesOffered::appendXML($e);
         Endpoint::appendXML($e, 'SecurityTokenServiceEndpoint', $this->Location);
         Endpoint::appendXML($e, 'fed:PassiveRequestorEndpoint', $this->Location);

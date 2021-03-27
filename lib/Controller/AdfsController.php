@@ -217,7 +217,8 @@ class AdfsController
                 }
                 $t->data['certdata'] = $certdata;
                 $t->data['headerString'] = Translate::noop('metadata_adfs-idp');
-                $t->data['metaurl'] = Utils\HTTP::getSelfURLNoQuery();
+                $httpUtils = new Utils\HTTP();
+                $t->data['metaurl'] = $httpUtils->getSelfURLNoQuery();
                 $t->data['metadata'] = htmlspecialchars($metaxml);
                 $t->data['metadataflat'] = htmlspecialchars($metaflat);
 

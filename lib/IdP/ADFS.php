@@ -49,7 +49,8 @@ class ADFS
         ];
 
         if (isset($query['wreply']) && !empty($query['wreply'])) {
-            $state['adfs:wreply'] = Utils\HTTP::checkURLAllowed($query['wreply']);
+            $httpUtils = new Utils\HTTP();
+            $state['adfs:wreply'] = $httpUtils->checkURLAllowed($query['wreply']);
         }
 
         $idp->handleAuthenticationRequest($state);
@@ -71,14 +72,18 @@ class ADFS
         array $attributes,
         int $assertionLifetime
     ): string {
-        $issueInstant = Utils\Time::generateTimestamp();
-        $notBefore = Utils\Time::generateTimestamp(time() - 30);
-        $assertionExpire = Utils\Time::generateTimestamp(time() + $assertionLifetime);
-        $assertionID = Utils\Random::generateID();
+        $httpUtils = new Utils\HTTP();
+        $randomUtils = new Utils\Random();
+        $timeUtils = new Utils\Time();
+
+        $issueInstant = $timeUtils->generateTimestamp();
+        $notBefore = $timeUtils->generateTimestamp(time() - 30);
+        $assertionExpire = $timeUtils->generateTimestamp(time() + $assertionLifetime);
+        $assertionID = $randomUtils->generateID();
         $nameidFormat = 'http://schemas.xmlsoap.org/claims/UPN';
         $nameid = htmlspecialchars($nameid);
 
-        if (Utils\HTTP::isHTTPS()) {
+        if ($httpUtils->isHTTPS()) {
             $method = Constants::AC_PASSWORD_PROTECTED_TRANSPORT;
         } else {
             $method = Constants::AC_PASSWORD;
@@ -361,7 +366,8 @@ MSG;
             }
             $nameid = $attributes[$nameidattribute][0];
         } else {
-            $nameid = Utils\Random::generateID();
+            $randomUtils = new Utils\Random();
+            $nameid = $randomUtils->generateID();
         }
 
         $idp = IdP::getByState($state);
@@ -406,8 +412,9 @@ MSG;
     {
         // NB:: we don't know from which SP the logout request came from
         $idpMetadata = $idp->getConfig();
-        Utils\HTTP::redirectTrustedURL(
-            $idpMetadata->getValue('redirect-after-logout', Utils\HTTP::getBaseURL())
+        $httpUtils = new Utils\HTTP();
+        $httpUtils->redirectTrustedURL(
+            $idpMetadata->getValue('redirect-after-logout', $httpUtils->getBaseURL())
         );
     }
 
@@ -421,7 +428,8 @@ MSG;
         // if a redirect is to occur based on wreply, we will redirect to url as
         // this implies an override to normal sp notification
         if (isset($_GET['wreply']) && !empty($_GET['wreply'])) {
-            $idp->doLogoutRedirect(Utils\HTTP::checkURLAllowed($_GET['wreply']));
+            $httpUtils = new Utils\HTTP();
+            $idp->doLogoutRedirect($httpUtils->checkURLAllowed($_GET['wreply']));
             throw new \Exception("Code should never be reached");
         }
 
