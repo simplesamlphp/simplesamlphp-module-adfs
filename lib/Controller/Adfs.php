@@ -12,7 +12,7 @@ use SimpleSAML\IdP;
 use SimpleSAML\Locale\Translate;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
-use SimpleSAML\Module\adfs\IdP\ADFS;
+use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Metadata;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  *
  * @package SimpleSAML\Module\adfs
  */
-class AdfsController
+class Adfs
 {
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;
@@ -74,8 +74,7 @@ class AdfsController
         }
 
         try {
-            $idpentityid = isset($_GET['idpentityid']) ?
-                $_GET['idpentityid'] : $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
+            $idpentityid = $request->get('idpentityid') ?: $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
             $idpmeta = $this->metadata->getMetaDataConfig($idpentityid, 'adfs-idp-hosted');
 
             $availableCerts = [];
@@ -255,25 +254,22 @@ class AdfsController
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
         $idp = IdP::getById('adfs:' . $idpEntityId);
 
-        if (isset($_GET['wa'])) {
-            if ($_GET['wa'] === 'wsignout1.0') {
+        if ($request->query->has('wa')) {
+            $wa = $request->get('wa');
+            if ($wa === 'wsignout1.0') {
                 return new StreamedResponse(
                     function () use ($idp) {
-                        ADFS::receiveLogoutMessage($idp);
+                        ADFS_IDP::receiveLogoutMessage($idp);
                     }
                 );
-            } elseif ($_GET['wa'] === 'wsignin1.0') {
-                return new StreamedResponse(
-                    function () use ($idp) {
-                        ADFS::receiveAuthnRequest($idp);
-                    }
-                );
+            } elseif ($wa === 'wsignin1.0') {
+                return ADFS_IDP::receiveAuthnRequest($request, $idp);
             }
             throw new SspError\BadRequest("Unsupported value for 'wa' specified in request.");
-        } elseif (isset($_GET['assocId'])) {
+        } elseif ($request->query->has('assocId')) {
             // logout response from ADFS SP
-            $assocId = $_GET['assocId']; // Association ID of the SP that sent the logout response
-            $relayState = $_GET['relayState']; // Data that was sent in the logout request to the SP. Can be null
+            $assocId = $request->get('assocId'); // Association ID of the SP that sent the logout response
+            $relayState = $request->get('relayState'); // Data that was sent in the logout request to the SP. Can be null
             $logoutError = null; // null on success, or an instance of a \SimpleSAML\Error\Exception on failure.
 
             return new StreamedResponse(
