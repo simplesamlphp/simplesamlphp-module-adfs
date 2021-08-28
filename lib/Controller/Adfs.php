@@ -273,7 +273,7 @@ class Adfs
             $logoutError = null; // null on success, or an instance of a \SimpleSAML\Error\Exception on failure.
 
             return new StreamedResponse(
-                function () use ($idp, $assocId, $relayState, $logoutError) {
+                function () use ($idp, /** @scrutinizer ignore-type */ $assocId, $relayState, $logoutError) {
                     $idp->handleLogoutResponse($assocId, $relayState, $logoutError);
                 }
             );
