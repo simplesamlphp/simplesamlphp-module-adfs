@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Simplesamlphp\adfs;
+namespace SimpleSAML\Module\adfs;
 
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\TestUtils\BuiltInServer;
 
+/**
+ * @covers \SimpleSAML\Module\adfs\Controller\AdfsController
+ */
 class PrpIntegrationTest extends TestCase
 {
     /**
