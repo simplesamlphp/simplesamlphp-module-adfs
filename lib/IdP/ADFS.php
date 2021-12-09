@@ -10,34 +10,32 @@ use SAML2\Constants;
 use SAML2\DOMDocumentFactory;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
+use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\IdP;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module;
 use SimpleSAML\Utils;
 use SimpleSAML\XHTML\Template;
+use Symfony\Component\HttpFoundation\Request;
 
 class ADFS
 {
     /**
      * @param \SimpleSAML\IdP $idp
-     * @throws \SimpleSAML\Error\Error
+     * @throws \SimpleSAML\Error\MetadataNotFound
      */
-    public static function receiveAuthnRequest(IdP $idp): void
+    public static function receiveAuthnRequest(Request $request, IdP $idp): RunnableResponse
     {
-        try {
-            parse_str($_SERVER['QUERY_STRING'], $query);
+        parse_str($request->server->get('QUERY_STRING'), $query);
 
-            $requestid = $query['wctx'];
-            $issuer = $query['wtrealm'];
+        $requestid = $query['wctx'] ?? null;
+        $issuer = $query['wtrealm'];
 
-            $metadata = MetaDataStorageHandler::getMetadataHandler();
-            $spMetadata = $metadata->getMetaDataConfig($issuer, 'adfs-sp-remote');
+        $metadata = MetaDataStorageHandler::getMetadataHandler();
+        $spMetadata = $metadata->getMetaDataConfig($issuer, 'adfs-sp-remote');
 
-            Logger::info('ADFS - IdP.prp: Incoming Authentication request: ' . $issuer . ' id ' . $requestid);
-        } catch (\Exception $exception) {
-            throw new Error\Error('PROCESSAUTHNREQUEST', $exception);
-        }
+        Logger::info('ADFS - IdP.prp: Incoming Authentication request: ' . $issuer . ' id ' . $requestid);
 
         $state = [
             'Responder' => [ADFS::class, 'sendResponse'],
@@ -53,7 +51,7 @@ class ADFS
             $state['adfs:wreply'] = $httpUtils->checkURLAllowed($query['wreply']);
         }
 
-        $idp->handleAuthenticationRequest($state);
+        return new RunnableResponse([$idp, 'handleAuthenticationRequest'], [$state]);
     }
 
 
@@ -202,9 +200,9 @@ MSG;
     /**
      * @param string $url
      * @param string $wresult
-     * @param string $wctx
+     * @param ?string $wctx
      */
-    private static function postResponse(string $url, string $wresult, string $wctx): void
+    private static function postResponse(string $url, string $wresult, ?string $wctx): void
     {
         $config = Configuration::getInstance();
         $t = new Template($config, 'adfs:postResponse.twig');
@@ -213,6 +211,8 @@ MSG;
         $t->data['wresult'] = $wresult;
         $t->data['wctx'] = $wctx;
         $t->send();
+        // Idp->postAuthProc expects this function to exit
+        exit();
     }
 
 
