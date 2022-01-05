@@ -186,9 +186,9 @@ class Adfs
             $metaBuilder->addOrganizationInfo($metaArray);
             $technicalContactEmail = $this->config->getString('technicalcontact_email', null);
             if ($technicalContactEmail && $technicalContactEmail !== 'na@example.org') {
-                $metaBuilder->addContact('technical', Utils\Config\Metadata::getContact([
+                $metaBuilder->addContact(Utils\Config\Metadata::getContact([
                     'emailAddress' => $technicalContactEmail,
-                    'name'         => $this->config->getString('technicalcontact_name', null),
+                    'givenName'    => $this->config->getString('technicalcontact_name', null),
                     'contactType'  => 'technical',
                 ]));
             }
