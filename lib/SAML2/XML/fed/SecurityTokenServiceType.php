@@ -35,6 +35,8 @@ class SecurityTokenServiceType extends \SAML2\XML\md\RoleDescriptor
     public function __construct(\DOMElement $xml = null)
     {
         parent::__construct('RoleDescriptor', $xml);
+        parent::setProtocolSupportEnumeration($this->protocolSupportEnumeration);
+
         if ($xml === null) {
             return;
         }
