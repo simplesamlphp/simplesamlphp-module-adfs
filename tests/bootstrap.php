@@ -12,7 +12,7 @@ require_once($projectRoot . '/vendor/autoload.php');
 $adfsModulePath = $projectRoot . '/vendor/simplesamlphp/simplesamlphp/modules/adfs';
 $simplesamlphpConfig = $projectRoot . '/vendor/simplesamlphp/simplesamlphp/config';
 
-function symlinkModulePathInVendorDirectory($target, $link)
+function symlinkModulePathInVendorDirectory(string $target, string $link): void
 {
     if (file_exists($link) === false) {
         // If the link is invalid, remove it.
