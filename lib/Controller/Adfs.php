@@ -202,7 +202,7 @@ class Adfs
             $metaxml = Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
 
             if ($output_xhtml) {
-                $t = new Template($this->config, 'metadata.twig', 'admin');
+                $t = new Template($this->config, 'metadata.twig');
 
                 $t->data['clipboard.js'] = true;
                 $t->data['available_certs'] = $availableCerts;
