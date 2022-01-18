@@ -54,7 +54,7 @@ class AdfsControllerTest extends TestCase
     /**
      * Test missing require query parameters is an error
      */
-    public function testNoQueryParameters()
+    public function testNoQueryParameters(): void
     {
         $request = Request::create(
             '/prp',
@@ -64,7 +64,9 @@ class AdfsControllerTest extends TestCase
         $c = new Controller\Adfs($this->config, $this->session);
 
         $this->expectException(Error\BadRequest::class);
-        $this->expectExceptionMessage("BADREQUEST('%REASON%' => 'Missing parameter \'wa\' or \'assocId\' in request.')");
+        $this->expectExceptionMessage(
+            "BADREQUEST('%REASON%' => 'Missing parameter \'wa\' or \'assocId\' in request.')"
+        );
 
         $c->prp($request);
     }
@@ -73,7 +75,7 @@ class AdfsControllerTest extends TestCase
     /**
      * Test that the service request authentication is not found in the metadata
      */
-    public function testMissingMetadataForRP()
+    public function testMissingMetadataForRP(): void
     {
         $request = Request::create(
             '/prp',
@@ -94,7 +96,7 @@ class AdfsControllerTest extends TestCase
     /**
      * Test a valid request
      */
-    public function testValidRequest()
+    public function testValidRequest(): void
     {
         $request = Request::create(
             '/prp',

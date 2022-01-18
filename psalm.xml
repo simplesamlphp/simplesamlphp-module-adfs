@@ -32,6 +32,7 @@
         <PossiblyUndefinedGlobalVariable>
             <errorLevel type="suppress">
                 <file name="metadata-templates/*.php" />
+                <file name="tests/metadata/*.php" />
             </errorLevel>
         </PossiblyUndefinedGlobalVariable>
     </issueHandlers>
