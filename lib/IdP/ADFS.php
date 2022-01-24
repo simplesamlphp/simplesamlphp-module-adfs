@@ -51,7 +51,7 @@ class ADFS
             $state['adfs:wreply'] = $httpUtils->checkURLAllowed($query['wreply']);
         }
 
-        return new RunnableResponse([$idp, 'handleAuthenticationRequest'], [$state]);
+        return new RunnableResponse([$idp, 'handleAuthenticationRequest'], [&$state]);
     }
 
 
