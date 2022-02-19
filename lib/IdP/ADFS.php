@@ -198,16 +198,16 @@ MSG;
 
 
     /**
-     * @param string $url
+     * @param string $wreply
      * @param string $wresult
      * @param ?string $wctx
      */
-    private static function postResponse(string $url, string $wresult, ?string $wctx): void
+    private static function postResponse(string $wreply, string $wresult, ?string $wctx): void
     {
         $config = Configuration::getInstance();
         $t = new Template($config, 'adfs:postResponse.twig');
         $t->data['baseurlpath'] = Module::getModuleURL('adfs');
-        $t->data['url'] = $url;
+        $t->data['wreply'] = $wreply;
         $t->data['wresult'] = $wresult;
         $t->data['wctx'] = $wctx;
         $t->send();
