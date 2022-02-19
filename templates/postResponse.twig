@@ -4,10 +4,10 @@
         <script src="{{ asset('js/postResponse.js', 'adfs') }}"></script>
     </head>
     <body>
-        <form method="post" action="{{ url }}">
+        <form method="post" action="{{ wreply|url_encode }}">
             <input type="hidden" name="wa" value="wsignin1.0">
-            <input type="hidden" name="wresult" value="{{ wresult|escape('html') }}">
-            <input type="hidden" name="wctx" value="{{ wctx|escape('html') }}">
+            <input type="hidden" name="wresult" value="{{ wresult }}">
+            <input type="hidden" name="wctx" value="{{ wctx }}">
             <noscript>
                 <input type="submit" value="Continue">
             </noscript>
