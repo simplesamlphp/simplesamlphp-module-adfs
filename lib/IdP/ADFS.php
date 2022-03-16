@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\adfs\IdP;
 
+use Exception;
 use RobRichards\XMLSecLibs\XMLSecurityDSig;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\Constants;
@@ -169,7 +170,7 @@ MSG;
         $firstassertionroot = $responsedom->getElementsByTagName('Assertion')->item(0);
 
         if (is_null($firstassertionroot)) {
-            throw new \Exception("No assertion found in response.");
+            throw new Exception("No assertion found in response.");
         }
 
         $objXMLSecDSig->addReferenceList(
@@ -245,7 +246,7 @@ MSG;
                 'Binding' => Constants::BINDING_HTTP_REDIRECT,
                 'Location' => $endpoint,
             ],
-            'NameIDFormat' => $config->getString('NameIDFormat', Constants::NAMEID_TRANSIENT),
+            'NameIDFormat' => $config->getOptionalString('NameIDFormat', Constants::NAMEID_TRANSIENT),
             'contacts' => [],
         ];
 
@@ -290,7 +291,7 @@ MSG;
         // add organization information
         if ($config->hasValue('OrganizationName')) {
             $metadata['OrganizationName'] = $config->getLocalizedString('OrganizationName');
-            $metadata['OrganizationDisplayName'] = $config->getLocalizedString(
+            $metadata['OrganizationDisplayName'] = $config->getOptionalLocalizedString(
                 'OrganizationDisplayName',
                 $metadata['OrganizationName']
             );
@@ -330,11 +331,11 @@ MSG;
 
         // add contact information
         $globalConfig = Configuration::getInstance();
-        $email = $globalConfig->getString('technicalcontact_email', false);
-        if ($email && $email !== 'na@example.org') {
+        $email = $globalConfig->getOptionalString('technicalcontact_email', null);
+        if ($email !== null && $email !== 'na@example.org') {
             $contact = [
                 'emailAddress' => $email,
-                'givenName' => $globalConfig->getString('technicalcontact_name', null),
+                'givenName' => $globalConfig->getOptionalString('technicalcontact_name', null),
                 'contactType' => 'technical',
             ];
             $metadata['contacts'][] = Utils\Config\Metadata::getContact($contact);
@@ -362,7 +363,7 @@ MSG;
         $nameidattribute = $spMetadata->getValue('simplesaml.nameidattribute');
         if (!empty($nameidattribute)) {
             if (!array_key_exists($nameidattribute, $attributes)) {
-                throw new \Exception('simplesaml.nameidattribute does not exist in resulting attribute set');
+                throw new Exception('simplesaml.nameidattribute does not exist in resulting attribute set');
             }
             $nameid = $attributes[$nameidattribute][0];
         } else {
@@ -380,9 +381,9 @@ MSG;
             'adfs:entityID' => $spEntityId,
         ]);
 
-        $assertionLifetime = $spMetadata->getInteger('assertion.lifetime', null);
+        $assertionLifetime = $spMetadata->getOptionalInteger('assertion.lifetime', null);
         if ($assertionLifetime === null) {
-            $assertionLifetime = $idpMetadata->getInteger('assertion.lifetime', 300);
+            $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
         }
 
         $response = ADFS::generateResponse($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
@@ -390,11 +391,11 @@ MSG;
         $configUtils = new Utils\Config();
         $privateKeyFile = $configUtils->getCertPath($idpMetadata->getString('privatekey'));
         $certificateFile = $configUtils->getCertPath($idpMetadata->getString('certificate'));
-        $passphrase = $idpMetadata->getString('privatekey_pass', null);
+        $passphrase = $idpMetadata->getOptionalString('privatekey_pass', null);
 
-        $algo = $spMetadata->getString('signature.algorithm', null);
+        $algo = $spMetadata->getOptionalString('signature.algorithm', null);
         if ($algo === null) {
-            $algo = $idpMetadata->getString('signature.algorithm', XMLSecurityKey::RSA_SHA256);
+            $algo = $idpMetadata->getOptionalString('signature.algorithm', XMLSecurityKey::RSA_SHA256);
         }
         $wresult = ADFS::signResponse($response, $privateKeyFile, $certificateFile, $algo, $passphrase);
 
@@ -414,7 +415,7 @@ MSG;
         $idpMetadata = $idp->getConfig();
         $httpUtils = new Utils\HTTP();
         $httpUtils->redirectTrustedURL(
-            $idpMetadata->getValue('redirect-after-logout', $httpUtils->getBaseURL())
+            $idpMetadata->getOptionalString('redirect-after-logout', $httpUtils->getBaseURL())
         );
     }
 
@@ -430,7 +431,7 @@ MSG;
         if (isset($_GET['wreply']) && !empty($_GET['wreply'])) {
             $httpUtils = new Utils\HTTP();
             $idp->doLogoutRedirect($httpUtils->checkURLAllowed($_GET['wreply']));
-            throw new \Exception("Code should never be reached");
+            throw new Exception("Code should never be reached");
         }
 
         $state = [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\adfs\Controller;
 
+use Exception;
 use SAML2\Constants;
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\Configuration;
@@ -63,12 +64,12 @@ class Adfs
      */
     public function metadata(Request $request): Response
     {
-        if (!$this->config->getBoolean('enable.adfs-idp', false)) {
+        if (!$this->config->getOptionalBoolean('enable.adfs-idp', false)) {
             throw new SspError\Error('NOACCESS');
         }
 
         // check if valid local session exists
-        if ($this->config->getBoolean('admin.protectmetadata', false)) {
+        if ($this->config->getOptionalBoolean('admin.protectmetadata', false)) {
             $authUtils = new Utils\Auth();
             $authUtils->requireAdmin();
         }
@@ -145,14 +146,14 @@ class Adfs
                 $metaArray['keys'] = $keys;
             }
 
-            $metaArray['NameIDFormat'] = $idpmeta->getString(
+            $metaArray['NameIDFormat'] = $idpmeta->getOptionalString(
                 'NameIDFormat',
                 Constants::NAMEID_TRANSIENT
             );
 
             if ($idpmeta->hasValue('OrganizationName')) {
                 $metaArray['OrganizationName'] = $idpmeta->getLocalizedString('OrganizationName');
-                $metaArray['OrganizationDisplayName'] = $idpmeta->getLocalizedString(
+                $metaArray['OrganizationDisplayName'] = $idpmeta->getOptionalLocalizedString(
                     'OrganizationDisplayName',
                     $metaArray['OrganizationName']
                 );
@@ -188,15 +189,15 @@ class Adfs
             $metaBuilder = new Metadata\SAMLBuilder($idpentityid);
             $metaBuilder->addSecurityTokenServiceType($metaArray);
             $metaBuilder->addOrganizationInfo($metaArray);
-            $technicalContactEmail = $this->config->getString('technicalcontact_email', null);
-            if ($technicalContactEmail && $technicalContactEmail !== 'na@example.org') {
+            $technicalContactEmail = $this->config->getOptionalString('technicalcontact_email', null);
+            if ($technicalContactEmail !== null && $technicalContactEmail !== 'na@example.org') {
                 $metaBuilder->addContact(Utils\Config\Metadata::getContact([
                     'emailAddress' => $technicalContactEmail,
-                    'givenName'    => $this->config->getString('technicalcontact_name', null),
+                    'givenName'    => $this->config->getOptionalString('technicalcontact_name', null),
                     'contactType'  => 'technical',
                 ]));
             }
-            $output_xhtml = array_key_exists('output', $_GET) && $_GET['output'] == 'xhtml';
+            $output_xhtml = $request->query->get('output') === 'xhtml';
             $metaxml = $metaBuilder->getEntityDescriptorText($output_xhtml);
             if (!$output_xhtml) {
                 $metaxml = str_replace("\n", '', $metaxml);
@@ -241,7 +242,7 @@ class Adfs
 
                 return $response;
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new SspError\Error('METADATA', $exception);
         }
     }
