@@ -17,11 +17,11 @@ Basic Setup Companion based on [SimpleSAMLphp IDP configuration][docs]
 3. Configuring the authentication module
 
    Next thing you need to do is to enable the module: in `config.php`,
-   search for the `module.enable` key and set `subjectidattrs` to true:
+   search for the `module.enable` key and set `adfs` to true:
 
    ```php
        'module.enable' => [
-            'subjectidattrs' => true,
+            'adfs' => true,
             …
        ],
    ```
