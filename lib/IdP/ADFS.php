@@ -207,7 +207,6 @@ MSG;
     {
         $config = Configuration::getInstance();
         $t = new Template($config, 'adfs:postResponse.twig');
-        $t->data['baseurlpath'] = Module::getModuleURL('adfs');
         $t->data['wreply'] = $wreply;
         $t->data['wresult'] = $wresult;
         $t->data['wctx'] = $wctx;
