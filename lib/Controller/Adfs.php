@@ -237,7 +237,7 @@ class Adfs
                 $metaxml = substr($metaxml, 0, $i ? $i + 22 : 0);
 
                 $response = new Response();
-                $response->headers->set('Content-Type', 'application/xml');
+                $response->headers->set('Content-Type', 'application/samlmetadata+xml');
                 $response->setContent($metaxml);
 
                 return $response;
