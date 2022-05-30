@@ -22,7 +22,7 @@
     },
     "autoload": {
         "psr-4": {
-            "SimpleSAML\\Module\\adfs\\": "lib/"
+            "SimpleSAML\\Module\\adfs\\": "src/"
         }
     },
     "autoload-dev": {
@@ -37,8 +37,8 @@
         "simplesamlphp/xml-security": "~0.4.1"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp": "^2.0.0-beta.9",
-        "simplesamlphp/simplesamlphp-test-framework": "^1.1.6"
+        "simplesamlphp/simplesamlphp": "^2.0.0-beta.10",
+        "simplesamlphp/simplesamlphp-test-framework": "^1.2.1"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
