@@ -10,7 +10,7 @@
 Install with composer
 
 ```bash
-    composer require simplesamlphp/simplesamlphp-module-adfs
+    vendor/bin/composer require simplesamlphp/simplesamlphp-module-adfs
 ```
 
 ## Configuration
