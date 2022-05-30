@@ -6,12 +6,7 @@ $projectRoot = dirname(__DIR__);
 /** @psalm-suppress UnresolvableInclude */
 require_once($projectRoot . '/vendor/autoload.php');
 
-// Symlink module into ssp vendor lib so that templates and urls can resolve correctly
 // Symlink in our config
-
-$adfsModulePath = $projectRoot . '/vendor/simplesamlphp/simplesamlphp/modules/adfs';
-$simplesamlphpConfig = $projectRoot . '/vendor/simplesamlphp/simplesamlphp/config';
-
 function symlinkModulePathInVendorDirectory(string $target, string $link): void
 {
     if (file_exists($link) === false) {
@@ -31,5 +26,5 @@ function symlinkModulePathInVendorDirectory(string $target, string $link): void
     }
 }
 
-symlinkModulePathInVendorDirectory($projectRoot, $adfsModulePath);
+$simplesamlphpConfig = $projectRoot . '/vendor/simplesamlphp/simplesamlphp/config';
 symlinkModulePathInVendorDirectory($projectRoot . '/tests/config/', $simplesamlphpConfig);
