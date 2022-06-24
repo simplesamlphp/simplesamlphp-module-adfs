@@ -86,8 +86,7 @@ class AdfsControllerTest extends TestCase
         $c = new Controller\Adfs($this->config, $this->session);
 
         $this->expectException(Error\MetadataNotFound::class);
-        // This line breaks tests in PHP 8.1
-        //$this->expectExceptionMessage("METADATANOTFOUND('%ENTITYID%' => '\'urn:example-sp\'')");
+        $this->expectExceptionMessage("METADATANOTFOUND('%ENTITYID%' => 'urn:example-sp')");
 
         $c->prp($request);
     }
