@@ -184,8 +184,6 @@ class Adfs
                 $metaArray['RegistrationInfo'] = $idpmeta->getArray('RegistrationInfo');
             }
 
-            $metaflat = '$metadata[' . var_export($idpentityid, true) . '] = ' . var_export($metaArray, true) . ';';
-
             $metaBuilder = new Metadata\SAMLBuilder($idpentityid);
             $metaBuilder->addSecurityTokenServiceType($metaArray);
             $metaBuilder->addOrganizationInfo($metaArray);
@@ -197,51 +195,24 @@ class Adfs
                     'contactType'  => 'technical',
                 ]));
             }
-            $output_xhtml = $request->query->get('output') === 'xhtml';
-            $metaxml = $metaBuilder->getEntityDescriptorText($output_xhtml);
-            if (!$output_xhtml) {
-                $metaxml = str_replace("\n", '', $metaxml);
-            }
+            $metaxml = $metaBuilder->getEntityDescriptorText();
 
             // sign the metadata if enabled
             $metaxml = Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
 
-            if ($output_xhtml) {
-                $t = new Template($this->config, 'metadata.twig');
+            // make sure to export only the md:EntityDescriptor
+            $i = strpos($metaxml, '<md:EntityDescriptor');
+            $metaxml = substr($metaxml, $i ? $i : 0);
 
-                $t->data['clipboard.js'] = true;
-                $t->data['available_certs'] = $availableCerts;
-                $certdata = [];
-                foreach (array_keys($availableCerts) as $availableCert) {
-                    $certdata[$availableCert]['name'] = $availableCert;
-                    $certdata[$availableCert]['url'] = Module::getModuleURL('saml/idp/certs.php') .
-                        '/' . $availableCert;
+            // 22 = strlen('</md:EntityDescriptor>')
+            $i = strrpos($metaxml, '</md:EntityDescriptor>');
+            $metaxml = substr($metaxml, 0, $i ? $i + 22 : 0);
 
-                    $certdata[$availableCert]['comment'] = '';
-                }
-                $t->data['certdata'] = $certdata;
-                $t->data['headerString'] = Translate::noop('metadata_adfs-idp');
-                $httpUtils = new Utils\HTTP();
-                $t->data['metaurl'] = $httpUtils->getSelfURLNoQuery();
-                $t->data['metadata'] = htmlspecialchars($metaxml);
-                $t->data['metadataflat'] = htmlspecialchars($metaflat);
+            $response = new Response();
+            $response->headers->set('Content-Type', 'application/samlmetadata+xml');
+            $response->setContent($metaxml);
 
-                return $t;
-            } else {
-                // make sure to export only the md:EntityDescriptor
-                $i = strpos($metaxml, '<md:EntityDescriptor');
-                $metaxml = substr($metaxml, $i ? $i : 0);
-
-                // 22 = strlen('</md:EntityDescriptor>')
-                $i = strrpos($metaxml, '</md:EntityDescriptor>');
-                $metaxml = substr($metaxml, 0, $i ? $i + 22 : 0);
-
-                $response = new Response();
-                $response->headers->set('Content-Type', 'application/samlmetadata+xml');
-                $response->setContent($metaxml);
-
-                return $response;
-            }
+            return $response;
         } catch (Exception $exception) {
             throw new SspError\Error('METADATA', $exception);
         }

@@ -118,6 +118,8 @@ MSG;
                 $name,
                 'http://schemas.xmlsoap.org/claims'
             );
+            $namespace = htmlspecialchars($namespace);
+            $name = htmlspecialchars($name);
             foreach ($values as $value) {
                 if ((!isset($value)) || ($value === '')) {
                     continue;
