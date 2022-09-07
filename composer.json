@@ -32,12 +32,12 @@
     },
     "require": {
         "php": ">=7.4 || ^8.0",
-        "simplesamlphp/composer-module-installer": "^1.1.7",
-        "simplesamlphp/assert": "^0.3.0",
-        "simplesamlphp/xml-security": "~0.4.1"
+        "simplesamlphp/composer-module-installer": "^1.2.0",
+        "simplesamlphp/assert": "^0.6.0",
+        "simplesamlphp/xml-security": "~0.6.3"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp": "^2.0.0-beta.10",
+        "simplesamlphp/simplesamlphp": "^2.0.0-rc1",
         "simplesamlphp/simplesamlphp-test-framework": "^1.2.1"
     },
     "support": {
