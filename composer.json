@@ -33,8 +33,8 @@
     "require": {
         "php": ">=7.4 || ^8.0",
         "simplesamlphp/composer-module-installer": "^1.2.0",
-        "simplesamlphp/assert": "^0.6.0",
-        "simplesamlphp/xml-security": "~0.6.3"
+        "simplesamlphp/assert": "^0.6.3",
+        "simplesamlphp/xml-security": "~0.6.2"
     },
     "require-dev": {
         "simplesamlphp/simplesamlphp": "^2.0.0-rc1",
