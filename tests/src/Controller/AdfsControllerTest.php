@@ -36,6 +36,7 @@ class AdfsControllerTest extends TestCase
 
         $this->config = Configuration::loadFromArray(
             [
+                'enable.saml20-idp' => true,
                 'enable.adfs-idp' => true,
                 'module.enable' => ['adfs' => true, 'exampleauth' => true],
                 'metadata.sources' => [
