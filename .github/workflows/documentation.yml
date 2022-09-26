@@ -24,6 +24,13 @@ jobs:
           files: .
           ignore_path: .markdownlintignore
 
+      - name: Perform spell check
+        uses: codespell-project/actions-codespell@master
+        with:
+          path: '**/*.md'
+          check_filenames: true
+          ignore_words_list: tekst
+
   build:
     name: Build documentation
     needs: quality
