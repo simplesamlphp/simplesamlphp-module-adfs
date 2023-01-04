@@ -40,7 +40,7 @@ class AdfsControllerTest extends TestCase
                 'enable.adfs-idp' => true,
                 'module.enable' => ['adfs' => true, 'exampleauth' => true],
                 'metadata.sources' => [
-                    ['type' => 'flatfile', 'directory' =>  dirname(dirname(__DIR__)) . '/metadata'],
+                    ['type' => 'flatfile', 'directory' =>  dirname(__DIR__, 2) . '/metadata'],
                 ],
             ],
             '[ARRAY]',
