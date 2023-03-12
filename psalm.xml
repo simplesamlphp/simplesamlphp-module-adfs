@@ -6,8 +6,7 @@
 >
     <projectFiles>
         <directory name="src" />
-        <directory name="metadata-templates" />
-        <directory name="tests" />
+        <directory name="metadata" />
     </projectFiles>
 
     <issueHandlers>
@@ -27,12 +26,5 @@
         <MissingParamType errorLevel="info" />
         <UnusedClass errorLevel="info" />
         <PossiblyUnusedMethod errorLevel="info" />
-
-        <PossiblyUndefinedGlobalVariable>
-            <errorLevel type="suppress">
-                <file name="metadata-templates/*.php" />
-                <file name="tests/metadata/*.php" />
-            </errorLevel>
-        </PossiblyUndefinedGlobalVariable>
     </issueHandlers>
 </psalm>

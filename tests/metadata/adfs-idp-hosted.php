@@ -2,7 +2,7 @@
 
 use SimpleSAML\XMLSecurity\TestUtils\PEMCertificatesMock;
 
-$certDir = dirname(__DIR__, 2) . '/vendor/simplesamlphp/xml-security' . PEMCertificatesMock::CERTIFICATE_DIR;
+$certDir = dirname(__DIR__, 2) . '/vendor/simplesamlphp/xml-security' . PEMCertificatesMock::CERTS_DIR;
 $metadata['__DYNAMIC:1__'] = [
     'host' => '__DEFAULT__',
     'privatekey_pass' => '1234',
