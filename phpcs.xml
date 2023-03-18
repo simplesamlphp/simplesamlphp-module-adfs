@@ -22,5 +22,14 @@
     <rule ref="Generic.PHP.RequireStrictTypes">
       <exclude-pattern>*/metadata/*</exclude-pattern>
     </rule>
-</ruleset>
 
+    <!-- Ignore files with side effects that we cannot fix -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>tests/bootstrap</exclude-pattern>
+    </rule>
+
+    <!-- Require the file to start with a declare(strict_types=1); -->
+    <rule ref="Generic.PHP.RequireStrictTypes">
+      <exclude-pattern>tests/config/authsources.php</exclude-pattern>
+    </rule>
+</ruleset>
