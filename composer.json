@@ -37,7 +37,7 @@
         "robrichards/xmlseclibs": "^3.1.1",
         "simplesamlphp/assert": "^1.0.4",
         "simplesamlphp/saml2": "^4.6",
-        "simplesamlphp/simplesamlphp": "dev-master",
+        "simplesamlphp/simplesamlphp": "3.0.x-dev",
         "symfony/http-foundation": "^6.0"
     },
     "require-dev": {
@@ -47,5 +47,10 @@
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
         "source": "https://github.com/simplesamlphp/simplesamlphp-module-adfs"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.0.x-dev"
+        }
     }
 }
