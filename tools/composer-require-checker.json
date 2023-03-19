@@ -1,0 +1,26 @@
+{
+  "symbol-whitelist": [
+    "SimpleSAML\\Configuration",
+    "SimpleSAML\\Error\\BadRequest",
+    "SimpleSAML\\Error\\Error",
+    "SimpleSAML\\Error\\Exception",
+    "SimpleSAML\\HTTP\\RunnableResponse",
+    "SimpleSAML\\IdP",
+    "SimpleSAML\\Locale\\Translate",
+    "SimpleSAML\\Logger",
+    "SimpleSAML\\Metadata\\MetaDataStorageHandler",
+    "SimpleSAML\\Metadata\\SAMLBuilder",
+    "SimpleSAML\\Metadata\\Signer",
+    "SimpleSAML\\Module",
+    "SimpleSAML\\Session",
+    "SimpleSAML\\Utils\\Attributes",
+    "SimpleSAML\\Utils\\Auth",
+    "SimpleSAML\\Utils\\Config",
+    "SimpleSAML\\Utils\\Config\\Metadata",
+    "SimpleSAML\\Utils\\Crypto",
+    "SimpleSAML\\Utils\\HTTP",
+    "SimpleSAML\\Utils\\Random",
+    "SimpleSAML\\Utils\\Time",
+    "SimpleSAML\\XHTML\\Template"
+  ]
+}
