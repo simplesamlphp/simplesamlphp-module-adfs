@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\Controller;
 
 use Exception;
-use SAML2\Constants;
+use SimpleSAML\SAML2\Constants;
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error as SspError;

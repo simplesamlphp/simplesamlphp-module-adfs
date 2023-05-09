@@ -10,7 +10,7 @@ namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
  * @package SimpleSAMLphp
  */
 
-class Constants extends \SAML2\Constants
+class Constants extends \SimpleSAML\SAML2\Constants
 {
     /**
      * The namespace for WS-FED protocol.

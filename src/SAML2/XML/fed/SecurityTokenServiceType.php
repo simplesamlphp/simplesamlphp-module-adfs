@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
 use DOMElement;
-use SAML2\XML\md\RoleDescriptor;
+use SimpleSAML\SAML2\XML\md\RoleDescriptor;
 use SimpleSAML\Assert\Assert;
 
 /**
