@@ -52,7 +52,7 @@ class Adfs
     public function __construct(Configuration $config, Session $session)
     {
         $this->config = $config;
-        $this->metadata = Metadata\MetaDataStorageHandler::getMetadataHandler();
+        $this->metadata = Metadata\MetaDataStorageHandler::getMetadataHandler($config);
         $this->session = $session;
         $this->cryptoUtils = new Utils\Crypto();
     }
@@ -228,7 +228,7 @@ class Adfs
         Logger::info('ADFS - IdP.prp: Accessing ADFS IdP endpoint prp');
 
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
-        $idp = IdP::getById('adfs:' . $idpEntityId);
+        $idp = IdP::getById($this->config, 'adfs:' . $idpEntityId);
 
         if ($request->query->has('wa')) {
             $wa = $request->query->get('wa');

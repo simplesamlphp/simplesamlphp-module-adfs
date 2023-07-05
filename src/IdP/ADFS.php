@@ -33,7 +33,7 @@ class ADFS
         $requestid = $query['wctx'] ?? null;
         $issuer = $query['wtrealm'];
 
-        $metadata = MetaDataStorageHandler::getMetadataHandler();
+        $metadata = MetaDataStorageHandler::getMetadataHandler(Configuration::getInstance());
         $spMetadata = $metadata->getMetaDataConfig($issuer, 'adfs-sp-remote');
 
         Logger::info('ADFS - IdP.prp: Incoming Authentication request: ' . $issuer . ' id ' . $requestid);
