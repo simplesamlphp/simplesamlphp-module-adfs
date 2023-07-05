@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
 use DOMElement;
+use SimpleSAML\WSSecurity\XML\wsa\Address;
+use SimpleSAML\WSSecurity\XML\wsa\EndpointReference;
 
 /**
  * Class representing fed Endpoint.
@@ -27,12 +29,8 @@ class Endpoint
         $e = $parent->ownerDocument->createElement($name);
         $parent->appendChild($e);
 
-        $endpoint = $parent->ownerDocument->createElement('EndpointReference');
-        $endpoint->setAttribute('xmlns', 'http://www.w3.org/2005/08/addressing');
-        $e->appendChild($endpoint);
-
-        $address = $parent->ownerDocument->createElement('Address', $address);
-        $endpoint->appendChild($address);
+        $endpoint = new EndpointReference(new Address($address));
+        $endpoint->toXML($parent);
 
         return $e;
     }

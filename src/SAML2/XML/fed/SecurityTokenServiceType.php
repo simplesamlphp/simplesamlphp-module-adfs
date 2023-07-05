@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
 use DOMElement;
-use SimpleSAML\SAML2\XML\md\RoleDescriptor;
 use SimpleSAML\Assert\Assert;
+use SimpleSAML\SAML2\XML\md\RoleDescriptor;
+use SimpleSAML\WSSecurity\Constants as C;
 
 /**
  * Class representing SecurityTokenServiceType RoleDescriptor.
@@ -21,7 +22,7 @@ class SecurityTokenServiceType extends RoleDescriptor
      *
      * @var string[] $protocolSupportEnumeration
      */
-    public array $protocolSupportEnumeration = [Constants::NS_FED];
+    public array $protocolSupportEnumeration = [C::NS_FED];
 
     /**
      * The Location of Services.
@@ -57,8 +58,8 @@ class SecurityTokenServiceType extends RoleDescriptor
         Assert::notEmpty($this->Location, 'Location not set');
 
         $e = parent::toXML($parent);
-        $e->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:fed', Constants::NS_FED);
-        $e->setAttributeNS(Constants::NS_XSI, 'xsi:type', 'fed:SecurityTokenServiceType');
+        $e->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:fed', C::NS_FED);
+        $e->setAttributeNS(C::NS_XSI, 'xsi:type', 'fed:SecurityTokenServiceType');
         TokenTypesOffered::appendXML($e);
         Endpoint::appendXML($e, 'SecurityTokenServiceEndpoint', $this->Location);
         Endpoint::appendXML($e, 'fed:PassiveRequestorEndpoint', $this->Location);

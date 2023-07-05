@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\SAML2\XML\fed;
 
 use DOMElement;
+use SimpleSAML\WSSecurity\Constants as C;
 
 /**
  * Class representing fed TokenTypesOffered.
  *
  * @package SimpleSAMLphp
  */
-
 class TokenTypesOffered
 {
     /**
@@ -22,10 +22,10 @@ class TokenTypesOffered
      */
     public static function appendXML(DOMElement $parent): DOMElement
     {
-        $e = $parent->ownerDocument->createElementNS(Constants::NS_FED, 'fed:TokenTypesOffered');
+        $e = $parent->ownerDocument->createElementNS(C::NS_FED, 'fed:TokenTypesOffered');
         $parent->appendChild($e);
 
-        $tokentype = $parent->ownerDocument->createElementNS(Constants::NS_FED, 'fed:TokenType');
+        $tokentype = $parent->ownerDocument->createElementNS(C::NS_FED, 'fed:TokenType');
         $tokentype->setAttribute('Uri', 'urn:oasis:names:tc:SAML:1.0:assertion');
         $e->appendChild($tokentype);
 
