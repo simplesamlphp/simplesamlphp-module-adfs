@@ -38,6 +38,7 @@
         "simplesamlphp/assert": "^1.0.4",
         "simplesamlphp/saml2": "^5.0.0-alpha.6",
         "simplesamlphp/xml-common": "^1.12",
+        "tvdijen/ws-security": "dev-master",
         "symfony/http-foundation": "^6.0"
     },
     "require-dev": {
