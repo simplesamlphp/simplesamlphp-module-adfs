@@ -43,5 +43,10 @@
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
         "source": "https://github.com/simplesamlphp/simplesamlphp-module-adfs"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1.x-dev"
+        }
     }
 }
