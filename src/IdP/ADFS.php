@@ -11,7 +11,6 @@ use SAML2\Constants;
 use SAML2\DOMDocumentFactory;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
-use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\IdP;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
@@ -19,6 +18,7 @@ use SimpleSAML\Module;
 use SimpleSAML\Utils;
 use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ADFS
 {
@@ -26,7 +26,7 @@ class ADFS
      * @param \SimpleSAML\IdP $idp
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
-    public static function receiveAuthnRequest(Request $request, IdP $idp): RunnableResponse
+    public static function receiveAuthnRequest(Request $request, IdP $idp): StreamedResponse
     {
         parse_str($request->server->get('QUERY_STRING'), $query);
 
@@ -52,7 +52,7 @@ class ADFS
             $state['adfs:wreply'] = $httpUtils->checkURLAllowed($query['wreply']);
         }
 
-        return new RunnableResponse([$idp, 'handleAuthenticationRequest'], [&$state]);
+        return new StreamedResponse([$idp, 'handleAuthenticationRequest'], [&$state]);
     }
 
 
