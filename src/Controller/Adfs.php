@@ -69,9 +69,9 @@ class Adfs
         }
 
         // check if valid local session exists
-        if ($this->config->getOptionalBoolean('admin.protectmetadata', false)) {
-            $authUtils = new Utils\Auth();
-            $authUtils->requireAdmin();
+        $authUtils = new Utils\Auth();
+        if ($this->config->getOptionalBoolean('admin.protectmetadata', false) && !$authUtils->isAdmin()) {
+            return new RunnableResponse([$authUtils, 'requireAdmin']);
         }
 
         try {
