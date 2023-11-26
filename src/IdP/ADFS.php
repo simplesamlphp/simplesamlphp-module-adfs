@@ -52,7 +52,11 @@ class ADFS
             $state['adfs:wreply'] = $httpUtils->checkURLAllowed($query['wreply']);
         }
 
-        return new StreamedResponse([$idp, 'handleAuthenticationRequest'], [&$state]);
+        return new StreamedResponse(
+            function () use ($idp, $state) {
+                $idp->handleAuthenticationRequest($state);
+            }
+        );
     }
 
 
