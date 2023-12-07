@@ -31,20 +31,20 @@
         }
     },
     "require": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-dom": "*",
 
-        "robrichards/xmlseclibs": "^3.1.1",
-        "simplesamlphp/assert": "^1.0.4",
+        "robrichards/xmlseclibs": "^3.1",
+        "simplesamlphp/assert": "^1.0",
         "simplesamlphp/saml2": "^5.0.0@dev",
         "simplesamlphp/simplesamlphp": "^3@dev",
         "simplesamlphp/xml-common": "^1.12",
         "tvdijen/ws-security": "^1@dev",
-        "symfony/http-foundation": "^6.0"
+        "symfony/http-foundation": "^6.4"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp-test-framework": "^1.5.4",
-        "simplesamlphp/xml-security": "^1.6.0"
+        "simplesamlphp/simplesamlphp-test-framework": "^1.5",
+        "simplesamlphp/xml-security": "^1.6"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
