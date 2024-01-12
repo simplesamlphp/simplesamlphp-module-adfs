@@ -11,7 +11,6 @@ use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Module\adfs\Controller;
 use SimpleSAML\Session;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 use function dirname;
 
