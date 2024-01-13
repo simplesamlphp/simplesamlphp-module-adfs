@@ -53,7 +53,7 @@ class ADFS
         }
 
         return new StreamedResponse(
-            function () use ($idp, $state) {
+            function () use ($idp, &$state) {
                 $idp->handleAuthenticationRequest($state);
             }
         );
