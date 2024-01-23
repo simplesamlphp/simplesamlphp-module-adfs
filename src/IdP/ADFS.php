@@ -143,7 +143,7 @@ MSG;
         </saml:Assertion>
    </wst:RequestedSecurityToken>
    <wsp:AppliesTo xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
-       <wsa:EndpointReference xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing">
+       <wsa:EndpointReference xmlns:wsa="http://www.w3.org/2005/08/addressing">
            <wsa:Address>$target</wsa:Address>
        </wsa:EndpointReference>
    </wsp:AppliesTo>
