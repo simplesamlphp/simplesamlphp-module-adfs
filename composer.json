@@ -37,10 +37,9 @@
 
         "robrichards/xmlseclibs": "^3.1",
         "simplesamlphp/assert": "^1.0",
-        "simplesamlphp/saml2": "^5.0.0@dev",
-        "simplesamlphp/simplesamlphp": "^3@dev",
+        "simplesamlphp/simplesamlphp": "^2.0",
         "simplesamlphp/xml-common": "^1.12",
-        "tvdijen/ws-security": "^1@dev",
+        "simplesamlphp/ws-security": "^1.0",
         "symfony/http-foundation": "^6.4"
     },
     "require-dev": {

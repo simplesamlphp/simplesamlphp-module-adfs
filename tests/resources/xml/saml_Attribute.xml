@@ -1,0 +1,4 @@
+<saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" AttributeName="TheName" AttributeNamespace="https://example.org/">
+  <saml:AttributeValue>FirstValue</saml:AttributeValue>
+  <saml:AttributeValue>SecondValue</saml:AttributeValue>
+</saml:Attribute>
