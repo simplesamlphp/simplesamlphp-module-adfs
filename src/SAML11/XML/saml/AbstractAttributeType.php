@@ -75,7 +75,7 @@ abstract class AbstractAttributeType extends AbstractSamlElement
      * Convert this AttributeType to XML.
      *
      * @param \DOMElement $parent The element we are converting to XML.
-     * @return \DOMElement The XML element after adding the data corresponding to this NameIdentifierType.
+     * @return \DOMElement The XML element after adding the data corresponding to this AttributeType.
      */
     public function toXML(DOMElement $parent = null): DOMElement
     {

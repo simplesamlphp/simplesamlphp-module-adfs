@@ -21,7 +21,7 @@ abstract class AbstractSubjectLocalityType extends AbstractSamlElement
      * @param string|null $IPAddress
      * @param string|null $DNSAddress
      */
-    public function __construct(
+    final public function __construct(
         protected ?string $IPAddress = null,
         protected ?string $DNSAddress = null,
     ) {
