@@ -1,0 +1,1 @@
+<saml:AuthorityBinding xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol" AuthorityKind="samlp:AttributeQuery" Location="urn:x-simplesamlphp:location" Binding="urn:x-simplesamlphp:binding" />
