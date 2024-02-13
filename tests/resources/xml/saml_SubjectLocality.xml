@@ -1,0 +1,1 @@
+<saml:SubjectLocality xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" IPAddress="127.0.0.1" DNSAddress="simplesamlphp.org" />

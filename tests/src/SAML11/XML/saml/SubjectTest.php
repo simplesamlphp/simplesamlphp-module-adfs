@@ -89,7 +89,7 @@ final class SubjectTest extends TestCase
 
 
     /**
-     * Test creating an SubjectConfirmation from scratch using an integer.
+     * Test creating an Subject from scratch.
      */
     public function testMarshalling(): void
     {
