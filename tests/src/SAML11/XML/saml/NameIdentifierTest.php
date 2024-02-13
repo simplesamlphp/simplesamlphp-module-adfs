@@ -17,6 +17,7 @@ use function strval;
  * Class \SimpleSAML\Module\adfs\SAML11\XML\saml\NameIdentifierTest
  *
  * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\NameIdentifier
+ * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AbstractNameIdentifierType
  * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AbstractSamlElement
  *
  * @package simplesamlphp/simplesamlphp-module-adfs

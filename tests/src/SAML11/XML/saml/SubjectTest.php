@@ -9,6 +9,7 @@ use SimpleSAML\Module\adfs\SAML11\Constants as C;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\Assertion;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\ConfirmationMethod;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\NameIdentifier;
+use SimpleSAML\Module\adfs\SAML11\XML\saml\Subject;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\SubjectConfirmation;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\SubjectConfirmationData;
 use SimpleSAML\XML\Chunk;
@@ -26,15 +27,15 @@ use function dirname;
 use function strval;
 
 /**
- * Tests for SubjectConfirmation elements.
+ * Tests for Subject elements.
  *
- * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\SubjectConfirmation
- * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AbstractSubjectConfirmationType
+ * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\Subject
+ * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AbstractSubjectType
  * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AbstractSamlElement
  *
  * @package simplesamlphp/simplesamlphp-module-adfs
  */
-final class SubjectConfirmationTest extends TestCase
+final class SubjectTest extends TestCase
 {
     use SchemaValidationTestTrait;
     use SerializableElementTestTrait;
@@ -52,10 +53,10 @@ final class SubjectConfirmationTest extends TestCase
     {
         self::$schemaFile = dirname(__FILE__, 6) . '/resources/schemas/oasis-sstc-saml-schema-assertion-1.1.xsd';
 
-        self::$testedClass = SubjectConfirmation::class;
+        self::$testedClass = Subject::class;
 
         self::$xmlRepresentation = DOMDocumentFactory::fromFile(
-            dirname(__FILE__, 5) . '/resources/xml/saml_SubjectConfirmation.xml',
+            dirname(__FILE__, 5) . '/resources/xml/saml_Subject.xml',
         );
 
         self::$certificate = str_replace(
@@ -116,9 +117,17 @@ final class SubjectConfirmationTest extends TestCase
             $keyInfo,
         );
 
+        $nameIdentifier = new NameIdentifier(
+            'TheNameIDValue',
+            'TheNameQualifier',
+            'urn:the:format',
+        );
+
+        $subject = new Subject($sc, $nameIdentifier);
+
         $this->assertEquals(
             self::$xmlRepresentation->saveXML(self::$xmlRepresentation->documentElement),
-            strval($sc),
+            strval($subject),
         );
     }
 }
