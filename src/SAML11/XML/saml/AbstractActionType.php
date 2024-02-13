@@ -11,7 +11,7 @@ use SimpleSAML\XML\Exception\SchemaViolationException;
 use SimpleSAML\XML\StringElementTrait;
 
 /**
- * SAML AttributeType abstract data type.
+ * SAML ActionType abstract data type.
  *
  * @package simplesamlphp/simplesamlphp-module-adfs
  */
