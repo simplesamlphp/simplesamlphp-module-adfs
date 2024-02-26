@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\adfs\Test\SAML11\XML\saml;
 
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\Module\adfs\SAML11\Constants as C;
+use SimpleSAML\Module\adfs\SAML11\XML\saml\AuthenticationStatement;
+use SimpleSAML\Module\adfs\SAML11\XML\saml\AuthorityBinding;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\ConfirmationMethod;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\NameIdentifier;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\Subject;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\SubjectConfirmation;
 use SimpleSAML\Module\adfs\SAML11\XML\saml\SubjectConfirmationData;
+use SimpleSAML\Module\adfs\SAML11\XML\saml\SubjectLocality;
 use SimpleSAML\XML\Chunk;
 use SimpleSAML\XML\DOMDocumentFactory;
 use SimpleSAML\XML\TestUtils\SchemaValidationTestTrait;
 use SimpleSAML\XML\TestUtils\SerializableElementTestTrait;
+use SimpleSAML\XML\Utils\XPath;
 use SimpleSAML\XMLSecurity\TestUtils\PEMCertificatesMock;
 use SimpleSAML\XMLSecurity\XML\ds\KeyInfo;
 use SimpleSAML\XMLSecurity\XML\ds\KeyName;
@@ -26,15 +31,15 @@ use function dirname;
 use function strval;
 
 /**
- * Tests for Subject elements.
+ * Tests for AuthenticationStatement elements.
  *
- * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\Subject
- * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AbstractSubjectType
+ * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AuthenticationStatement
+ * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AbstractAuthenticationStatementType
  * @covers \SimpleSAML\Module\adfs\SAML11\XML\saml\AbstractSamlElement
  *
  * @package simplesamlphp/simplesamlphp-module-adfs
  */
-final class SubjectTest extends TestCase
+final class AuthenticationStatementTest extends TestCase
 {
     use SchemaValidationTestTrait;
     use SerializableElementTestTrait;
@@ -52,10 +57,10 @@ final class SubjectTest extends TestCase
     {
         self::$schemaFile = dirname(__FILE__, 6) . '/resources/schemas/oasis-sstc-saml-schema-assertion-1.1.xsd';
 
-        self::$testedClass = Subject::class;
+        self::$testedClass = AuthenticationStatement::class;
 
         self::$xmlRepresentation = DOMDocumentFactory::fromFile(
-            dirname(__FILE__, 5) . '/resources/xml/saml_Subject.xml',
+            dirname(__FILE__, 5) . '/resources/xml/saml_AuthenticationStatement.xml',
         );
 
         self::$certificate = str_replace(
@@ -88,7 +93,7 @@ final class SubjectTest extends TestCase
 
 
     /**
-     * Test creating an Subject from scratch.
+     * Test creating an AuthenticationStatement from scratch
      */
     public function testMarshalling(): void
     {
@@ -124,9 +129,49 @@ final class SubjectTest extends TestCase
 
         $subject = new Subject($sc, $nameIdentifier);
 
+        $subjectLocality = new SubjectLocality('127.0.0.1', 'simplesamlphp.org');
+        $authorityBinding = new AuthorityBinding(
+            'samlp:AttributeQuery',
+            'urn:x-simplesamlphp:location',
+            'urn:x-simplesamlphp:binding',
+        );
+
+        $authenticationStatement = new AuthenticationStatement(
+            C::AC_PASSWORD,
+            new DateTimeImmutable('2023-01-24T09:42:26Z'),
+            $subjectLocality,
+            [$authorityBinding],
+        );
+
         $this->assertEquals(
             self::$xmlRepresentation->saveXML(self::$xmlRepresentation->documentElement),
-            strval($subject),
+            strval($authenticationStatement),
         );
+    }
+
+
+    public function testMarshallingElementOrdering(): void
+    {
+        $authenticationStatement = AuthenticationStatement::fromXML(self::$xmlRepresentation->documentElement);
+        $authenticationStatementElement = $authenticationStatement->toXML();
+
+        // Test for a SubjectLocality
+        $xpCache = XPath::getXPath($authenticationStatementElement);
+        $authenticationStatementElements = XPath::xpQuery(
+            $authenticationStatementElement,
+            './saml_assertion:SubjectLocality',
+            $xpCache,
+        );
+        $this->assertCount(1, $authenticationStatementElements);
+
+        // Test ordering of AuthenticationStatement contents
+        /** @psalm-var \DOMElement[] $authnStatementElements */
+        $authenticationStatementElements = XPath::xpQuery(
+            $authenticationStatementElement,
+            './saml_assertion:SubjectLocality/following-sibling::*',
+            $xpCache,
+        );
+        $this->assertCount(1, $authenticationStatementElements);
+        $this->assertEquals('saml:AuthorityBinding', $authenticationStatementElements[0]->tagName);
     }
 }

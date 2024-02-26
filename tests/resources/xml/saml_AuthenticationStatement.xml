@@ -1,0 +1,19 @@
+<saml:AuthenticationStatement xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" AuthenticationMethod="urn:oasis:names:tc:SAML:1.0:am:password" AuthenticationInstant="2023-01-24T09:42:26Z">
+  <saml:Subject>
+    <saml:SubjectConfirmation>
+      <saml:ConfirmationMethod>_Test1</saml:ConfirmationMethod>
+      <saml:ConfirmationMethod>_Test2</saml:ConfirmationMethod>
+      <saml:SubjectConfirmationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:integer">2</saml:SubjectConfirmationData>
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="fed654">
+        <ds:KeyName>testkey</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509Certificate>MIICxDCCAi2gAwIBAgIUZ9QDx+SBFHednUWDFGm9tyVKrgQwDQYJKoZIhvcNAQELBQAwczElMCMGA1UEAwwcc2VsZnNpZ25lZC5zaW1wbGVzYW1scGhwLm9yZzEZMBcGA1UECgwQU2ltcGxlU0FNTHBocCBIUTERMA8GA1UEBwwISG9ub2x1bHUxDzANBgNVBAgMBkhhd2FpaTELMAkGA1UEBhMCVVMwIBcNMjIxMjAzMTAzNTQwWhgPMjEyMjExMDkxMDM1NDBaMHMxJTAjBgNVBAMMHHNlbGZzaWduZWQuc2ltcGxlc2FtbHBocC5vcmcxGTAXBgNVBAoMEFNpbXBsZVNBTUxwaHAgSFExETAPBgNVBAcMCEhvbm9sdWx1MQ8wDQYDVQQIDAZIYXdhaWkxCzAJBgNVBAYTAlVTMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDessdFRVDTMQQW3Na81B1CjJV1tmY3nopoIhZrkbDxLa+pv7jGDRcYreyu1DoQxEs06V2nHLoyOPhqJXSFivqtUwVYhR6NYgbNI6RRSsIJCweH0YOdlHna7gULPcLX0Bfbi4odStaFwG9yzDySwSEPtsKxm5pENPjNVGh+jJ+H/QIDAQABo1MwUTAdBgNVHQ4EFgQUvV75t8EoQo2fVa0E9otdtIGK5X0wHwYDVR0jBBgwFoAUvV75t8EoQo2fVa0E9otdtIGK5X0wDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOBgQANQUeiwPJXkWMXuaDHToEBKcezYGqGEYnGUi9LMjeb+Kln7X8nn5iknlz4k77rWCbSwLPC/WDr0ySYQA+HagaeUaFpoiYFJKS6uFlK1HYWnM3W4PUiGHg1/xeZlMO44wTwybXVo0y9KMhchfB5XNbDdoJcqWYvi6xtmZZNRbxUyw==</ds:X509Certificate>
+          <ds:X509SubjectName>/CN=selfsigned.simplesamlphp.org/O=SimpleSAMLphp HQ/L=Honolulu/ST=Hawaii/C=US</ds:X509SubjectName>
+        </ds:X509Data>
+        <ssp:Chunk xmlns:ssp="urn:x-simplesamlphp:namespace">some</ssp:Chunk>
+      </ds:KeyInfo>
+    </saml:SubjectConfirmation>
+  </saml:Subject>
+  <saml:SubjectLocality IPAddress="127.0.0.1" DNSAddress="simplesamlphp.org" />
+  <saml:AuthorityBinding xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol" AuthorityKind="samlp:AttributeQuery" Location="urn:x-simplesamlphp:location" Binding="urn:x-simplesamlphp:binding" />
+</saml:AuthenticationStatement>

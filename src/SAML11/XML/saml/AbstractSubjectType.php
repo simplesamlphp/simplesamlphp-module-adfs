@@ -8,6 +8,7 @@ use DOMElement;
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\XML\Exception\InvalidDOMElementException;
 use SimpleSAML\XML\Exception\MissingElementException;
+use SimpleSAML\XML\Exception\TooManyElementsException;
 
 /**
  * SAML SubjectType abstract data type.
@@ -70,7 +71,10 @@ abstract class AbstractSubjectType extends AbstractSamlElement
         Assert::same($xml->namespaceURI, static::NS, InvalidDOMElementException::class);
 
         $subjectConfirmation = SubjectConfirmation::getChildrenOfClass($xml);
+        Assert::maxCount($subjectConfirmation, 1, TooManyElementsException::class);
+
         $nameIdentifier = NameIdentifier::getChildrenOfClass($xml);
+        Assert::maxCount($nameIdentifier, 1, TooManyElementsException::class);
 
         return new static(
             array_pop($subjectConfirmation),
