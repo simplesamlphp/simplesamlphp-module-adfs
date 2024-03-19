@@ -37,6 +37,7 @@
 
         "robrichards/xmlseclibs": "^3.1",
         "simplesamlphp/assert": "^1.0",
+        "simplesamlphp/saml11": "^1.0",
         "simplesamlphp/simplesamlphp": "^2.0",
         "simplesamlphp/xml-common": "^1.12",
         "simplesamlphp/ws-security": "^1.0",

@@ -1,1 +1,0 @@
-<saml:NameIdentifier xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion" NameQualifier="TheNameQualifier" Format="urn:the:format">TheNameIDValue</saml:NameIdentifier>
