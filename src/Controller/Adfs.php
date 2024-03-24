@@ -13,7 +13,7 @@ use SimpleSAML\Logger;
 use SimpleSAML\Metadata;
 use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
-use SimpleSAML\SAML2\Constants;
+use SimpleSAML\SAML2\Constants as C;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
 use Symfony\Component\HttpFoundation\Request;
@@ -200,12 +200,7 @@ class Adfs
 
             $response = new Response();
             $response->setEtag(hash('sha256', $metaxml));
-            $response->setCache([
-                'no_cache' => $protectedMetadata === true,
-                'public' => $protectedMetadata === false,
-                'private' => $protectedMetadata === true,
-            ]);
-
+            $response->setPublic();
             if ($response->isNotModified($request)) {
                 return $response;
             }
