@@ -8,6 +8,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
+use SimpleSAML\Assert\Assert;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\IdP;
@@ -31,13 +32,13 @@ use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
 use SimpleSAML\WSSecurity\XML\wsp\AppliesTo;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityTokenResponse;
-use SimpleSAML\XHTML\Template;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
 use SimpleSAML\XMLSecurity\Key\PrivateKey;
 use SimpleSAML\XMLSecurity\Key\X509Certificate as PublicKey;
 use SimpleSAML\XMLSecurity\XML\ds\KeyInfo;
 use SimpleSAML\XMLSecurity\XML\ds\X509Certificate;
 use SimpleSAML\XMLSecurity\XML\ds\X509Data;
+use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -432,10 +433,11 @@ class ADFS
             'adfs:entityID' => $spEntityId,
         ]);
 
-        $assertionLifetime = $spMetadata->getOptionalInteger('assertion.lifetime', null);
+        $assertionLifetime = $spMetadata->getOptionalString('assertion.lifetime', null);
         if ($assertionLifetime === null) {
-            $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
+            $assertionLifetime = $idpMetadata->getOptionalString('assertion.lifetime', 'PT300S');
         }
+        Assert::nullOrValidDuration($assertionLifetime);
 
         $assertion = ADFS::generateAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
