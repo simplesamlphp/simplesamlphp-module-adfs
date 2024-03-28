@@ -35,7 +35,6 @@
         "php": "^8.1",
         "ext-dom": "*",
 
-        "robrichards/xmlseclibs": "^3.1",
         "simplesamlphp/assert": "^1.0",
         "simplesamlphp/saml11": "^1.0",
         "simplesamlphp/simplesamlphp": "^2.0",
