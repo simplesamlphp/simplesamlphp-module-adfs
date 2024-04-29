@@ -220,10 +220,10 @@ class ADFS
      * Get the metadata of a given hosted ADFS IdP.
      *
      * @param string $entityid The entity ID of the hosted ADFS IdP whose metadata we want to fetch.
-     *
-     * @return array
-     * @param MetaDataStorageHandler $handler Optionally the metadata storage to use,
+     * @param \SimpleSAML\Metadata\MetaDataStorageHandler $handler Optionally the metadata storage to use,
      *        if omitted the configured handler will be used.
+     * @return array
+     *
      * @throws \SimpleSAML\Error\Exception
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
