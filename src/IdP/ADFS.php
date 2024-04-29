@@ -25,21 +25,20 @@ use SimpleSAML\SAML11\Conditions;
 use SimpleSAML\SAML11\NameIdentifier;
 use SimpleSAML\SAML11\Subject;
 use SimpleSAML\SAML2\Constants;
+use SimpleSAML\SAML2\Constants as C;
 use SimpleSAML\Utils;
-use SimpleSAML\XMLSecurity\Constants as C;
+use SimpleSAML\WSSecurity\XML\wsa\Address;
+use SimpleSAML\WSSecurity\XML\wsa\EndpointReference;
+use SimpleSAML\WSSecurity\XML\wsp\AppliesTo;
+use SimpleSAML\WSSecurity\XML\wst\RequestSecurityToken;
+use SimpleSAML\WSSecurity\XML\wst\RequestSecurityTokenResponse;
+use SimpleSAML\XHTML\Template;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
 use SimpleSAML\XMLSecurity\Key\PrivateKey;
 use SimpleSAML\XMLSecurity\Key\X509Certificate as PublicKey;
 use SimpleSAML\XMLSecurity\XML\ds\KeyInfo;
 use SimpleSAML\XMLSecurity\XML\ds\X509Certificate;
 use SimpleSAML\XMLSecurity\XML\ds\X509Data;
-use SimpleSAML\WSSecurity\XML\wsa\Address;
-use SimpleSAML\WSSecurity\XML\wsa\EndpointReference;
-use SimpleSAML\WSSecurity\XML\wsp\AppliesTo;
-use SimpleSAML\WSSecurity\XML\wst\RequestSecurityTokenResponse;
-use SimpleSAML\WSSecurity\XML\wst\RequestSecurityToken;
-use SimpleSAML\XHTML\Template;
-use SimpleSAML\XML\DOMDocumentFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -223,30 +222,66 @@ class ADFS
      * @param string $entityid The entity ID of the hosted ADFS IdP whose metadata we want to fetch.
      *
      * @return array
+     * @param MetaDataStorageHandler $handler Optionally the metadata storage to use,
+     *        if omitted the configured handler will be used.
      * @throws \SimpleSAML\Error\Exception
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
-    public static function getHostedMetadata(string $entityid): array
+    public static function getHostedMetadata(string $entityid, MetaDataStorageHandler $handler = null): array
     {
-        $handler = MetaDataStorageHandler::getMetadataHandler();
         $cryptoUtils = new Utils\Crypto();
+
+        $globalConfig = Configuration::getInstance();
+        if ($handler === null) {
+            $handler = MetaDataStorageHandler::getMetadataHandler($globalConfig);
+        }
         $config = $handler->getMetaDataConfig($entityid, 'adfs-idp-hosted');
 
-        $endpoint = Module::getModuleURL('adfs/idp/prp.php');
+        $host = Module::getModuleURL('adfs/idp/prp.php');
+
+        // configure endpoints
+        $ssob = $handler->getGenerated('SingleSignOnServiceBinding', 'adfs-idp-hosted', $host);
+        $slob = $handler->getGenerated('SingleLogoutServiceBinding', 'adfs-idp-hosted', $host);
+        $ssol = $handler->getGenerated('SingleSignOnService', 'adfs-idp-hosted', $host);
+        $slol = $handler->getGenerated('SingleLogoutService', 'adfs-idp-hosted', $host);
+
+        $sso = [];
+        if (is_array($ssob)) {
+            foreach ($ssob as $binding) {
+                $sso[] = [
+                    'Binding'  => $binding,
+                    'Location' => $ssol,
+                ];
+            }
+        } else {
+            $sso[] = [
+                'Binding'  => $ssob,
+                'Location' => $ssol,
+            ];
+        }
+
+        $slo = [];
+        if (is_array($slob)) {
+            foreach ($slob as $binding) {
+                $slo[] = [
+                    'Binding'  => $binding,
+                    'Location' => $slol,
+                ];
+            }
+        } else {
+            $slo[] = [
+                'Binding'  => $slob,
+                'Location' => $slol,
+            ];
+        }
+
+
         $metadata = [
             'metadata-set' => 'adfs-idp-hosted',
             'entityid' => $entityid,
-            'SingleSignOnService' => [
-                [
-                    'Binding' => Constants::BINDING_HTTP_REDIRECT,
-                    'Location' => $endpoint,
-                ]
-            ],
-            'SingleLogoutService' => [
-                'Binding' => Constants::BINDING_HTTP_REDIRECT,
-                'Location' => $endpoint,
-            ],
-            'NameIDFormat' => $config->getOptionalString('NameIDFormat', Constants::NAMEID_TRANSIENT),
+            'SingleSignOnService' => $sso,
+            'SingleLogoutService' => $slo,
+            'NameIDFormat' => $config->getOptionalArrayizeString('NameIDFormat', [C::NAMEID_TRANSIENT]),
             'contacts' => [],
         ];
 
@@ -404,7 +439,7 @@ class ADFS
         $appliesTo = new AppliesTo([new EndpointReference(new Address($target))]);
         $requestSecurityTokenResponse = RequestSecurityTokenResponse(null, [$requestSecurityToken, $appliesTo]);
 
-        $wresult = $requestSecurityTokenResponse->saveXML();;
+        $wresult = $requestSecurityTokenResponse->saveXML();
         $wctx = $state['adfs:wctx'];
         $wreply = $state['adfs:wreply'] ? : $spMetadata->getValue('prp');
         ADFS::postResponse($wreply, $wresult, $wctx);
