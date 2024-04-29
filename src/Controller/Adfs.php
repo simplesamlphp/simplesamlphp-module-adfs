@@ -5,15 +5,12 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\Controller;
 
 use Exception;
-use SimpleSAML\Assert\Assert;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error as SspError;
 use SimpleSAML\IdP;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata;
-use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
-use SimpleSAML\SAML2\Constants as C;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
 use Symfony\Component\HttpFoundation\Request;
