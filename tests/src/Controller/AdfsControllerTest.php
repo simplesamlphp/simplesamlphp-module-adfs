@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Test\Module\adfs\Controller;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
@@ -15,8 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 use function dirname;
 
 /**
- * @covers \SimpleSAML\Module\adfs\Controller\Adfs
  */
+#[CoversClass(Controller\Adfs::class)]
 class AdfsControllerTest extends TestCase
 {
     /** @var \SimpleSAML\Configuration */
