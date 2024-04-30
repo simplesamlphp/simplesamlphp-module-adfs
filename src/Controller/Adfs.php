@@ -198,16 +198,19 @@ class Adfs
             // sign the metadata if enabled
             $metaxml = Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
 
-            // make sure to export only the md:EntityDescriptor
-            $i = strpos($metaxml, '<md:EntityDescriptor');
-            $metaxml = substr($metaxml, $i ? $i : 0);
-
-            // 22 = strlen('</md:EntityDescriptor>')
-            $i = strrpos($metaxml, '</md:EntityDescriptor>');
-            $metaxml = substr($metaxml, 0, $i ? $i + 22 : 0);
-
             $response = new Response();
+            $response->setEtag(hash('sha256', $metaxml));
+            $response->setCache([
+                'no_cache' => $protectedMetadata === true,
+                'public' => $protectedMetadata === false,
+                'private' => $protectedMetadata === true,
+            ]);
+
+            if ($response->isNotModified($request)) {
+                return $response;
+            }
             $response->headers->set('Content-Type', 'application/samlmetadata+xml');
+            $response->headers->set('Content-Disposition', 'attachment; filename="FederationMetadata.xml"');
             $response->setContent($metaxml);
 
             return $response;
