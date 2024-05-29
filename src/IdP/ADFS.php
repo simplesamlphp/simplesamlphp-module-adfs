@@ -167,7 +167,8 @@ MSG;
         string $key,
         string $cert,
         string $algo,
-        string $passphrase = null
+        #[\SensitiveParameter]
+        string $passphrase = null,
     ): string {
         $objXMLSecDSig = new XMLSecurityDSig();
         $objXMLSecDSig->idKeys = ['AssertionID'];
