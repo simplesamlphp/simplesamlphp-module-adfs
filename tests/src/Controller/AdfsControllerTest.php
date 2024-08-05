@@ -44,7 +44,7 @@ class AdfsControllerTest extends TestCase
                 ],
             ],
             '[ARRAY]',
-            'simplesaml'
+            'simplesaml',
         );
         $this->session = Session::getSessionFromRequest();
 
@@ -66,7 +66,7 @@ class AdfsControllerTest extends TestCase
 
         $this->expectException(Error\BadRequest::class);
         $this->expectExceptionMessage(
-            "BADREQUEST('%REASON%' => 'Missing parameter \'wa\' or \'assocId\' in request.')"
+            "BADREQUEST('%REASON%' => 'Missing parameter \'wa\' or \'assocId\' in request.')",
         );
 
         $c->prp($request);

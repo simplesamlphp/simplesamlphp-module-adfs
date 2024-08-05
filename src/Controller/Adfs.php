@@ -127,14 +127,14 @@ class Adfs
                 'SingleSignOnService' => [
                     0 => [
                         'Binding'  => Constants::BINDING_HTTP_REDIRECT,
-                        'Location' => $adfs_service_location
-                    ]
+                        'Location' => $adfs_service_location,
+                    ],
                 ],
                 'SingleLogoutService' => [
                     0 => [
                         'Binding'  => Constants::BINDING_HTTP_REDIRECT,
-                        'Location' => $adfs_service_location
-                    ]
+                        'Location' => $adfs_service_location,
+                    ],
                 ],
             ];
 
@@ -146,14 +146,14 @@ class Adfs
 
             $metaArray['NameIDFormat'] = $idpmeta->getOptionalString(
                 'NameIDFormat',
-                Constants::NAMEID_TRANSIENT
+                Constants::NAMEID_TRANSIENT,
             );
 
             if ($idpmeta->hasValue('OrganizationName')) {
                 $metaArray['OrganizationName'] = $idpmeta->getLocalizedString('OrganizationName');
                 $metaArray['OrganizationDisplayName'] = $idpmeta->getOptionalLocalizedString(
                     'OrganizationDisplayName',
-                    $metaArray['OrganizationName']
+                    $metaArray['OrganizationName'],
                 );
 
                 if (!$idpmeta->hasValue('OrganizationURL')) {
@@ -237,7 +237,7 @@ class Adfs
                 return new StreamedResponse(
                     function () use ($idp) {
                         ADFS_IDP::receiveLogoutMessage($idp);
-                    }
+                    },
                 );
             } elseif ($wa === 'wsignin1.0') {
                 return ADFS_IDP::receiveAuthnRequest($request, $idp);
@@ -255,7 +255,7 @@ class Adfs
             return new StreamedResponse(
                 function () use ($idp, /** @scrutinizer ignore-type */ $assocId, $relayState, $logoutError) {
                     $idp->handleLogoutResponse($assocId, $relayState, $logoutError);
-                }
+                },
             );
         }
         throw new SspError\BadRequest("Missing parameter 'wa' or 'assocId' in request.");

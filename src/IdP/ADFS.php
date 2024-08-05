@@ -44,7 +44,7 @@ class ADFS
             'ForceAuthn' => false,
             'isPassive' => false,
             'adfs:wctx' => $requestid,
-            'adfs:wreply' => false
+            'adfs:wreply' => false,
         ];
 
         if (isset($query['wreply']) && !empty($query['wreply'])) {
@@ -55,7 +55,7 @@ class ADFS
         return new StreamedResponse(
             function () use ($idp, &$state) {
                 $idp->handleAuthenticationRequest($state);
-            }
+            },
         );
     }
 
@@ -73,7 +73,7 @@ class ADFS
         string $target,
         string $nameid,
         array $attributes,
-        int $assertionLifetime
+        int $assertionLifetime,
     ): string {
         $httpUtils = new Utils\HTTP();
         $randomUtils = new Utils\Random();
@@ -120,7 +120,7 @@ MSG;
 
             list($namespace, $name) = $attrUtils->getAttributeNamespace(
                 $name,
-                'http://schemas.xmlsoap.org/claims'
+                'http://schemas.xmlsoap.org/claims',
             );
             $namespace = htmlspecialchars($namespace);
             $name = htmlspecialchars($name);
@@ -184,7 +184,7 @@ MSG;
             [$firstassertionroot],
             XMLSecurityDSig::SHA256,
             ['http://www.w3.org/2000/09/xmldsig#enveloped-signature', XMLSecurityDSig::EXC_C14N],
-            ['id_name' => 'AssertionID']
+            ['id_name' => 'AssertionID'],
         );
 
         $objKey = new XMLSecurityKey($algo, ['type' => 'private']);
@@ -246,7 +246,7 @@ MSG;
                 [
                     'Binding' => Constants::BINDING_HTTP_REDIRECT,
                     'Location' => $endpoint,
-                ]
+                ],
             ],
             'SingleLogoutService' => [
                 'Binding' => Constants::BINDING_HTTP_REDIRECT,
@@ -289,7 +289,7 @@ MSG;
                 'signing' => true,
                 'encryption' => false,
                 'X509Certificate' => $httpsCert['certData'],
-                'prefix' => 'https.'
+                'prefix' => 'https.',
             ];
         }
         $metadata['keys'] = $keys;
@@ -299,7 +299,7 @@ MSG;
             $metadata['OrganizationName'] = $config->getLocalizedString('OrganizationName');
             $metadata['OrganizationDisplayName'] = $config->getOptionalLocalizedString(
                 'OrganizationDisplayName',
-                $metadata['OrganizationName']
+                $metadata['OrganizationName'],
             );
 
             if (!$config->hasValue('OrganizationURL')) {
@@ -361,7 +361,7 @@ MSG;
         $spEntityId = $spMetadata['entityid'];
         $spMetadata = Configuration::loadFromArray(
             $spMetadata,
-            '$metadata[' . var_export($spEntityId, true) . ']'
+            '$metadata[' . var_export($spEntityId, true) . ']',
         );
 
         $attributes = $state['Attributes'];
@@ -421,7 +421,7 @@ MSG;
         $idpMetadata = $idp->getConfig();
         $httpUtils = new Utils\HTTP();
         $httpUtils->redirectTrustedURL(
-            $idpMetadata->getOptionalString('redirect-after-logout', $httpUtils->getBaseURL())
+            $idpMetadata->getOptionalString('redirect-after-logout', $httpUtils->getBaseURL()),
         );
     }
 
@@ -464,7 +464,7 @@ MSG;
         $metadata = MetaDataStorageHandler::getMetadataHandler();
         $spMetadata = $metadata->getMetaDataConfig($association['adfs:entityID'], 'adfs-sp-remote');
         $returnTo = Module::getModuleURL(
-            'adfs/idp/prp.php?assocId=' . urlencode($association["id"]) . '&relayState=' . urlencode($relayState)
+            'adfs/idp/prp.php?assocId=' . urlencode($association["id"]) . '&relayState=' . urlencode($relayState),
         );
         return $spMetadata->getValue('prp') . '?wa=wsignoutcleanup1.0&wreply=' . urlencode($returnTo);
     }
