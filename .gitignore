@@ -9,4 +9,5 @@ bin/*
 phpunit.xml.bak
 vendor/*
 build/*
+/super-linter-output/
 *~
