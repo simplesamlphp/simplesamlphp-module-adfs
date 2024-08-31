@@ -38,7 +38,7 @@
 
         "simplesamlphp/assert": "^1.1",
         "simplesamlphp/saml11": "^1.0",
-        "simplesamlphp/simplesamlphp": "dev-saml2v5_metadata",
+        "simplesamlphp/simplesamlphp": "^2.3",
         "simplesamlphp/xml-common": "^1.16",
         "simplesamlphp/ws-security": "^1.0",
         "symfony/http-foundation": "^6.4"
