@@ -6,7 +6,7 @@
 >
     <projectFiles>
         <directory name="src" />
-        <directory name="metadata-templates" />
+        <directory name="metadata" />
         <directory name="tests" />
     </projectFiles>
 
@@ -30,7 +30,7 @@
 
         <PossiblyUndefinedGlobalVariable>
             <errorLevel type="suppress">
-                <file name="metadata-templates/*.php" />
+                <file name="metadata/*.dist" />
                 <file name="tests/metadata/*.php" />
             </errorLevel>
         </PossiblyUndefinedGlobalVariable>
