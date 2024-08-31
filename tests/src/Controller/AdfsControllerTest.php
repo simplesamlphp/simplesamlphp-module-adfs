@@ -8,10 +8,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
-use SimpleSAML\HTTP\RunnableResponse;
 use SimpleSAML\Module\adfs\Controller;
 use SimpleSAML\Session;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\{Request, StreamedResponse};
 
 use function dirname;
 
@@ -108,6 +107,6 @@ class AdfsControllerTest extends TestCase
         $response = $c->prp($request);
 
         $this->assertTrue($response->isSuccessful());
-        $this->assertInstanceOf(RunnableResponse::class, $response);
+        $this->assertInstanceOf(StreamedResponse::class, $response);
     }
 }
