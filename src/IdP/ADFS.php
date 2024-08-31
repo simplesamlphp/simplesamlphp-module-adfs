@@ -15,6 +15,7 @@ use SimpleSAML\IdP;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module;
+use SimpleSAML\SAML2\Constants as SAML2_C;
 use SimpleSAML\SAML11\Constants as C;
 use SimpleSAML\SAML11\XML\saml\Assertion;
 use SimpleSAML\SAML11\XML\saml\Attribute;
@@ -122,7 +123,7 @@ class ADFS
         $now = new DateTimeImmutable('now', new DateTimeZone('Z'));
 
         if ($httpUtils->isHTTPS()) {
-            $method = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport';
+            $method = SAML2_C::AC_PASSWORD_PROTECTED_TRANSPORT;
         } else {
             $method = C::AC_PASSWORD;
         }
