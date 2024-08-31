@@ -27,11 +27,10 @@ class Endpoint
         $e = $parent->ownerDocument->createElement($name);
         $parent->appendChild($e);
 
-        $endpoint = $parent->ownerDocument->createElement('EndpointReference');
-        $endpoint->setAttribute('xmlns', 'http://www.w3.org/2005/08/addressing');
+        $endpoint = $parent->ownerDocument->createElementNS(Constants::NS_FED, 'fed:EndpointReference');
         $e->appendChild($endpoint);
 
-        $address = $parent->ownerDocument->createElement('Address', $address);
+        $address = $parent->ownerDocument->createElementNS('http://www.w3.org/2005/08/addressing', 'wsa:Address', $address);
         $endpoint->appendChild($address);
 
         return $e;

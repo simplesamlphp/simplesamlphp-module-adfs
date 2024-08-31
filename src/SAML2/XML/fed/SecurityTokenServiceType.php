@@ -60,7 +60,7 @@ class SecurityTokenServiceType extends RoleDescriptor
         $e->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:fed', Constants::NS_FED);
         $e->setAttributeNS(Constants::NS_XSI, 'xsi:type', 'fed:SecurityTokenServiceType');
         TokenTypesOffered::appendXML($e);
-        Endpoint::appendXML($e, 'SecurityTokenServiceEndpoint', $this->Location);
+        Endpoint::appendXML($e, 'fed:SecurityTokenServiceEndpoint', $this->Location);
         Endpoint::appendXML($e, 'fed:PassiveRequestorEndpoint', $this->Location);
 
         return $e;
