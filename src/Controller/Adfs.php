@@ -9,6 +9,7 @@ use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
+use SimpleSAML\SAML2\Constants as C;
 use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
 
 /**
@@ -77,7 +78,6 @@ class Adfs
             // Some products like DirX are known to break on pretty-printed XML
             $document->ownerDocument->formatOutput = false;
             $document->ownerDocument->encoding = 'UTF-8';
-
             $metaxml = $document->ownerDocument->saveXML();
 
             $response = new Response();
