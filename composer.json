@@ -37,7 +37,7 @@
         "simplesamlphp/xml-security": "^1.6"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp": "^3@dev",
+        "simplesamlphp/simplesamlphp": "^2.3",
         "simplesamlphp/simplesamlphp-test-framework": "^1.5.4"
     },
     "support": {
