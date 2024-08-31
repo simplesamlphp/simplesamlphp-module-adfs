@@ -7,7 +7,7 @@
     </description>
 
     <file>src</file>
-    <file>metadata-templates</file>
+    <file>metadata</file>
     <file>tests</file>
 
     <!-- Use this to exclude paths. You can have multiple patterns -->
