@@ -24,7 +24,6 @@ use SimpleSAML\SAML11\AuthenticationStatement;
 use SimpleSAML\SAML11\Conditions;
 use SimpleSAML\SAML11\NameIdentifier;
 use SimpleSAML\SAML11\Subject;
-use SimpleSAML\SAML2\Constants;
 use SimpleSAML\SAML2\Constants as C;
 use SimpleSAML\Utils;
 use SimpleSAML\WSSecurity\XML\wsa\Address;
@@ -110,9 +109,9 @@ class ADFS
         $now = new DateTimeImmutable('now', new DateTimeZone('Z'));
 
         if ($httpUtils->isHTTPS()) {
-            $method = Constants::AC_PASSWORD_PROTECTED_TRANSPORT;
+            $method = C::AC_PASSWORD_PROTECTED_TRANSPORT;
         } else {
-            $method = Constants::AC_PASSWORD;
+            $method = C::AC_PASSWORD;
         }
 
         $audience = new Audience($target);
