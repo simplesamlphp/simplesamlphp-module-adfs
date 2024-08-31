@@ -42,7 +42,7 @@
         "simplesamlphp/assert": "^1.1",
         "simplesamlphp/saml11": "^1.0",
         "simplesamlphp/saml2": "^5@dev",
-        "simplesamlphp/simplesamlphp": "dev-feature/adfs-upgrade",
+        "simplesamlphp/simplesamlphp": "^2.4",
         "simplesamlphp/ws-security": "^1.6",
         "simplesamlphp/xml-common": "^1.16",
         "simplesamlphp/xml-security": "^1.9",
