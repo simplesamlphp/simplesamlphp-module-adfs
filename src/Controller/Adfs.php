@@ -10,7 +10,9 @@ use SimpleSAML\Error as SspError;
 use SimpleSAML\IdP;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata;
+use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
+use SimpleSAML\SAML2\Constants as C;
 use SimpleSAML\Session;
 use SimpleSAML\Utils;
 use Symfony\Component\HttpFoundation\Request;
@@ -123,13 +125,13 @@ class Adfs
                 'entityid'            => $idpentityid,
                 'SingleSignOnService' => [
                     0 => [
-                        'Binding'  => Constants::BINDING_HTTP_REDIRECT,
+                        'Binding'  => C::BINDING_HTTP_REDIRECT,
                         'Location' => $adfs_service_location,
                     ],
                 ],
                 'SingleLogoutService' => [
                     0 => [
-                        'Binding'  => Constants::BINDING_HTTP_REDIRECT,
+                        'Binding'  => C::BINDING_HTTP_REDIRECT,
                         'Location' => $adfs_service_location,
                     ],
                 ],
@@ -143,7 +145,7 @@ class Adfs
 
             $metaArray['NameIDFormat'] = $idpmeta->getOptionalString(
                 'NameIDFormat',
-                Constants::NAMEID_TRANSIENT,
+                C::NAMEID_TRANSIENT,
             );
 
             if ($idpmeta->hasValue('OrganizationName')) {
