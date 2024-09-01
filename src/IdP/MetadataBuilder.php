@@ -7,7 +7,7 @@ namespace SimpleSAML\Module\adfs\IdP;
 use Beste\Clock\LocalizedClock;
 use Exception;
 use Psr\Clock\ClockInterface;
-use SimpleSAML\{Configuration, Logger, Utils};
+use SimpleSAML\{Configuration, Logger, Module, Utils};
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\SAML2\Exception\ArrayValidationException;
 use SimpleSAML\SAML2\XML\md\AbstractMetadataDocument;
@@ -72,7 +72,9 @@ class MetadataBuilder
         $organization = $this->getOrganization();
         $roleDescriptor = $this->getRoleDescriptor();
 
+        $randomUtils = new Utils\Random();
         $entityDescriptor = new EntityDescriptor(
+            id: $randomUtils->generateID(),
             entityId: $entityId,
             contactPerson: $contactPerson,
             organization: $organization,
@@ -171,9 +173,9 @@ class MetadataBuilder
     /**
      * This method builds the SecurityTokenService element
      */
-    private function getSecurityTokenService(): SecurityTokenService
+    public function getSecurityTokenService(): SecurityTokenServiceType
     {
-        $defaultEndpoint = $this->metadata->getDefaultEndpoint('SingleSignOnService');
+        $defaultEndpoint = Module::getModuleURL('adfs') . '/idp/prp.php';
 
         return new SecurityTokenServiceType(
             protocolSupportEnumeration: [C::NS_TRUST, C::NS_FED],
@@ -181,12 +183,12 @@ class MetadataBuilder
             tokenTypesOffered: new TokenTypesOffered([new TokenType('urn:oasis:names:tc:SAML:1.0:assertion')]),
             securityTokenServiceEndpoint: [
                 new SecurityTokenServiceEndpoint([
-                    new EndpointReference(new Address($defaultEndpoint['Location'])),
+                    new EndpointReference(new Address($defaultEndpoint)),
                 ]),
             ],
             passiveRequestorEndpoint: [
                 new PassiveRequestorEndpoint([
-                    new EndpointReference(new Address($defaultEndpoint['Location'])),
+                    new EndpointReference(new Address($defaultEndpoint)),
                 ]),
             ],
         );
