@@ -38,6 +38,10 @@ class ADFS
 
         Logger::info('ADFS - IdP.prp: Incoming Authentication request: ' . $issuer . ' id ' . $requestid);
 
+        if ($request->query->has('username')) {
+            $username = (string) $request->query->get('username');
+        }
+
         $state = [
             'Responder' => [ADFS::class, 'sendResponse'],
             'SPMetadata' => $spMetadata->toArray(),
@@ -46,6 +50,10 @@ class ADFS
             'adfs:wctx' => $requestid,
             'adfs:wreply' => false,
         ];
+
+        if ($username !== null) {
+            $state['core:username'] = $username;
+        }
 
         if (isset($query['wreply']) && !empty($query['wreply'])) {
             $httpUtils = new Utils\HTTP();
