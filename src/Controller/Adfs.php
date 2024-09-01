@@ -223,7 +223,7 @@ class Adfs
         Logger::info('ADFS - IdP.prp: Accessing ADFS IdP endpoint prp');
 
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
-        $idp = IdP::getById($this->config, 'adfs:' . $idpEntityId);
+        $idp = IdP::getById('adfs:' . $idpEntityId);
 
         if ($request->query->has('wa')) {
             $wa = $request->query->get('wa');
