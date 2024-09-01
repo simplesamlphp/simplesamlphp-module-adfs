@@ -15,15 +15,16 @@ use SimpleSAML\IdP;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module;
-use SimpleSAML\SAML11\Attribute;
-use SimpleSAML\SAML11\AttributeStatement;
-use SimpleSAML\SAML11\AttributeValue;
-use SimpleSAML\SAML11\Audience;
-use SimpleSAML\SAML11\AudienceRestrictionCondition;
-use SimpleSAML\SAML11\AuthenticationStatement;
-use SimpleSAML\SAML11\Conditions;
-use SimpleSAML\SAML11\NameIdentifier;
-use SimpleSAML\SAML11\Subject;
+use SimpleSAML\SAML11\XML\saml\Assertion;
+use SimpleSAML\SAML11\XML\saml\Attribute;
+use SimpleSAML\SAML11\XML\saml\AttributeStatement;
+use SimpleSAML\SAML11\XML\saml\AttributeValue;
+use SimpleSAML\SAML11\XML\saml\Audience;
+use SimpleSAML\SAML11\XML\saml\AudienceRestrictionCondition;
+use SimpleSAML\SAML11\XML\saml\AuthenticationStatement;
+use SimpleSAML\SAML11\XML\saml\Conditions;
+use SimpleSAML\SAML11\XML\saml\NameIdentifier;
+use SimpleSAML\SAML11\XML\saml\Subject;
 use SimpleSAML\SAML2\Constants as C;
 use SimpleSAML\Utils;
 use SimpleSAML\WSSecurity\XML\wsa\Address;
@@ -40,6 +41,10 @@ use SimpleSAML\XMLSecurity\XML\ds\X509Certificate;
 use SimpleSAML\XMLSecurity\XML\ds\X509Data;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+
+use function base64_encode;
+use function chunk_split;
+use function trim;
 
 class ADFS
 {
@@ -103,14 +108,14 @@ class ADFS
         string $nameid,
         array $attributes,
         int $assertionLifetime,
-    ): string {
+    ): Assertion {
         $httpUtils = new Utils\HTTP();
         $randomUtils = new Utils\Random();
         $timeUtils = new Utils\Time();
 
         $issueInstant = $timeUtils->generateTimestamp();
-        $notBefore = new DateInterval('PT30S');
-        $notOnOrAfter = new DateInterval($assertionLifetime);
+        $notBefore = DateInterval::createFromDateString('30 seconds');
+        $notOnOrAfter = DateInterval::createFromDateString(sprintf('%d seconds', $assertionLifetime));
         $assertionID = $randomUtils->generateID();
         $nameidFormat = 'http://schemas.xmlsoap.org/claims/UPN';
         $nameid = htmlspecialchars($nameid);
@@ -125,11 +130,11 @@ class ADFS
         $audience = new Audience($target);
         $audienceRestrictionCondition = new AudienceRestrictionCondition([$audience]);
         $conditions = new Conditions(
-            $audience,
+            [$audienceRestrictionCondition],
             [],
             [],
             $now->sub($notBefore),
-            $now->add($assertionLifetime),
+            $now->add($notOnOrAfter),
         );
 
         $nameIdentifier = new NameIdentifier($nameid, null, $nameidFormat);
@@ -160,7 +165,7 @@ class ADFS
             }
             $attrs[] = new Attribute($name, $namespace, $attrValue);
         }
-        $attributeStatement = new AttributeStatement($subject, $attributes);
+        $attributeStatement = new AttributeStatement($subject, $attrs);
 
         return new Assertion(
             $assertionID,
@@ -188,12 +193,14 @@ class ADFS
         string $algo,
         #[\SensitiveParameter]
         string $passphrase = null,
-    ): string {
+    ): Assertion {
         $key = PrivateKey::fromFile($key, $passphrase);
         $pubkey = PublicKey::fromFile($cert);
         $keyInfo = new KeyInfo([
             new X509Data(
-                [new X509Certificate($pubkey->getPEM()->getData())],
+                [new X509Certificate(
+                    trim(chunk_split(base64_encode($pubkey->getPEM()->data()))),
+                )],
             ),
         ]);
 
@@ -202,7 +209,8 @@ class ADFS
             $key,
         );
 
-        return $assertion->sign($signer, C::C14N_EXCLUSIVE_WITHOUT_COMMENTS, $keyInfo);
+        $assertion->sign($signer, C::C14N_EXCLUSIVE_WITHOUT_COMMENTS, $keyInfo);
+        return $assertion;
     }
 
 
@@ -424,11 +432,10 @@ class ADFS
             'adfs:entityID' => $spEntityId,
         ]);
 
-        $assertionLifetime = $spMetadata->getOptionalString('assertion.lifetime', null);
+        $assertionLifetime = $spMetadata->getOptionalInteger('assertion.lifetime', null);
         if ($assertionLifetime === null) {
-            $assertionLifetime = $idpMetadata->getOptionalString('assertion.lifetime', 'PT300S');
+            $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
         }
-        Assert::nullOrValidDuration($assertionLifetime);
 
         $assertion = ADFS::generateAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
@@ -444,10 +451,12 @@ class ADFS
         $assertion = ADFS::signAssertion($assertion, $privateKeyFile, $certificateFile, $algo, $passphrase);
 
         $requestSecurityToken = new RequestSecurityToken(null, [$assertion]);
-        $appliesTo = new AppliesTo([new EndpointReference(new Address($target))]);
-        $requestSecurityTokenResponse = RequestSecurityTokenResponse(null, [$requestSecurityToken, $appliesTo]);
+        $appliesTo = new AppliesTo([new EndpointReference(new Address($spEntityId))]);
+        $requestSecurityTokenResponse = new RequestSecurityTokenResponse(null, [$requestSecurityToken, $appliesTo]);
 
-        $wresult = $requestSecurityTokenResponse->saveXML();
+
+        $xmlResponse = $requestSecurityTokenResponse->toXML();
+        $wresult = $xmlResponse->ownerDocument->saveXML($xmlResponse);
         $wctx = $state['adfs:wctx'];
         $wreply = $state['adfs:wreply'] ? : $spMetadata->getValue('prp');
         ADFS::postResponse($wreply, $wresult, $wctx);
