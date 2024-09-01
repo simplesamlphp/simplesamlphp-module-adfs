@@ -9,7 +9,6 @@ use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
-use SimpleSAML\SAML2\Constants as C;
 use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
 
 /**
@@ -73,131 +72,13 @@ class Adfs
             $idpmeta = $this->metadata->getMetaDataConfig($idpentityid, 'adfs-idp-hosted');
 
             $builder = new MetadataBuilder($this->config, $idpmeta);
-/*
-            $availableCerts = [];
-            $keys = [];
-            $certInfo = $this->cryptoUtils->loadPublicKey($idpmeta, false, 'new_');
 
-            if ($certInfo !== null) {
-                $availableCerts['new_idp.crt'] = $certInfo;
-                $keys[] = [
-                    'type'            => 'X509Certificate',
-                    'signing'         => true,
-                    'encryption'      => true,
-                    'X509Certificate' => $certInfo['certData'],
-                ];
-                $hasNewCert = true;
-            } else {
-                $hasNewCert = false;
-            }
-*/
-            /** @var array $certInfo */
-/*            $certInfo = $this->cryptoUtils->loadPublicKey($idpmeta, true);
-            $availableCerts['idp.crt'] = $certInfo;
-            $keys[] = [
-                'type'            => 'X509Certificate',
-                'signing'         => true,
-                'encryption'      => ($hasNewCert ? false : true),
-                'X509Certificate' => $certInfo['certData'],
-            ];
+            $document = $builder->buildDocument()->toXML();
+            // Some products like DirX are known to break on pretty-printed XML
+            $document->ownerDocument->formatOutput = false;
+            $document->ownerDocument->encoding = 'UTF-8';
 
-            if ($idpmeta->hasValue('https.certificate')) {
-*/
-                /** @var array $httpsCert */
-/*
-                $httpsCert = $this->cryptoUtils->loadPublicKey($idpmeta, true, 'https.');
-                Assert::keyExists($httpsCert, 'certData');
-                $availableCerts['https.crt'] = $httpsCert;
-                $keys[] = [
-                    'type'            => 'X509Certificate',
-                    'signing'         => true,
-                    'encryption'      => false,
-                    'X509Certificate' => $httpsCert['certData'],
-                ];
-            }
-
-            $adfs_service_location = Module::getModuleURL('adfs') . '/idp/prp.php';
-            $metaArray = [
-                'metadata-set'        => 'adfs-idp-remote',
-                'entityid'            => $idpentityid,
-                'SingleSignOnService' => [
-                    0 => [
-                        'Binding'  => C::BINDING_HTTP_REDIRECT,
-                        'Location' => $adfs_service_location,
-                    ],
-                ],
-                'SingleLogoutService' => [
-                    0 => [
-                        'Binding'  => C::BINDING_HTTP_REDIRECT,
-                        'Location' => $adfs_service_location,
-                    ],
-                ],
-            ];
-
-            if (count($keys) === 1) {
-                $metaArray['certData'] = $keys[0]['X509Certificate'];
-            } else {
-                $metaArray['keys'] = $keys;
-            }
-
-            $metaArray['NameIDFormat'] = $idpmeta->getOptionalString(
-                'NameIDFormat',
-                C::NAMEID_TRANSIENT,
-            );
-
-            if ($idpmeta->hasValue('OrganizationName')) {
-                $metaArray['OrganizationName'] = $idpmeta->getLocalizedString('OrganizationName');
-                $metaArray['OrganizationDisplayName'] = $idpmeta->getOptionalLocalizedString(
-                    'OrganizationDisplayName',
-                    $metaArray['OrganizationName'],
-                );
-
-                if (!$idpmeta->hasValue('OrganizationURL')) {
-                    throw new SspError\Exception('If OrganizationName is set, OrganizationURL must also be set.');
-                }
-                $metaArray['OrganizationURL'] = $idpmeta->getLocalizedString('OrganizationURL');
-            }
-
-            if ($idpmeta->hasValue('scope')) {
-                $metaArray['scope'] = $idpmeta->getArray('scope');
-            }
-
-            if ($idpmeta->hasValue('EntityAttributes')) {
-                $metaArray['EntityAttributes'] = $idpmeta->getArray('EntityAttributes');
-            }
-
-            if ($idpmeta->hasValue('UIInfo')) {
-                $metaArray['UIInfo'] = $idpmeta->getArray('UIInfo');
-            }
-
-            if ($idpmeta->hasValue('DiscoHints')) {
-                $metaArray['DiscoHints'] = $idpmeta->getArray('DiscoHints');
-            }
-
-            if ($idpmeta->hasValue('RegistrationInfo')) {
-                $metaArray['RegistrationInfo'] = $idpmeta->getArray('RegistrationInfo');
-            }
-
-            $metaBuilder = new Metadata\SAMLBuilder($idpentityid);
-            $metaBuilder->addSecurityTokenServiceType($metaArray);
-            $metaBuilder->addOrganizationInfo($metaArray);
-            $technicalContactEmail = $this->config->getOptionalString('technicalcontact_email', null);
-            if ($technicalContactEmail !== null && $technicalContactEmail !== 'na@example.org') {
-                $metaBuilder->addContact(Utils\Config\Metadata::getContact([
-                    'emailAddress' => $technicalContactEmail,
-                    'givenName'    => $this->config->getOptionalString('technicalcontact_name', null),
-                    'contactType'  => 'technical',
-                ]));
-            }
-            $metaxml = $metaBuilder->getEntityDescriptorText();
-*/
-            // sign the metadata if enabled
-//            $metaxml = Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
-                    $document = $builder->buildDocument()->toXML();
-                    $document->ownerDocument->formatOutput = true;
-                    $document->ownerDocument->encoding = 'UTF-8';
-
-$metaxml = $document->ownerDocument->saveXML();
+            $metaxml = $document->ownerDocument->saveXML();
 
             $response = new Response();
             $response->setEtag(hash('sha256', $metaxml));
