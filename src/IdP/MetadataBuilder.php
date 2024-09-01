@@ -13,12 +13,8 @@ use SimpleSAML\SAML2\Exception\ArrayValidationException;
 use SimpleSAML\SAML2\XML\md\AbstractMetadataDocument;
 use SimpleSAML\SAML2\XML\md\ContactPerson;
 use SimpleSAML\SAML2\XML\md\EntityDescriptor;
-use SimpleSAML\SAML2\XML\md\NameIDFormat;
 use SimpleSAML\SAML2\XML\md\KeyDescriptor;
 use SimpleSAML\SAML2\XML\md\Organization;
-use SimpleSAML\SAML2\XML\md\RequestedAttribute;
-use SimpleSAML\SAML2\XML\md\ServiceDescription;
-use SimpleSAML\SAML2\XML\md\ServiceName;
 use SimpleSAML\XML\Chunk;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
 use SimpleSAML\XMLSecurity\Key\PrivateKey;
@@ -54,7 +50,7 @@ class MetadataBuilder
      */
     public function __construct(
         protected Configuration $config,
-        protected Configuration $metadata
+        protected Configuration $metadata,
     ) {
         $this->clock = LocalizedClock::in('Z');
     }
@@ -139,7 +135,10 @@ class MetadataBuilder
         try {
             $org = Organization::fromArray([
                 'OrganizationName' => $arrayUtils->arrayize($this->metadata->getArray('OrganizationName'), 'en'),
-                'OrganizationDisplayName' => $arrayUtils->arrayize($this->metadata->getArray('OrganizationDisplayName'), 'en'),
+                'OrganizationDisplayName' => $arrayUtils->arrayize(
+                    $this->metadata->getArray('OrganizationDisplayName'),
+                    'en',
+                ),
                 'OrganizationURL' => $arrayUtils->arrayize($this->metadata->getArray('OrganizationURL'), 'en'),
             ]);
         } catch (ArrayValidationException $e) {
@@ -208,10 +207,18 @@ class MetadataBuilder
                 continue;
             }
             if (!isset($key['signing']) || $key['signing'] === true) {
-                $keyDescriptor[] = self::buildKeyDescriptor('signing', $key['X509Certificate'], $key['name'] ?? null);
+                $keyDescriptor[] = self::buildKeyDescriptor(
+                    'signing',
+                    $key['X509Certificate'],
+                    $key['name'] ?? null,
+                );
             }
             if (!isset($key['encryption']) || $key['encryption'] === true) {
-                $keyDescriptor[] = self::buildKeyDescriptor('encryption', $key['X509Certificate'], $key['name'] ?? null);
+                $keyDescriptor[] = self::buildKeyDescriptor(
+                    'encryption',
+                    $key['X509Certificate'],
+                    $key['name'] ?? null,
+                );
             }
         }
 
