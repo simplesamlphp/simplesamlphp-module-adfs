@@ -72,7 +72,7 @@ class Adfs
             }
             $idpmeta = $this->metadata->getMetaDataConfig($idpentityid, 'adfs-idp-hosted');
 
-            $builder = new MetadataBuilder($this->config, Configuration::fromArray($idpmeta));
+            $builder = new MetadataBuilder($this->config, $idpmeta);
 /*
             $availableCerts = [];
             $keys = [];
