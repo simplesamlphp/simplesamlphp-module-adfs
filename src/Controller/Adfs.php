@@ -5,19 +5,12 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\Controller;
 
 use Exception;
-use SimpleSAML\Configuration;
+use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
-use SimpleSAML\IdP;
-use SimpleSAML\Logger;
-use SimpleSAML\Metadata;
-use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
+use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
 use SimpleSAML\SAML2\Constants as C;
-use SimpleSAML\Session;
-use SimpleSAML\Utils;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
 
 /**
  * Controller class for the adfs module.
@@ -79,6 +72,8 @@ class Adfs
             }
             $idpmeta = $this->metadata->getMetaDataConfig($idpentityid, 'adfs-idp-hosted');
 
+            $builder = new MetadataBuilder($this->config, Configuration::fromArray($idpmeta));
+/*
             $availableCerts = [];
             $keys = [];
             $certInfo = $this->cryptoUtils->loadPublicKey($idpmeta, false, 'new_');
@@ -95,9 +90,9 @@ class Adfs
             } else {
                 $hasNewCert = false;
             }
-
+*/
             /** @var array $certInfo */
-            $certInfo = $this->cryptoUtils->loadPublicKey($idpmeta, true);
+/*            $certInfo = $this->cryptoUtils->loadPublicKey($idpmeta, true);
             $availableCerts['idp.crt'] = $certInfo;
             $keys[] = [
                 'type'            => 'X509Certificate',
@@ -107,7 +102,9 @@ class Adfs
             ];
 
             if ($idpmeta->hasValue('https.certificate')) {
+*/
                 /** @var array $httpsCert */
+/*
                 $httpsCert = $this->cryptoUtils->loadPublicKey($idpmeta, true, 'https.');
                 Assert::keyExists($httpsCert, 'certData');
                 $availableCerts['https.crt'] = $httpsCert;
@@ -193,9 +190,14 @@ class Adfs
                 ]));
             }
             $metaxml = $metaBuilder->getEntityDescriptorText();
-
+*/
             // sign the metadata if enabled
-            $metaxml = Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
+//            $metaxml = Metadata\Signer::sign($metaxml, $idpmeta->toArray(), 'ADFS IdP');
+                    $document = $builder->buildDocument()->toXML();
+                    $document->ownerDocument->formatOutput = true;
+                    $document->ownerDocument->encoding = 'UTF-8';
+
+$metaxml = $document->ownerDocument->saveXML();
 
             $response = new Response();
             $response->setEtag(hash('sha256', $metaxml));
