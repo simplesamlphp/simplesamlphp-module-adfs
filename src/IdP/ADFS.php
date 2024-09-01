@@ -46,6 +46,10 @@ use function base64_encode;
 use function chunk_split;
 use function trim;
 
+use function base64_encode;
+use function chunk_split;
+use function trim;
+
 class ADFS
 {
     /**
@@ -433,11 +437,10 @@ class ADFS
             'adfs:entityID' => $spEntityId,
         ]);
 
-        $assertionLifetime = $spMetadata->getOptionalString('assertion.lifetime', null);
+        $assertionLifetime = $spMetadata->getOptionalInteger('assertion.lifetime', null);
         if ($assertionLifetime === null) {
-            $assertionLifetime = $idpMetadata->getOptionalString('assertion.lifetime', 'PT300S');
+            $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
         }
-        Assert::nullOrValidDuration($assertionLifetime);
 
         $assertion = ADFS::generateAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
