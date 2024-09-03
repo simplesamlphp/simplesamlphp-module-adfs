@@ -218,7 +218,7 @@ class MetadataBuilder
                     'encryption',
                     $key['X509Certificate'],
                     $key['name'] ?? null,
-                ));
+                );
             }
         }
 
