@@ -27,3 +27,10 @@ adfs-prp-legacy:
     _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::prp'
   }
   methods: [GET, POST]
+
+adfs-wstrust-mex:
+  path: /ws-trust/mex
+  defaults: {
+    _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::mex'
+  }
+  methods: [GET]

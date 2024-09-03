@@ -9,6 +9,7 @@ use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
+use SimpleSAML\Module\adfs\Trust\MetadataExchange;
 use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
 
 /**
@@ -135,5 +136,44 @@ class Adfs
             );
         }
         throw new SspError\BadRequest("Missing parameter 'wa' or 'assocId' in request.");
+    }
+
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function mex(Request $request): Response
+    {
+        if (!$this->config->getOptionalBoolean('enable.adfs-idp', false)) {
+            throw new SspError\Error('NOACCESS');
+        }
+
+        // check if valid local session exists
+        $authUtils = new Utils\Auth();
+        if ($this->config->getOptionalBoolean('admin.protectmetadata', false) && !$authUtils->isAdmin()) {
+            return new StreamedResponse([$authUtils, 'requireAdmin']);
+        }
+
+        $mexBuilder = new MetadataExchange();
+        $document = $mexBuilder->buildDocument();
+
+        $document = $builder->buildDocument()->toXML();
+        // Some products like DirX are known to break on pretty-printed XML
+        $document->ownerDocument->formatOutput = false;
+        $document->ownerDocument->encoding = 'UTF-8';
+
+        $metaxml = $document->ownerDocument->saveXML();
+
+        $response = new Response();
+        $response->setEtag(hash('sha256', $metaxml));
+        $response->setPublic();
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+        $response->headers->set('Content-Type', 'text/xml');
+        $response->setContent($metaxml);
+
+        return $response;
     }
 }
