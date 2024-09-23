@@ -84,78 +84,86 @@ class MetadataExchange
      */
     private function getUserNameWSTrustBindingPolicy(): Policy
     {
+        $transportBinding = new TransportBinding(
+            elements: [new Policy(
+                children: [
+                    new TransportToken(
+                        elements: [new Policy(
+                            children: [new HttpsToken(true)],
+                        )],
+                    ),
+                    new AlgorithmSuite(
+                        elements: [new Policy(
+                            children: [new Basic256()],
+                        )],
+                    ),
+                    new Layout(
+                        elements: [new Policy(
+                            children: [new Strict()],
+                        )],
+                    ),
+                    new IncludeTimestamp(),
+                ],
+            )],
+        );
+
+        $signedSupportingTokens = new SignedSupportingTokens(
+            elements: [new Policy(
+                children: [new UsernameToken(
+                    includeToken: IncludeToken::AlwaysToRecipient,
+                    elts: [new Policy(
+                        children: [new WssUsernameToken10()],
+                    )],
+                )],
+            )],
+        );
+
+        $endorsingSupportingTokens = new EndorsingSupportingTokens(
+            elements: [new Policy(
+                children: [new RsaToken(
+                    includeToken: IncludeToken::Never,
+                    elts: [new SignedParts(
+                        header: [
+                            new Header(
+                                namespace: C::NS_ADDR_200508,
+                                name: 'To',
+                            ),
+                        ],
+                    )],
+                    namespacedAttributes: [
+                        new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
+                    ],
+                )],
+            )],
+        );
+
+        $wss11 = new Wss11(
+            elements: [new Policy()],
+        );
+
+        $trust10 = new Trust10(
+            elements: [new Policy(
+                children: [
+                    new MustSupportIssuedTokens(),
+                    new RequireClientEntropy(),
+                    new RequireServerEntropy(),
+                ],
+            )],
+        );
+
+        $usingAddressing = new UsingAddressing();
+
         return new Policy(
             Id: 'UserNameWSTrustBinding_IWSTrustFeb2005Async_policy',
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
                    children: [
-                       new TransportBinding(
-                           elements: [new Policy(
-                               children: [
-                                   new TransportToken(
-                                       elements: [new Policy(
-                                           children: [new HttpsToken(
-                                               namespacedAttributes: [
-                                                   new XMLAttribute(null, null, 'RequireClientCertificate', 'false'),
-                                               ],
-                                           )],
-                                       )],
-                                   ),
-                                   new AlgorithmSuite(
-                                       elements: [new Policy(
-                                           children: [new Basic256()],
-                                       )],
-                                   ),
-                                   new Layout(
-                                       elements: [new Policy(
-                                           children: [new Strict()],
-                                       )],
-                                   ),
-                                   new IncludeTimestamp(),
-                               ],
-                           )],
-                       ),
-                       new SignedSupportingTokens(
-                           elements: [new Policy(
-                               children: [new UsernameToken(
-                                   includeToken: IncludeToken::AlwaysToRecipient,
-                                   elts: [new Policy(
-                                       children: [new WssUsernameToken10()],
-                                   )],
-                               )],
-                           )],
-                       ),
-                       new EndorsingSupportingTokens(
-                           elements: [new Policy(
-                               children: [new RsaToken(
-                                   includeToken: IncludeToken::Never,
-                                   elts: [new SignedParts(
-                                       header: [
-                                           new Header(
-                                               namespace: C::NS_ADDR,
-                                               name: 'To',
-                                           ),
-                                       ],
-                                   )],
-                                   namespacedAttributes: [
-                                       new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
-                                   ],
-                               )],
-                           )],
-                       ),
-                       new Wss11(
-                           elements: [new Policy()],
-                       ),
-                       new Trust10(
-                           elements: [new Policy(
-                               children: [
-                                   new MustSupportIssuedTokens(),
-                                   new RequireClientEntropy(),
-                                    new RequireServerEntropy(),
-                               ],
-                           )],
-                       ),
-                       new UsingAddressing(),
+                       $transportBinding,
+                       $signedSupportingTokens,
+                       $endorsingSupportingTokens,
+                       $wss11,
+                       $trust10,
+                       $usingAddressing,
                    ],
                 )],
             )],
