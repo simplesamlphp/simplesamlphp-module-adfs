@@ -63,6 +63,7 @@ class ADFS
 
         Logger::info('ADFS - IdP.prp: Incoming Authentication request: ' . $issuer . ' id ' . $requestid);
 
+        $username = null;
         if ($request->query->has('username')) {
             $username = (string) $request->query->get('username');
         }

@@ -19,7 +19,8 @@
             "composer/package-versions-deprecated": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true,
-            "simplesamlphp/composer-module-installer": true
+            "simplesamlphp/composer-module-installer": true,
+            "simplesamlphp/composer-xmlprovider-installer": true
         }
     },
     "autoload": {
@@ -41,7 +42,7 @@
         "simplesamlphp/assert": "^1.1",
         "simplesamlphp/saml11": "^1.0",
         "simplesamlphp/saml2": "^5@dev",
-        "simplesamlphp/simplesamlphp": "^2.3",
+        "simplesamlphp/simplesamlphp": "dev-feature/adfs-upgrade",
         "simplesamlphp/xml-common": "^1.16",
         "simplesamlphp/ws-security": "^1.0",
         "symfony/http-foundation": "^6.4"
