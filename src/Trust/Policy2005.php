@@ -34,7 +34,6 @@ use SimpleSAML\WSSecurity\XML\sp_200507\WssUsernameToken10;
 use SimpleSAML\WSSecurity\XML\sp_200507\WssX509V3Token10;
 use SimpleSAML\WSSecurity\XML\sp_200507\X509Token;
 use SimpleSAML\WSSecurity\XML\wsaw\UsingAddressing;
-use SimpleSAML\WSSecurity\XML\wsdl\Definitions;
 use SimpleSAML\WSSecurity\XML\wsp\All;
 use SimpleSAML\WSSecurity\XML\wsp\ExactlyOne;
 use SimpleSAML\WSSecurity\XML\wsp\Policy;
