@@ -41,6 +41,7 @@ use SimpleSAML\WSSecurity\XML\wsp\Policy;
 use SimpleSAML\WSSecurity\XML\wst\CanonicalizationAlgorithm;
 use SimpleSAML\WSSecurity\XML\wst\EncryptionAlgorithm;
 use SimpleSAML\WSSecurity\XML\wst\EncryptWith;
+use SimpleSAML\WSSecurity\XML\wst\KeySize;
 use SimpleSAML\WSSecurity\XML\wst\KeyType;
 use SimpleSAML\WSSecurity\XML\wst\KeyTypeEnum;
 use SimpleSAML\WSSecurity\XML\wst\SignatureAlgorithm;
@@ -365,16 +366,16 @@ class Policy2005
             elements: [new Policy(
                 children: [
                     new IssuedToken(
+                        requestSecurityTokenTemplate: new RequestSecurityTokenTemplate(
+                            elts: [
+                                new KeyType([KeyTypeEnum::PublicKey]),
+                                new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
+                                new SignatureAlgorithm(C::SIG_RSA_SHA1),
+                                new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
+                                new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
+                            ],
+                        ),
                         elts: [
-                            new RequestSecurityTokenTemplate(
-                                elts: [
-                                    new KeyType([KeyTypeEnum::PublicKey]),
-                                    new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
-                                    new SignatureAlgorithm(C::SIG_RSA_SHA1),
-                                    new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
-                                    new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
-                                ],
-                            ),
                             new Policy(
                                 children: [
                                     new RequireInternalReference(),
@@ -476,17 +477,17 @@ class Policy2005
             elements: [new Policy(
                 children: [
                     new IssuedToken(
+                        requestSecurityTokenTemplate: new RequestSecurityTokenTemplate(
+                            elts: [
+                                new KeyType([KeyTypeEnum::SymmetricKey]),
+                                new KeySize('256'),
+                                new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
+                                new SignatureAlgorithm(C::SIG_HMAC_SHA1),
+                                new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
+                                new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
+                            ],
+                        ),
                         elts: [
-                            new RequestSecurityTokenTemplate(
-                                elts: [
-                                    new KeyType([KeyTypeEnum::SymmetricKey]),
-                                    new KeySize('256'),
-                                    new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
-                                    new SignatureAlgorithm(C::SIG_HMAC_SHA1),
-                                    new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
-                                    new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
-                                ],
-                            ),
                             new Policy(
                                 children: [
                                     new RequireInternalReference(),
@@ -519,6 +520,23 @@ class Policy2005
                 ],
             )],
         );
+
+        $wss11 = new Wss11(
+            elements: [new Policy(
+            )],
+        );
+
+        $trust10 = new Trust10(
+            elements: [new Policy(
+                children: [
+                    new MustSupportIssuedTokens(),
+                    new RequireClientEntropy(),
+                    new RequireServerEntropy(),
+                ],
+            )],
+        );
+
+        $usingAddressing = new UsingAddressing();
 
         return new Policy(
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1_policy'),
