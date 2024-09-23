@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\Trust;
 
 use SimpleSAML\WSSecurity\Constants as C;
+/*
 use SimpleSAML\WSSecurity\XML\mssp\RsaToken;
 use SimpleSAML\WSSecurity\XML\sp_200507\AlgorithmSuite;
 use SimpleSAML\WSSecurity\XML\sp_200507\Basic256;
@@ -44,14 +45,13 @@ use SimpleSAML\WSSecurity\XML\wst\EncryptWith;
 use SimpleSAML\WSSecurity\XML\wst\KeyType;
 use SimpleSAML\WSSecurity\XML\wst\KeyTypeEnum;
 use SimpleSAML\WSSecurity\XML\wst\SignatureAlgorithm;
+*/
 use SimpleSAML\XML\Attribute as XMLAttribute;
 
 /**
- * Common code for building MetaExchange (mex) documents based on the available configuration.
- *
  * @package simplesamlphp/simplesamlphp-module-adfs
  */
-class MetadataExchange
+class Policy13
 {
     /**
      * Constructor.
@@ -65,33 +65,17 @@ class MetadataExchange
 
 
     /**
-     * Build a mex document
-     *
-     * @return \SimpleSAML\WSSecurity\XML\wsdl\Definitions
-     */
-    public function buildDocument(): Definitions
-    {
-        return new Definitions(
-            targetNamespace: 'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
-            name: 'SecurityTokenService',
-            elements: $this->getPolicies(),
-        );
-    }
-
-
-    /**
      * This method builds the wsp:Policy elements
      *
      * @param \SimpleSAML\WSSecurity\XML\wsp\Policy[]
      */
-    private function getPolicies(): array
+    public function getPolicies(): array
     {
         return [
-            $this->getCertificateWSTrustBinding(),
-            $this->getCertificateWSTrustBinding1(),
-            $this->getUserNameWSTrustBindingPolicy(),
-            $this->getIssuedTokenWSTrustBinding(),
-            $this->getIssuedTokenWSTrustBinding1(),
+//            $this->getCertificateWSTrustBinding(),
+//            $this->getUserNameWSTrustBindingPolicy(),
+//            $this->getIssuedTokenWSTrustBinding(),
+//            $this->getIssuedTokenWSTrustBinding1(),
         ];
     }
 
@@ -103,6 +87,7 @@ class MetadataExchange
      */
     private function getCertificateWSTrustBinding(): Policy
     {
+/*
         $transportBinding = new TransportBinding(
             elements: [new Policy(
                 children: [
@@ -197,51 +182,7 @@ class MetadataExchange
                 )],
             )],
         );
-    }
-
-
-    /**
-     * This method builds the CertificateWSTrustBinding1 policy.
-     *
-     * @param \SimpleSAML\WSSecurity\XML\wsp\Policy
-     */
-    private function getCertificateWSTrustBinding1(): Policy
-    {
-        $transportBinding = new TransportBinding(
-            elements: [new Policy(
-                children: [
-                    new TransportToken(
-                        elements: [new Policy(
-                            children: [new HttpsToken(true)],
-                        )],
-                    ),
-                    new AlgorithmSuite(
-                        elements: [new Policy(
-                            children: [new Basic256()],
-                        )],
-                    ),
-                    new Layout(
-                        elements: [new Policy(
-                            children: [new Strict()],
-                        )],
-                    ),
-                ],
-            )],
-        );
-
-        $usingAddressing = new UsingAddressing();
-
-        return new Policy(
-            Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'CertificateWSTrustBinding_IWSTrustFeb2005Async1_policy'),
-            operatorContent: [new ExactlyOne(
-                operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $usingAddressing,
-                   ],
-                )],
-            )],
-        );
+*/
     }
 
 
@@ -252,6 +193,7 @@ class MetadataExchange
      */
     private function getUserNameWSTrustBindingPolicy(): Policy
     {
+/*
         $transportBinding = new TransportBinding(
             elements: [new Policy(
                 children: [
@@ -345,6 +287,7 @@ class MetadataExchange
                 )],
             )],
         );
+*/
     }
 
 
@@ -355,6 +298,7 @@ class MetadataExchange
      */
     private function getIssuedTokenWSTrustBinding(): Policy
     {
+/*
         $transportBinding = new TransportBinding(
             elements: [new Policy(
                 children: [
@@ -456,6 +400,7 @@ class MetadataExchange
                 )],
             )],
         );
+*/
     }
 
 
@@ -466,6 +411,7 @@ class MetadataExchange
      */
     private function getIssuedTokenWSTrustBinding1(): Policy
     {
+/*
         $transportBinding = new TransportBinding(
             elements: [new Policy(
                 children: [
@@ -551,5 +497,6 @@ class MetadataExchange
                 )],
             )],
         );
+*/
     }
 }

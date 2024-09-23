@@ -9,7 +9,7 @@ use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
-use SimpleSAML\Module\adfs\Trust\MetadataExchange;
+use SimpleSAML\Module\adfs\MetadataExchange;
 use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
 
 /**
