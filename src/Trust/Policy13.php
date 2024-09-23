@@ -5,37 +5,33 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\Trust;
 
 use SimpleSAML\WSSecurity\Constants as C;
-/*
-use SimpleSAML\WSSecurity\XML\mssp\RsaToken;
-use SimpleSAML\WSSecurity\XML\sp_200507\AlgorithmSuite;
-use SimpleSAML\WSSecurity\XML\sp_200507\Basic256;
-use SimpleSAML\WSSecurity\XML\sp_200507\EndorsingSupportingTokens;
-use SimpleSAML\WSSecurity\XML\sp_200507\Header;
-use SimpleSAML\WSSecurity\XML\sp_200507\HttpsToken;
-use SimpleSAML\WSSecurity\XML\sp_200507\IncludeTimestamp;
-use SimpleSAML\WSSecurity\XML\sp_200507\IncludeToken;
-use SimpleSAML\WSSecurity\XML\sp_200507\IssuedToken;
-use SimpleSAML\WSSecurity\XML\sp_200507\Layout;
-use SimpleSAML\WSSecurity\XML\sp_200507\MustSupportIssuedTokens;
-use SimpleSAML\WSSecurity\XML\sp_200507\MustSupportRefThumbprint;
-use SimpleSAML\WSSecurity\XML\sp_200507\RequestSecurityTokenTemplate;
-use SimpleSAML\WSSecurity\XML\sp_200507\RequireClientEntropy;
-use SimpleSAML\WSSecurity\XML\sp_200507\RequireInternalReference;
-use SimpleSAML\WSSecurity\XML\sp_200507\RequireServerEntropy;
-use SimpleSAML\WSSecurity\XML\sp_200507\RequireThumbprintReference;
-use SimpleSAML\WSSecurity\XML\sp_200507\SignedParts;
-use SimpleSAML\WSSecurity\XML\sp_200507\SignedSupportingTokens;
-use SimpleSAML\WSSecurity\XML\sp_200507\Strict;
-use SimpleSAML\WSSecurity\XML\sp_200507\TransportBinding;
-use SimpleSAML\WSSecurity\XML\sp_200507\TransportToken;
-use SimpleSAML\WSSecurity\XML\sp_200507\Trust10;
-use SimpleSAML\WSSecurity\XML\sp_200507\UsernameToken;
-use SimpleSAML\WSSecurity\XML\sp_200507\Wss11;
-use SimpleSAML\WSSecurity\XML\sp_200507\WssUsernameToken10;
-use SimpleSAML\WSSecurity\XML\sp_200507\WssX509V3Token10;
-use SimpleSAML\WSSecurity\XML\sp_200507\X509Token;
+use SimpleSAML\WSSecurity\XML\sp_200702\AlgorithmSuite;
+use SimpleSAML\WSSecurity\XML\sp_200702\Basic256;
+use SimpleSAML\WSSecurity\XML\sp_200702\EndorsingSupportingTokens;
+use SimpleSAML\WSSecurity\XML\sp_200702\Header;
+use SimpleSAML\WSSecurity\XML\sp_200702\HttpsToken;
+use SimpleSAML\WSSecurity\XML\sp_200702\IncludeTimestamp;
+use SimpleSAML\WSSecurity\XML\sp_200702\IncludeToken;
+use SimpleSAML\WSSecurity\XML\sp_200702\IssuedToken;
+use SimpleSAML\WSSecurity\XML\sp_200702\KeyValueToken;
+use SimpleSAML\WSSecurity\XML\sp_200702\Layout;
+use SimpleSAML\WSSecurity\XML\sp_200702\MustSupportIssuedTokens;
+use SimpleSAML\WSSecurity\XML\sp_200702\MustSupportRefThumbprint;
+use SimpleSAML\WSSecurity\XML\sp_200702\RequireClientEntropy;
+use SimpleSAML\WSSecurity\XML\sp_200702\RequireServerEntropy;
+use SimpleSAML\WSSecurity\XML\sp_200702\RequireThumbprintReference;
+use SimpleSAML\WSSecurity\XML\sp_200702\SignedParts;
+use SimpleSAML\WSSecurity\XML\sp_200702\SignedEncryptedSupportingTokens;
+use SimpleSAML\WSSecurity\XML\sp_200702\Strict;
+use SimpleSAML\WSSecurity\XML\sp_200702\TransportBinding;
+use SimpleSAML\WSSecurity\XML\sp_200702\TransportToken;
+use SimpleSAML\WSSecurity\XML\sp_200702\Trust13;
+use SimpleSAML\WSSecurity\XML\sp_200702\UsernameToken;
+use SimpleSAML\WSSecurity\XML\sp_200702\Wss11;
+use SimpleSAML\WSSecurity\XML\sp_200702\WssUsernameToken10;
+use SimpleSAML\WSSecurity\XML\sp_200702\WssX509V3Token10;
+use SimpleSAML\WSSecurity\XML\sp_200702\X509Token;
 use SimpleSAML\WSSecurity\XML\wsaw\UsingAddressing;
-use SimpleSAML\WSSecurity\XML\wsdl\Definitions;
 use SimpleSAML\WSSecurity\XML\wsp\All;
 use SimpleSAML\WSSecurity\XML\wsp\ExactlyOne;
 use SimpleSAML\WSSecurity\XML\wsp\Policy;
@@ -44,8 +40,8 @@ use SimpleSAML\WSSecurity\XML\wst\EncryptionAlgorithm;
 use SimpleSAML\WSSecurity\XML\wst\EncryptWith;
 use SimpleSAML\WSSecurity\XML\wst\KeyType;
 use SimpleSAML\WSSecurity\XML\wst\KeyTypeEnum;
+use SimpleSAML\WSSecurity\XML\wst\KeyWrapAlgorithm;
 use SimpleSAML\WSSecurity\XML\wst\SignatureAlgorithm;
-*/
 use SimpleSAML\XML\Attribute as XMLAttribute;
 
 /**
@@ -72,8 +68,8 @@ class Policy13
     public function getPolicies(): array
     {
         return [
-//            $this->getCertificateWSTrustBinding(),
-//            $this->getUserNameWSTrustBindingPolicy(),
+            $this->getCertificateWSTrustBinding(),
+            $this->getUserNameWSTrustBindingPolicy(),
 //            $this->getIssuedTokenWSTrustBinding(),
 //            $this->getIssuedTokenWSTrustBinding1(),
         ];
@@ -87,13 +83,12 @@ class Policy13
      */
     private function getCertificateWSTrustBinding(): Policy
     {
-/*
         $transportBinding = new TransportBinding(
             elements: [new Policy(
                 children: [
                     new TransportToken(
                         elements: [new Policy(
-                            children: [new HttpsToken(false)],
+                            children: [new HttpsToken()],
                         )],
                     ),
                     new AlgorithmSuite(
@@ -123,16 +118,16 @@ class Policy13
                         )],
                         namespacedAttributes: [
                             new XMLAttribute(
-                                C::NS_SEC_POLICY_11,
+                                C::NS_SEC_POLICY_12,
                                 'sp',
                                 'IncludeToken',
                                 IncludeToken::AlwaysToRecipient->value,
                             ),
                         ],
                     ),
-                    new RsaToken(
+                    new KeyValueToken(
                         namespacedAttributes: [
-                            new XMLAttribute(C::NS_SEC_POLICY_11, 'sp', 'IncludeToken', IncludeToken::Never->value),
+                            new XMLAttribute(C::NS_SEC_POLICY_12, 'sp', 'IncludeToken', IncludeToken::Never->value),
                             new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
                         ],
                     ),
@@ -156,7 +151,7 @@ class Policy13
             )],
         );
 
-        $trust10 = new Trust10(
+        $trust10 = new Trust13(
             elements: [new Policy(
                 children: [
                     new MustSupportIssuedTokens(),
@@ -169,7 +164,7 @@ class Policy13
         $usingAddressing = new UsingAddressing();
 
         return new Policy(
-            Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'CertificateWSTrustBinding_IWSTrustFeb2005Async_policy'),
+            Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'CertificateWSTrustBinding_IWSTrust13Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
                    children: [
@@ -182,7 +177,6 @@ class Policy13
                 )],
             )],
         );
-*/
     }
 
 
@@ -193,13 +187,12 @@ class Policy13
      */
     private function getUserNameWSTrustBindingPolicy(): Policy
     {
-/*
         $transportBinding = new TransportBinding(
             elements: [new Policy(
                 children: [
                     new TransportToken(
                         elements: [new Policy(
-                            children: [new HttpsToken(false)],
+                            children: [new HttpsToken()],
                         )],
                     ),
                     new AlgorithmSuite(
@@ -217,7 +210,7 @@ class Policy13
             )],
         );
 
-        $signedSupportingTokens = new SignedSupportingTokens(
+        $signedEncryptedSupportingTokens = new SignedEncryptedSupportingTokens(
             elements: [new Policy(
                 children: [new UsernameToken(
                     elts: [new Policy(
@@ -225,7 +218,7 @@ class Policy13
                     )],
                     namespacedAttributes: [
                         new XMLAttribute(
-                            C::NS_SEC_POLICY_11,
+                            C::NS_SEC_POLICY_12,
                             'sp',
                             'IncludeToken',
                             IncludeToken::AlwaysToRecipient->value,
@@ -238,9 +231,9 @@ class Policy13
         $endorsingSupportingTokens = new EndorsingSupportingTokens(
             elements: [new Policy(
                 children: [
-                    new RsaToken(
+                    new KeyValueToken(
                         namespacedAttributes: [
-                            new XMLAttribute(C::NS_SEC_POLICY_11, 'sp', 'IncludeToken', IncludeToken::Never->value),
+                            new XMLAttribute(C::NS_SEC_POLICY_12, 'sp', 'IncludeToken', IncludeToken::Never->value),
                             new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
                         ],
                     ),
@@ -260,7 +253,7 @@ class Policy13
             elements: [new Policy()],
         );
 
-        $trust10 = new Trust10(
+        $trust13 = new Trust13(
             elements: [new Policy(
                 children: [
                     new MustSupportIssuedTokens(),
@@ -278,16 +271,15 @@ class Policy13
                 operatorContent: [new All(
                    children: [
                        $transportBinding,
-                       $signedSupportingTokens,
+                       $signedEncryptedSupportingTokens,
                        $endorsingSupportingTokens,
                        $wss11,
-                       $trust10,
+                       $trust13,
                        $usingAddressing,
                    ],
                 )],
             )],
         );
-*/
     }
 
 
@@ -298,13 +290,12 @@ class Policy13
      */
     private function getIssuedTokenWSTrustBinding(): Policy
     {
-/*
         $transportBinding = new TransportBinding(
             elements: [new Policy(
                 children: [
                     new TransportToken(
                         elements: [new Policy(
-                            children: [new HttpsToken(false)],
+                            children: [new HttpsToken()],
                         )],
                     ),
                     new AlgorithmSuite(
@@ -330,6 +321,7 @@ class Policy13
                             new RequestSecurityTokenTemplate(
                                 elts: [
                                     new KeyType([KeyTypeEnum::PublicKey]),
+                                    new KeyWrapAlgorithm(C::KEY_TRANSPORT_OAEP_MGF1P),
                                     new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
                                     new SignatureAlgorithm(C::SIG_RSA_SHA1),
                                     new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
@@ -344,16 +336,16 @@ class Policy13
                         ],
                         namespacedAttributes: [
                             new XMLAttribute(
-                                C::NS_SEC_POLICY_11,
+                                C::NS_SEC_POLICY_12,
                                 'sp',
                                 'IncludeToken',
                                 IncludeToken::AlwaysToRecipient->value,
                             ),
                         ],
                     ),
-                    new RsaToken(
+                    new KeyValueToken(
                         namespacedAttributes: [
-                            new XMLAttribute(C::NS_SEC_POLICY_11, 'sp', 'IncludeToken', IncludeToken::Never->value),
+                            new XMLAttribute(C::NS_SEC_POLICY_12, 'sp', 'IncludeToken', IncludeToken::Never->value),
                             new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
                         ],
                     ),
@@ -374,7 +366,7 @@ class Policy13
             )],
         );
 
-        $trust10 = new Trust10(
+        $trust13 = new Trust13(
             elements: [new Policy(
                 children: [
                     new MustSupportIssuedTokens(),
@@ -387,20 +379,19 @@ class Policy13
         $usingAddressing = new UsingAddressing();
 
         return new Policy(
-            Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async_policy'),
+            Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrust13Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
                    children: [
                        $transportBinding,
                        $endorsingSupportingTokens,
                        $wss11,
-                       $trust10,
+                       $trust13,
                        $usingAddressing,
                    ],
                 )],
             )],
         );
-*/
     }
 
 
@@ -411,13 +402,12 @@ class Policy13
      */
     private function getIssuedTokenWSTrustBinding1(): Policy
     {
-/*
         $transportBinding = new TransportBinding(
             elements: [new Policy(
                 children: [
                     new TransportToken(
                         elements: [new Policy(
-                            children: [new HttpsToken(false)],
+                            children: [new HttpsToken()],
                         )],
                     ),
                     new AlgorithmSuite(
@@ -458,16 +448,16 @@ class Policy13
                         ],
                         namespacedAttributes: [
                             new XMLAttribute(
-                                C::NS_SEC_POLICY_11,
+                                C::NS_SEC_POLICY_12,
                                 'sp',
                                 'IncludeToken',
                                 IncludeToken::AlwaysToRecipient->value,
                             ),
                         ],
                     ),
-                    new RsaToken(
+                    new KeyValueToken(
                         namespacedAttributes: [
-                            new XMLAttribute(C::NS_SEC_POLICY_11, 'sp', 'IncludeToken', IncludeToken::Never->value),
+                            new XMLAttribute(C::NS_SEC_POLICY_12, 'sp', 'IncludeToken', IncludeToken::Never->value),
                             new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
                         ],
                     ),
@@ -483,20 +473,36 @@ class Policy13
             )],
         );
 
+        $wss11 = new Wss11(
+            elements: [new Policy(
+            )],
+        );
+
+        $trust13 = new Trust13(
+            elements: [new Policy(
+                children: [
+                    new MustSupportIssuedTokens(),
+                    new RequireClientEntropy(),
+                    new RequireServerEntropy(),
+                ],
+            )],
+        );
+
+        $usingAddressing = new UsingAddressing();
+
         return new Policy(
-            Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1_policy'),
+            Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrust13Async1_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
                    children: [
                        $transportBinding,
                        $endorsingSupportingTokens,
                        $wss11,
-                       $trust10,
+                       $trust13,
                        $usingAddressing,
                    ],
                 )],
             )],
         );
-*/
     }
 }
