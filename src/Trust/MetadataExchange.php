@@ -110,10 +110,17 @@ class MetadataExchange
         $signedSupportingTokens = new SignedSupportingTokens(
             elements: [new Policy(
                 children: [new UsernameToken(
-                    includeToken: IncludeToken::AlwaysToRecipient,
                     elts: [new Policy(
                         children: [new WssUsernameToken10()],
                     )],
+                    namespacedAttributes: [
+                        new XMLAttribute(
+                            C::NS_SEC_POLICY_11,
+                            'sp',
+                            'IncludeToken',
+                            IncludeToken::AlwaysToRecipient->value,
+                        ),
+                    ],
                 )],
             )],
         );
@@ -122,8 +129,8 @@ class MetadataExchange
             elements: [new Policy(
                 children: [
                     new RsaToken(
-                        includeToken: IncludeToken::Never,
                         namespacedAttributes: [
+                            new XMLAttribute(C::NS_SEC_POLICY_11, 'sp', 'IncludeToken', IncludeToken::Never->value),
                             new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
                         ],
                     ),
