@@ -156,9 +156,7 @@ class Adfs
         }
 
         $mexBuilder = new MetadataExchange();
-        $document = $mexBuilder->buildDocument();
-
-        $document = $builder->buildDocument()->toXML();
+        $document = $mexBuilder->buildDocument()->toXML();
         // Some products like DirX are known to break on pretty-printed XML
         $document->ownerDocument->formatOutput = false;
         $document->ownerDocument->encoding = 'UTF-8';
