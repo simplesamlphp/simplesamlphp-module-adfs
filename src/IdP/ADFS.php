@@ -24,7 +24,7 @@ use SimpleSAML\SAML11\XML\saml\AuthenticationStatement;
 use SimpleSAML\SAML11\XML\saml\Conditions;
 use SimpleSAML\SAML11\XML\saml\NameIdentifier;
 use SimpleSAML\SAML11\XML\saml\Subject;
-use SimpleSAML\SAML2\Constants as C;
+use SimpleSAML\SAML11\Constants as C;
 use SimpleSAML\Utils;
 use SimpleSAML\WSSecurity\XML\wsa_200508\Address;
 use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
@@ -122,7 +122,7 @@ class ADFS
         $now = new DateTimeImmutable('now', new DateTimeZone('Z'));
 
         if ($httpUtils->isHTTPS()) {
-            $method = C::AC_PASSWORD_PROTECTED_TRANSPORT;
+            $method = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport';
         } else {
             $method = C::AC_PASSWORD;
         }
