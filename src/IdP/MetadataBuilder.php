@@ -27,7 +27,7 @@ use SimpleSAML\WSSecurity\XML\fed\{
     TokenTypesOffered,
     TokenType,
 };
-use SimpleSAML\WSSecurity\XML\wsa\{Address, EndpointReference};
+use SimpleSAML\WSSecurity\XML\wsa_200508\{Address, EndpointReference};
 
 use function array_key_exists;
 use function preg_match;
