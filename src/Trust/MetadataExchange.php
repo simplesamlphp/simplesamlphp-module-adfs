@@ -89,7 +89,7 @@ class MetadataExchange
                 children: [
                     new TransportToken(
                         elements: [new Policy(
-                            children: [new HttpsToken(true)],
+                            children: [new HttpsToken(false)],
                         )],
                     ),
                     new AlgorithmSuite(
@@ -120,20 +120,22 @@ class MetadataExchange
 
         $endorsingSupportingTokens = new EndorsingSupportingTokens(
             elements: [new Policy(
-                children: [new RsaToken(
-                    includeToken: IncludeToken::Never,
-                    elts: [new SignedParts(
+                children: [
+                    new RsaToken(
+                        includeToken: IncludeToken::Never,
+                        namespacedAttributes: [
+                            new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
+                        ],
+                    ),
+                    new SignedParts(
                         header: [
                             new Header(
                                 namespace: C::NS_ADDR_200508,
                                 name: 'To',
                             ),
                         ],
-                    )],
-                    namespacedAttributes: [
-                        new XMLAttribute(C::NS_POLICY, 'wsp', 'Optional', 'true'),
-                    ],
-                )],
+                    ),
+                ],
             )],
         );
 
@@ -154,7 +156,7 @@ class MetadataExchange
         $usingAddressing = new UsingAddressing();
 
         return new Policy(
-            Id: 'UserNameWSTrustBinding_IWSTrustFeb2005Async_policy',
+            Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'UserNameWSTrustBinding_IWSTrustFeb2005Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
                    children: [
