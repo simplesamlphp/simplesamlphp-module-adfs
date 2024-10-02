@@ -32,13 +32,13 @@ use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
 use SimpleSAML\WSSecurity\XML\wsp\AppliesTo;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityTokenResponse;
+use SimpleSAML\XHTML\Template;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
 use SimpleSAML\XMLSecurity\Key\PrivateKey;
 use SimpleSAML\XMLSecurity\Key\X509Certificate as PublicKey;
 use SimpleSAML\XMLSecurity\XML\ds\KeyInfo;
 use SimpleSAML\XMLSecurity\XML\ds\X509Certificate;
 use SimpleSAML\XMLSecurity\XML\ds\X509Data;
-use SimpleSAML\XHTML\Template;
 use Symfony\Component\HttpFoundation\{Request, StreamedResponse};
 
 use function base64_encode;
