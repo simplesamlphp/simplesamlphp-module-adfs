@@ -35,13 +35,13 @@ use SimpleSAML\WSSecurity\XML\wsaw\UsingAddressing;
 use SimpleSAML\WSSecurity\XML\wsp\All;
 use SimpleSAML\WSSecurity\XML\wsp\ExactlyOne;
 use SimpleSAML\WSSecurity\XML\wsp\Policy;
-use SimpleSAML\WSSecurity\XML\wst\CanonicalizationAlgorithm;
-use SimpleSAML\WSSecurity\XML\wst\EncryptionAlgorithm;
-use SimpleSAML\WSSecurity\XML\wst\EncryptWith;
-use SimpleSAML\WSSecurity\XML\wst\KeyType;
-use SimpleSAML\WSSecurity\XML\wst\KeyTypeEnum;
-use SimpleSAML\WSSecurity\XML\wst\KeyWrapAlgorithm;
-use SimpleSAML\WSSecurity\XML\wst\SignatureAlgorithm;
+use SimpleSAML\WSSecurity\XML\wst_200512\CanonicalizationAlgorithm;
+use SimpleSAML\WSSecurity\XML\wst_200512\EncryptionAlgorithm;
+use SimpleSAML\WSSecurity\XML\wst_200512\EncryptWith;
+use SimpleSAML\WSSecurity\XML\wst_200512\KeyType;
+use SimpleSAML\WSSecurity\XML\wst_200512\KeyTypeEnum;
+use SimpleSAML\WSSecurity\XML\wst_200512\KeyWrapAlgorithm;
+use SimpleSAML\WSSecurity\XML\wst_200512\SignatureAlgorithm;
 use SimpleSAML\XML\Attribute as XMLAttribute;
 
 /**
