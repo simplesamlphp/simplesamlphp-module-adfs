@@ -183,7 +183,7 @@ class MetadataBuilder
         $defaultEndpoint = Module::getModuleURL('adfs') . '/idp/prp.php';
 
         return new SecurityTokenServiceType(
-            protocolSupportEnumeration: [C::NS_TRUST, C::NS_FED],
+            protocolSupportEnumeration: [C::NS_TRUST_200512, C::NS_TRUST_200502, C::NS_FED],
             keyDescriptors: $this->getKeyDescriptor(),
             tokenTypesOffered: new TokenTypesOffered([new TokenType('urn:oasis:names:tc:SAML:1.0:assertion')]),
             securityTokenServiceEndpoint: [
