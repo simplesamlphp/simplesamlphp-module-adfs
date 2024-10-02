@@ -44,6 +44,7 @@
         "simplesamlphp/saml2": "^5@dev",
         "simplesamlphp/simplesamlphp": "dev-feature/adfs-upgrade",
         "simplesamlphp/xml-common": "^1.16",
+        "simplesamlphp/xml-security": "^1.9",
         "simplesamlphp/ws-security": "^1.6",
         "symfony/http-foundation": "^6.4"
     },
