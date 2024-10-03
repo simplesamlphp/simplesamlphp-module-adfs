@@ -6,7 +6,17 @@ namespace SimpleSAML\Module\adfs;
 
 use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\Trust;
-use SimpleSAML\WSSecurity\XML\wsdl\{Definitions, Message, Part, Types};
+use SimpleSAML\WSSecurity\XML\wsdl\{
+    Definitions,
+    Input,
+    Message,
+    Output,
+    Part,
+    PortType,
+    PortTypeOperation,
+    Types,
+};
+use SimpleSAML\WSSecurity\Constants as C;
 use SimpleSAML\WSSecurity\XML\wst_200502\{
     RequestSecurityToken as RequestSecurityToken2005,
     RequestSecurityTokenResponse as RequestSecurityTokenResponse2005,
@@ -15,6 +25,7 @@ use SimpleSAML\WSSecurity\XML\wst_200512\{
     RequestSecurityToken as RequestSecurityToken13,
     RequestSecurityTokenResponseCollection as RequestSecurityTokenResponseCollection13,
 };
+use SimpleSAML\XML\Attribute as XMLAttribute;
 use SimpleSAML\XML\Chunk;
 use SimpleSAML\XML\DOMDocumentFactory;
 
@@ -52,7 +63,7 @@ class MetadataExchange
             import: [],
             types: $this->getTypes(),
             message: $this->getMessages(),
-            portType: [],
+            portType: $this->getPortTypes(),
             binding: [],
             service: [],
             elements: $this->getPolicies(),
@@ -86,7 +97,9 @@ class MetadataExchange
     {
         $defaultEndpoint = Module::getModuleURL('adfs/services/trust/mex');
         $xml = <<<IMPORT
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice/Imports">
+<xsd:schema
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice/Imports">
 <xsd:import schemaLocation="$defaultEndpoint?xsd=xsd0" namespace="http://schemas.microsoft.com/Message"/>
 <xsd:import schemaLocation="$defaultEndpoint?xsd=xsd1" namespace="http://schemas.xmlsoap.org/ws/2005/02/trust"/>
 <xsd:import schemaLocation="$defaultEndpoint?xsd=xsd2" namespace="http://docs.oasis-open.org/ws-sx/ws-trust/200512"/>
@@ -153,6 +166,72 @@ IMPORT;
                     ),
                 )],
             ),
+        ];
+    }
+
+
+    /**
+     * This method builds the wsdl:portType elements
+     *
+     * @param \SimpleSAML\WSSecurity\XML\wsdl\PortType[]
+     */
+    private function getPortTypes(): array
+    {
+        return [
+            new PortType('IWSTrustFeb2005Async', [
+                new PortTypeOperation(
+                    name: 'TrustFeb2005IssueAsync',
+                    input: new Input(
+                        message: 'tns:IWSTrustFeb2005Async_TrustFeb2005IssueAsync_InputMessage',
+                        attributes: [
+                            new XMLAttribute(
+                                C::NS_WSDL_ADDR,
+                                'wsaw',
+                                'Action',
+                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                            ),
+                        ],
+                    ),
+                    output: new Output(
+                        message: 'tns:IWSTrustFeb2005Async_TrustFeb2005IssueAsync_OutputMessage',
+                        attributes: [
+                            new XMLAttribute(
+                                C::NS_WSDL_ADDR,
+                                'wsaw',
+                                'Action',
+                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                            ),
+                        ],
+                    ),
+                ),
+            ]),
+            new PortType('IWSTrust13Async', [
+                new PortTypeOperation(
+                    name: 'Trust13IssueAsync',
+                    input: new Input(
+                        message: 'tns:IWSTrust13Async_Trust13IssueAsync_InputMessage',
+                        attributes: [
+                            new XMLAttribute(
+                                C::NS_WSDL_ADDR,
+                                'wsaw',
+                                'Action',
+                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
+                            ),
+                        ],
+                    ),
+                    output: new Output(
+                        message: 'tns:IWSTrust13Async_Trust13IssueAsync_OutputMessage',
+                        attributes: [
+                            new XMLAttribute(
+                                C::NS_WSDL_ADDR,
+                                'wsaw',
+                                'Action',
+                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal',
+                            ),
+                        ],
+                    ),
+                ),
+            ]),
         ];
     }
 }
