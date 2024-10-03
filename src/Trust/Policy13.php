@@ -17,7 +17,9 @@ use SimpleSAML\WSSecurity\XML\sp_200702\KeyValueToken;
 use SimpleSAML\WSSecurity\XML\sp_200702\Layout;
 use SimpleSAML\WSSecurity\XML\sp_200702\MustSupportIssuedTokens;
 use SimpleSAML\WSSecurity\XML\sp_200702\MustSupportRefThumbprint;
+use SimpleSAML\WSSecurity\XML\sp_200702\RequestSecurityTokenTemplate;
 use SimpleSAML\WSSecurity\XML\sp_200702\RequireClientEntropy;
+use SimpleSAML\WSSecurity\XML\sp_200702\RequireInternalReference;
 use SimpleSAML\WSSecurity\XML\sp_200702\RequireServerEntropy;
 use SimpleSAML\WSSecurity\XML\sp_200702\RequireThumbprintReference;
 use SimpleSAML\WSSecurity\XML\sp_200702\SignedParts;
@@ -38,6 +40,7 @@ use SimpleSAML\WSSecurity\XML\wsp\Policy;
 use SimpleSAML\WSSecurity\XML\wst_200512\CanonicalizationAlgorithm;
 use SimpleSAML\WSSecurity\XML\wst_200512\EncryptionAlgorithm;
 use SimpleSAML\WSSecurity\XML\wst_200512\EncryptWith;
+use SimpleSAML\WSSecurity\XML\wst_200512\KeySize;
 use SimpleSAML\WSSecurity\XML\wst_200512\KeyType;
 use SimpleSAML\WSSecurity\XML\wst_200512\KeyTypeEnum;
 use SimpleSAML\WSSecurity\XML\wst_200512\KeyWrapAlgorithm;
@@ -70,8 +73,8 @@ class Policy13
         return [
             $this->getCertificateWSTrustBinding(),
             $this->getUserNameWSTrustBindingPolicy(),
-//            $this->getIssuedTokenWSTrustBinding(),
-//            $this->getIssuedTokenWSTrustBinding1(),
+            $this->getIssuedTokenWSTrustBinding(),
+            $this->getIssuedTokenWSTrustBinding1(),
         ];
     }
 
@@ -317,17 +320,17 @@ class Policy13
             elements: [new Policy(
                 children: [
                     new IssuedToken(
+                        requestSecurityTokenTemplate: new RequestSecurityTokenTemplate(
+                            elts: [
+                                new KeyType([KeyTypeEnum::PublicKey]),
+                                new KeyWrapAlgorithm(C::KEY_TRANSPORT_OAEP_MGF1P),
+                                new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
+                                new SignatureAlgorithm(C::SIG_RSA_SHA1),
+                                new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
+                                new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
+                            ],
+                        ),
                         elts: [
-                            new RequestSecurityTokenTemplate(
-                                elts: [
-                                    new KeyType([KeyTypeEnum::PublicKey]),
-                                    new KeyWrapAlgorithm(C::KEY_TRANSPORT_OAEP_MGF1P),
-                                    new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
-                                    new SignatureAlgorithm(C::SIG_RSA_SHA1),
-                                    new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
-                                    new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
-                                ],
-                            ),
                             new Policy(
                                 children: [
                                     new RequireInternalReference(),
@@ -429,17 +432,17 @@ class Policy13
             elements: [new Policy(
                 children: [
                     new IssuedToken(
+                        requestSecurityTokenTemplate: new RequestSecurityTokenTemplate(
+                            elts: [
+                                new KeyType([KeyTypeEnum::SymmetricKey]),
+                                new KeySize('256'),
+                                new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
+                                new SignatureAlgorithm(C::SIG_HMAC_SHA1),
+                                new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
+                                new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
+                            ],
+                        ),
                         elts: [
-                            new RequestSecurityTokenTemplate(
-                                elts: [
-                                    new KeyType([KeyTypeEnum::SymmetricKey]),
-                                    new KeySize('256'),
-                                    new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
-                                    new SignatureAlgorithm(C::SIG_HMAC_SHA1),
-                                    new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
-                                    new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
-                                ],
-                            ),
                             new Policy(
                                 children: [
                                     new RequireInternalReference(),
