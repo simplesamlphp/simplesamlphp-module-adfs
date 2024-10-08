@@ -30,6 +30,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "SimpleSAML\\Test\\Module\\adfs\\": "vendor/simplesamlphp/simplesamlphp/tests",
             "SimpleSAML\\Test\\Utils\\": "vendor/simplesamlphp/simplesamlphp/tests/Utils"
         }
     },
