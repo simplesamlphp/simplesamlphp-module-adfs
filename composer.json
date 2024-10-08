@@ -44,7 +44,7 @@
         "simplesamlphp/saml11": "^1.0",
         "simplesamlphp/saml2": "^5@dev",
         "simplesamlphp/saml2-legacy": "^4.6",
-        "simplesamlphp/simplesamlphp": "dev-feature/adfs-upgrade",
+        "simplesamlphp/simplesamlphp": "^2.3",
         "simplesamlphp/xml-common": "^1.16",
         "simplesamlphp/xml-security": "^1.9",
         "simplesamlphp/xml-wsdl": "^1.1",
