@@ -22,8 +22,8 @@ use SimpleSAML\WSSecurity\XML\sp_200702\RequireClientEntropy;
 use SimpleSAML\WSSecurity\XML\sp_200702\RequireInternalReference;
 use SimpleSAML\WSSecurity\XML\sp_200702\RequireServerEntropy;
 use SimpleSAML\WSSecurity\XML\sp_200702\RequireThumbprintReference;
-use SimpleSAML\WSSecurity\XML\sp_200702\SignedParts;
 use SimpleSAML\WSSecurity\XML\sp_200702\SignedEncryptedSupportingTokens;
+use SimpleSAML\WSSecurity\XML\sp_200702\SignedParts;
 use SimpleSAML\WSSecurity\XML\sp_200702\Strict;
 use SimpleSAML\WSSecurity\XML\sp_200702\TransportBinding;
 use SimpleSAML\WSSecurity\XML\sp_200702\TransportToken;
@@ -58,8 +58,8 @@ class Policy13
      * @param \SimpleSAML\Configuration $config The general configuration
      * @param \SimpleSAML\Configuration $metadata The metadata configuration
      */
-    public function __construct(
-    ) {
+    public function __construct()
+    {
     }
 
 
@@ -170,13 +170,13 @@ class Policy13
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'CertificateWSTrustBinding_IWSTrust13Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $endorsingSupportingTokens,
-                       $wss11,
-                       $trust10,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $endorsingSupportingTokens,
+                        $wss11,
+                        $trust10,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
@@ -272,14 +272,14 @@ class Policy13
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'UserNameWSTrustBinding_IWSTrustFeb2005Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $signedEncryptedSupportingTokens,
-                       $endorsingSupportingTokens,
-                       $wss11,
-                       $trust13,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $signedEncryptedSupportingTokens,
+                        $endorsingSupportingTokens,
+                        $wss11,
+                        $trust13,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
@@ -385,13 +385,13 @@ class Policy13
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrust13Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $endorsingSupportingTokens,
-                       $wss11,
-                       $trust13,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $endorsingSupportingTokens,
+                        $wss11,
+                        $trust13,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
@@ -497,13 +497,13 @@ class Policy13
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrust13Async1_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $endorsingSupportingTokens,
-                       $wss11,
-                       $trust13,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $endorsingSupportingTokens,
+                        $wss11,
+                        $trust13,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
