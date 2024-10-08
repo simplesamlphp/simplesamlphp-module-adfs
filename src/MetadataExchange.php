@@ -7,6 +7,7 @@ namespace SimpleSAML\Module\adfs;
 use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\Trust;
 use SimpleSAML\WSDL\XML\soap12\{
+    Address as Soap12Address,
     Binding as Soap12Binding,
     Body as Soap12Body,
     Operation as Soap12Operation,
@@ -21,11 +22,14 @@ use SimpleSAML\WSDL\XML\wsdl\{
     Message,
     Output,
     Part,
+    Port,
     PortType,
     PortTypeOperation,
+    Service,
     Types,
 };
 use SimpleSAML\WSSecurity\Constants as C;
+use SimpleSAML\WSSecurity\XML\wsa_200408\{Address, EndpointReference};
 use SimpleSAML\WSSecurity\XML\wsp\PolicyReference;
 use SimpleSAML\WSSecurity\XML\wst_200502\{
     RequestSecurityToken as RequestSecurityToken2005,
@@ -75,7 +79,7 @@ class MetadataExchange
             message: $this->getMessages(),
             portType: $this->getPortTypes(),
             binding: $this->getBindings(),
-            service: [],
+            service: $this->getServices(),
             elements: $this->getPolicies(),
         );
     }
@@ -285,6 +289,379 @@ IMPORT;
                         DigestAlgorithm: null,
                     ),
                     new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+            new Binding(
+                name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async1',
+                type: 'tns:IWSTrustFeb2005Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'TrustFeb2005IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#CertificateWSTrustBinding_IWSTrustFeb2005Async1_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+            new Binding(
+                name: 'UserNameWSTrustBinding_IWSTrustFeb2005Async',
+                type: 'tns:IWSTrustFeb2005Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'TrustFeb2005IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#UserNameWSTrustBinding_IWSTrustFeb2005Async_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+            new Binding(
+                name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async',
+                type: 'tns:IWSTrustFeb2005Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'TrustFeb2005IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#IssuedTokenWSTrustBinding_IWSTrustFeb2005Async_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+            new Binding(
+                name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1',
+                type: 'tns:IWSTrustFeb2005Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'TrustFeb2005IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+            new Binding(
+                name: 'CertificateWSTrustBinding_IWSTrust13Async',
+                type: 'tns:IWSTrust13Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'Trust13IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#CertificateWSTrustBinding_IWSTrust13Async_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+            new Binding(
+                name: 'UserNameWSTrustBinding_IWSTrust13Async',
+                type: 'tns:IWSTrust13Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'Trust13IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#UserNameWSTrustBinding_IWSTrust13Async_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+            new Binding(
+                name: 'IssuedTokenWSTrustBinding_IWSTrust13Async',
+                type: 'tns:IWSTrust13Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'Trust13IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#IssuedTokenWSTrustBinding_IWSTrust13Async_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+            new Binding(
+                name: 'IssuedTokenWSTrustBinding_IWSTrust13Async1',
+                type: 'tns:IWSTrust13Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'Trust13IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#IssuedTokenWSTrustBinding_IWSTrust13Async1_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
+        ];
+    }
+
+
+    /**
+     * This method builds the wsdl:service elements
+     *
+     * @param \SimpleSAML\WSSecurity\XML\wsdl\Service[]
+     */
+    private function getServices(): array
+    {
+        $defaultEndpoint = Module::getModuleURL('adfs/services/trust/');
+
+        return [
+            new Service(
+                name: 'SecurityTokenService',
+                ports: [
+                    new Port(
+                        name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async',
+                        binding: 'tns:CertificateWSTrustBinding_IWSTrustFeb2005Async',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '2005/certificatemixed'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '2005/certificatemixed'),
+                            ),
+                        ],
+                    ),
+                    new Port(
+                        name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async1',
+                        binding: 'tns:CertificateWSTrustBinding_IWSTrustFeb2005Async1',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '2005/certificatetransport'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '2005/certificatetransport'),
+                            ),
+                        ],
+                    ),
+                    new Port(
+                        name: 'UserNameWSTrustBinding_IWSTrustFeb2005Async',
+                        binding: 'tns:UserNameWSTrustBinding_IWSTrustFeb2005Async',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '2005/usernamemixed'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '2005/usernamemixed'),
+                            ),
+                        ],
+                    ),
+                    new Port(
+                        name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async',
+                        binding: 'tns:IssuedTokenWSTrustBinding_IWSTrustFeb2005Async',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '2005/issuedtokenmixedasymmetricbasic256'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '2005/issuedtokenmixedasymmetricbasic256'),
+                            ),
+                        ],
+                    ),
+                    new Port(
+                        name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1',
+                        binding: 'tns:IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '2005/issuedtokenmixedsymmetricbasic256'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '2005/issuedtokenmixedsymmetricbasic256'),
+                            ),
+                        ],
+                    ),
+                    new Port(
+                        name: 'CertificateWSTrustBinding_IWSTrust13Async',
+                        binding: 'tns:CertificateWSTrustBinding_IWSTrust13Async',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '13/certificatemixed'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '13/certificatemixed'),
+                            ),
+                        ],
+                    ),
+                    new Port(
+                        name: 'UserNameWSTrustBinding_IWSTrust13Async',
+                        binding: 'tns:UserNameWSTrustBinding_IWSTrust13Async',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '13/usernamemixed'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '13/usernamemixed'),
+                            ),
+                        ],
+                    ),
+                    new Port(
+                        name: 'IssuedTokenWSTrustBinding_IWSTrust13Async',
+                        binding: 'tns:IssuedTokenWSTrustBinding_IWSTrust13Async',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '13/issuedtokenmixedasymmetricbasic256'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '13/issuedtokenmixedasymmetricbasic256'),
+                            ),
+                        ],
+                    ),
+                    new Port(
+                        name: 'IssuedTokenWSTrustBinding_IWSTrust13Async1',
+                        binding: 'tns:IssuedTokenWSTrustBinding_IWSTrust13Async1',
+                        elements: [
+                            new Soap12Address($defaultEndpoint . '13/issuedtokenmixedsymmetricbasic256'),
+                            new EndpointReference(
+                                new Address($defaultEndpoint . '13/issuedtokenmixedsymmetricbasic256'),
+                            ),
+                        ],
+                    ),
                 ],
             ),
         ];
