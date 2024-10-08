@@ -449,11 +449,11 @@ class ADFS
             $algo = $idpMetadata->getOptionalString('signature.algorithm', C::SIG_RSA_SHA256);
         }
         $assertion = ADFS::signAssertion($assertion, $privateKeyFile, $certificateFile, $algo, $passphrase);
+        $assertion = Assertion::fromXML($assertion->toXML());
 
         $requestSecurityToken = new RequestSecurityToken(null, [$assertion]);
         $appliesTo = new AppliesTo([new EndpointReference(new Address($spEntityId))]);
         $requestSecurityTokenResponse = new RequestSecurityTokenResponse(null, [$requestSecurityToken, $appliesTo]);
-
 
         $xmlResponse = $requestSecurityTokenResponse->toXML();
         $wresult = $xmlResponse->ownerDocument->saveXML($xmlResponse);
