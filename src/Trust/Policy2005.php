@@ -57,8 +57,8 @@ class Policy2005
      * @param \SimpleSAML\Configuration $config The general configuration
      * @param \SimpleSAML\Configuration $metadata The metadata configuration
      */
-    public function __construct(
-    ) {
+    public function __construct()
+    {
     }
 
 
@@ -170,13 +170,13 @@ class Policy2005
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'CertificateWSTrustBinding_IWSTrustFeb2005Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $endorsingSupportingTokens,
-                       $wss11,
-                       $trust10,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $endorsingSupportingTokens,
+                        $wss11,
+                        $trust10,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
@@ -218,10 +218,10 @@ class Policy2005
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'CertificateWSTrustBinding_IWSTrustFeb2005Async1_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
@@ -317,14 +317,14 @@ class Policy2005
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'UserNameWSTrustBinding_IWSTrustFeb2005Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $signedSupportingTokens,
-                       $endorsingSupportingTokens,
-                       $wss11,
-                       $trust10,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $signedSupportingTokens,
+                        $endorsingSupportingTokens,
+                        $wss11,
+                        $trust10,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
@@ -429,13 +429,13 @@ class Policy2005
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $endorsingSupportingTokens,
-                       $wss11,
-                       $trust10,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $endorsingSupportingTokens,
+                        $wss11,
+                        $trust10,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
@@ -541,13 +541,13 @@ class Policy2005
             Id: new XMLAttribute(C::NS_SEC_UTIL, 'wsu', 'Id', 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1_policy'),
             operatorContent: [new ExactlyOne(
                 operatorContent: [new All(
-                   children: [
-                       $transportBinding,
-                       $endorsingSupportingTokens,
-                       $wss11,
-                       $trust10,
-                       $usingAddressing,
-                   ],
+                    children: [
+                        $transportBinding,
+                        $endorsingSupportingTokens,
+                        $wss11,
+                        $trust10,
+                        $usingAddressing,
+                    ],
                 )],
             )],
         );
