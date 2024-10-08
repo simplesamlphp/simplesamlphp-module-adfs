@@ -6,7 +6,16 @@ namespace SimpleSAML\Module\adfs;
 
 use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\Trust;
-use SimpleSAML\WSSecurity\XML\wsdl\{
+use SimpleSAML\WSDL\XML\soap12\{
+    Binding as Soap12Binding,
+    Body as Soap12Body,
+    Operation as Soap12Operation,
+};
+use SimpleSAML\WSDL\XML\wsdl\{
+    Binding,
+    BindingOperation,
+    BindingOperationInput,
+    BindingOperationOutput,
     Definitions,
     Input,
     Message,
@@ -17,6 +26,7 @@ use SimpleSAML\WSSecurity\XML\wsdl\{
     Types,
 };
 use SimpleSAML\WSSecurity\Constants as C;
+use SimpleSAML\WSSecurity\XML\wsp\PolicyReference;
 use SimpleSAML\WSSecurity\XML\wst_200502\{
     RequestSecurityToken as RequestSecurityToken2005,
     RequestSecurityTokenResponse as RequestSecurityTokenResponse2005,
@@ -64,7 +74,7 @@ class MetadataExchange
             types: $this->getTypes(),
             message: $this->getMessages(),
             portType: $this->getPortTypes(),
-            binding: [],
+            binding: $this->getBindings(),
             service: [],
             elements: $this->getPolicies(),
         );
@@ -232,6 +242,51 @@ IMPORT;
                     ),
                 ),
             ]),
+        ];
+    }
+
+
+    /**
+     * This method builds the wsdl:binding elements
+     *
+     * @param \SimpleSAML\WSSecurity\XML\wsdl\Binding[]
+     */
+    private function getBindings(): array
+    {
+        return [
+            new Binding(
+                name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async',
+                type: 'tns:IWSTrustFeb2005Async',
+                operation: [
+                    new BindingOperation(
+                        name: 'TrustFeb2005IssueAsync',
+                        input: new BindingOperationInput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        output: new BindingOperationOutput(
+                            elements: [
+                                new Soap12Body(null, null, 'literal'),
+                            ],
+                        ),
+                        elements: [
+                            new Soap12Operation(
+                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                null,
+                                'document',
+                            ),
+                        ],
+                    ),
+                ],
+                elements: [
+                    new PolicyReference(
+                        URI: '#CertificateWSTrustBinding_IWSTrustFeb2005Async_policy',
+                        DigestAlgorithm: null,
+                    ),
+                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                ],
+            ),
         ];
     }
 }
