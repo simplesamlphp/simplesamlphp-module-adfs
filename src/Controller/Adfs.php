@@ -161,6 +161,31 @@ class Adfs
         $document->ownerDocument->formatOutput = false;
         $document->ownerDocument->encoding = 'UTF-8';
 
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:tns',
+            'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+        );
+
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:soapenc',
+            'http://schemas.xmlsoap.org/soap/encoding/'
+        );
+
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:msc',
+            'http://schemas.microsoft.com/ws/2005/12/wsdl/contract'
+        );
+
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:wsam',
+            'http://www.w3.org/2007/05/addressing/metadata'
+        );
+
+
         $metaxml = $document->ownerDocument->saveXML();
 
         $response = new Response();
