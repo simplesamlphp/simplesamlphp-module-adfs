@@ -447,7 +447,10 @@ class ADFS
         if ($algo === null) {
             $algo = $idpMetadata->getOptionalString('signature.algorithm', C::SIG_RSA_SHA256);
         }
-        $assertion = ADFS::signAssertion($assertion, $privateKeyFile, $certificateFile, $algo, $passphrase);
+
+        if ($privateKeyFile !== null && $certificateFile !== null && $algo !== null) {
+            $assertion = ADFS::signAssertion($assertion, $privateKeyFile, $certificateFile, $algo, $passphrase);
+        }
 
         $requestSecurityToken = new RequestSecurityToken(null, [$assertion]);
         $appliesTo = new AppliesTo([new EndpointReference(new Address($spEntityId))]);
