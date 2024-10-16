@@ -436,7 +436,8 @@ class Policy13
                             elts: [
                                 new KeyType([KeyTypeEnum::SymmetricKey]),
                                 new KeySize('256'),
-                                new EncryptWith(C::KEY_TRANSPORT_OAEP_MGF1P),
+                                new KeyWrapAlgorithm(C::KEY_TRANSPORT_OAEP_MGF1P),
+                                new EncryptWith(C::BLOCK_ENC_AES256),
                                 new SignatureAlgorithm(C::SIG_HMAC_SHA1),
                                 new CanonicalizationAlgorithm(C::C14N_EXCLUSIVE_WITHOUT_COMMENTS),
                                 new EncryptionAlgorithm(C::BLOCK_ENC_AES256),
