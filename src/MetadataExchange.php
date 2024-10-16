@@ -213,7 +213,7 @@ IMPORT;
                                 C::NS_WSDL_ADDR,
                                 'wsaw',
                                 'Action',
-                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RSTR/Issue',
                             ),
                         ],
                     ),
