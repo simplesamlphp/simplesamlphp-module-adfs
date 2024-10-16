@@ -29,7 +29,7 @@ use SimpleSAML\WSDL\XML\wsdl\{
     Types,
 };
 use SimpleSAML\WSSecurity\Constants as C;
-use SimpleSAML\WSSecurity\XML\wsa_200408\{Address, EndpointReference};
+use SimpleSAML\WSSecurity\XML\wsa_200508\{Address, EndpointReference};
 use SimpleSAML\WSSecurity\XML\wsp\PolicyReference;
 use SimpleSAML\WSSecurity\XML\wst_200502\{
     RequestSecurityToken as RequestSecurityToken2005,
