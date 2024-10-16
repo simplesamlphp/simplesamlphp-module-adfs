@@ -186,6 +186,11 @@ class Adfs
             'http://www.w3.org/2007/05/addressing/metadata'
         );
 
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:wsap',
+            'http://schemas.xmlsoap.org/ws/2004/08/addressing/policy'
+        );
 
         $metaxml = $document->ownerDocument->saveXML();
 
