@@ -7,6 +7,7 @@ namespace SimpleSAML\Module\adfs\Controller;
 use Exception;
 use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
+use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
 use SimpleSAML\Module\adfs\MetadataExchange;
@@ -272,6 +273,11 @@ class Adfs
         if ($to === null || $request->server->get('SCRIPT_URI') !== $to->getContent()) {
             throw new SspError\BadRequest('This server is not the audience for the message received.');
         }
+
+        // Ensure we know the issuer (handled by the MetaDataStorageHandler
+        $issuer = $endpointReference->getAddress()->getContent();
+        $metadata = MetaDataStorageHandler::getMetadataHandler(Configuration::getInstance());
+        $spMetadata = $metadata->getMetaDataConfig($issuer, 'adfs-sp-remote');
 
 \SimpleSAML\Logger::debug(var_export($endpointReference->getAddress()->getContent(), true));
     }
