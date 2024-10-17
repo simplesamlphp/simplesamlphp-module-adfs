@@ -440,8 +440,8 @@ class ADFS
         $assertion = ADFS::generateAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
         $configUtils = new Utils\Config();
-        $privateKeyFile = $configUtils->getCertPath($idpMetadata->getString('privatekey'));
-        $certificateFile = $configUtils->getCertPath($idpMetadata->getString('certificate'));
+        $privateKeyFile = $configUtils->getCertPath($idpMetadata->getOptionalString('privatekey', null));
+        $certificateFile = $configUtils->getCertPath($idpMetadata->getOptionalString('certificate', null));
         $passphrase = $idpMetadata->getOptionalString('privatekey_pass', null);
 
         $algo = $spMetadata->getOptionalString('signature.algorithm', null);
