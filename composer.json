@@ -19,7 +19,8 @@
             "composer/package-versions-deprecated": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true,
-            "simplesamlphp/composer-module-installer": true
+            "simplesamlphp/composer-module-installer": true,
+            "simplesamlphp/composer-xmlprovider-installer": true
         }
     },
     "autoload": {
@@ -36,18 +37,20 @@
         "php": "^8.1",
         "ext-dom": "*",
 
-        "robrichards/xmlseclibs": "^3.1",
-        "simplesamlphp/assert": "^1.0",
+        "beste/clock": "^3.0",
+        "psr/clock": "^1.0",
+        "simplesamlphp/assert": "^1.1",
         "simplesamlphp/saml11": "^1.0",
         "simplesamlphp/saml2": "^5@dev",
-        "simplesamlphp/simplesamlphp": "^2.0",
-        "simplesamlphp/xml-common": "^1.12",
-        "simplesamlphp/ws-security": "^1.0",
+        "simplesamlphp/simplesamlphp": "dev-feature/adfs-upgrade",
+        "simplesamlphp/ws-security": "^1.6",
+        "simplesamlphp/xml-common": "^1.16",
+        "simplesamlphp/xml-security": "^1.9",
         "symfony/http-foundation": "^6.4"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp-test-framework": "^1.5",
-        "simplesamlphp/xml-security": "^1.6"
+        "simplesamlphp/simplesamlphp-test-framework": "^1.6",
+        "simplesamlphp/xml-security": "^1.7"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
