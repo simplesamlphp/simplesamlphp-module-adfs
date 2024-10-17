@@ -10,6 +10,12 @@ use SimpleSAML\Error as SspError;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
 use SimpleSAML\Module\adfs\MetadataExchange;
+use SimpleSAML\SOAP\XML\env_200305\Envelope;
+use SimpleSAML\WSSecurity\XML\wsa_200508\{Action, EndpointReference, MessageID, To};
+use SimpleSAML\WSSecurity\XML\wsp\AppliesTo;
+use SimpleSAML\WSSecurity\XML\wsse\Security;
+use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken;
+use SimpleSAML\XML\DOMDocumentFactory;
 use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
 
 /**
@@ -204,5 +210,69 @@ class Adfs
         $response->setContent($metaxml);
 
         return $response;
+    }
+
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function usernamemixed(Request $request): Response
+    {
+        if (!$this->config->getOptionalBoolean('enable.adfs-idp', false)) {
+            throw new SspError\Error('NOACCESS');
+        }
+
+        $soapMessage = $request->getContent();
+        if ($soapMessage === false) {
+            throw new SspError\BadRequest('Missing SOAP-content.');
+        }
+
+        $domDocument = DOMDocumentFactory::fromString($soapMessage);
+        $soapEnvelope = Envelope::fromXML($domDocument->documentElement);
+
+        $header = $soapEnvelope->getHeader();
+        $body = $soapEnvelope->getBody();
+
+        $to = $action = $messageid = $security = null;
+        foreach ($header->getElements() as $elt) {
+            if ($elt instanceof To) {
+                $to = $elt;
+            } elseif ($elt instanceof Action) {
+                $action = $elt;
+            } elseif ($elt instanceof MessageID) {
+                $messageid = $elt;
+            } elseif ($elt instanceof Security) {
+                $security = $elt;
+            }
+        }
+
+        $requestSecurityToken = null;
+        foreach ($body->getElements() as $elt) {
+            if ($elt instanceof RequestSecurityToken) {
+                $requestSecurityToken = $elt;
+            }
+        }
+
+        $appliesTo = null;
+        foreach ($requestSecurityToken->getElements() as $elt) {
+            if ($elt instanceof AppliesTo) {
+                $appliesTo = $elt;
+            }
+        }
+
+        $endpointReference = null;
+        foreach ($appliesTo->getElements() as $elt) {
+            if ($elt instanceof EndpointReference) {
+                $endpointReference = $elt;
+            }
+        }
+
+        // Make sure the message was addressed to us.
+        if ($to === null || $request->server->get('SCRIPT_URI') !== $to->getContent()) {
+            throw new SspError\BadRequest('This server is not the audience for the message received.');
+        }
+
+\SimpleSAML\Logger::debug(var_export($endpointReference->getAddress()->getContent(), true));
     }
 }

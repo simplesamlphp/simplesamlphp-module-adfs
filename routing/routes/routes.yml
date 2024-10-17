@@ -34,3 +34,10 @@ adfs-wstrust-mex:
     _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::mex'
   }
   methods: [GET]
+
+adfs-wstrust-usernamemixed:
+  path: /ws-trust/2005/services/usernamemixed
+  defaults: {
+    _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::usernamemixed'
+  }
+  methods: [POST]
