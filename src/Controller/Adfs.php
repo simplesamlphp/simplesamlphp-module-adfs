@@ -7,10 +7,15 @@ namespace SimpleSAML\Module\adfs\Controller;
 use Exception;
 use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
+use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
 use SimpleSAML\Module\adfs\MetadataExchange;
+use SimpleSAML\SOAP\XML\env_200305\Envelope;
+use SimpleSAML\XML\DOMDocumentFactory;
 use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
+
+use function array_pop;
 
 /**
  * Controller class for the adfs module.
@@ -203,5 +208,30 @@ class Adfs
         $response->setContent($metaxml);
 
         return $response;
+    }
+
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function usernamemixed(Request $request): Response
+    {
+        if (!$this->config->getOptionalBoolean('enable.adfs-idp', false)) {
+            throw new SspError\Error('NOACCESS');
+        }
+
+        $soapMessage = $request->getContent();
+        if ($soapMessage === false) {
+            throw new SspError\BadRequest('Missing SOAP-content.');
+        }
+
+        $domDocument = DOMDocumentFactory::fromString($soapMessage);
+        $soapEnvelope = Envelope::fromXML($domDocument->documentElement);
+
+        $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
+        $idp = IdP::getById('adfs:' . $idpEntityId);
+
+        return ADFS_IDP::receivePassiveAuthnRequest($request, $soapEnvelope, $idp);
     }
 }

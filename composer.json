@@ -47,6 +47,7 @@
         "simplesamlphp/ws-security": "^1.6",
         "simplesamlphp/xml-common": "^1.16",
         "simplesamlphp/xml-security": "^1.9",
+        "simplesamlphp/xml-soap": "^1.5",
         "simplesamlphp/xml-wsdl": "^1.1",
         "simplesamlphp/ws-security": "^1.7",
         "symfony/http-foundation": "^6.4"

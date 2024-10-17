@@ -8,6 +8,7 @@ use DateInterval;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
+use SimpleSAML\Assert\Assert;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\IdP;
@@ -26,12 +27,12 @@ use SimpleSAML\SAML11\XML\saml\AuthenticationStatement;
 use SimpleSAML\SAML11\XML\saml\Conditions;
 use SimpleSAML\SAML11\XML\saml\NameIdentifier;
 use SimpleSAML\SAML11\XML\saml\Subject;
+use SimpleSAML\SOAP\XML\env_200305\Envelope;
 use SimpleSAML\Utils;
-use SimpleSAML\WSSecurity\XML\wsa_200508\Address;
-use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
+use SimpleSAML\WSSecurity\XML\wsa_200508\{Action, Address, EndpointReference, MessageID, To};
 use SimpleSAML\WSSecurity\XML\wsp\AppliesTo;
-use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken;
-use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityTokenResponse;
+use SimpleSAML\WSSecurity\XML\wsse\{Password, Security, Username, UsernameToken};
+use SimpleSAML\WSSecurity\XML\wst_200502\{RequestSecurityToken, RequestSecurityTokenResponse};
 use SimpleSAML\XHTML\Template;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
 use SimpleSAML\XMLSecurity\Key\PrivateKey;
@@ -45,6 +46,7 @@ use function base64_encode;
 use function chunk_split;
 use function trim;
 
+use function array_pop;
 use function base64_encode;
 use function chunk_split;
 use function trim;
@@ -52,6 +54,94 @@ use function trim;
 class ADFS
 {
     /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \SimpleSAML\SOAP\XML\env_200305\Envelope $soapEnvelope
+     * @param \SimpleSAML\IdP $idp
+     * @throws \SimpleSAML\Error\MetadataNotFound
+     */
+    public static function receivePassiveAuthnRequest(
+        Request $request,
+        Envelope $soapEnvelope,
+        IdP $idp,
+    ): StreamedResponse {
+        // Parse the SOAP-header
+        $header = $soapEnvelope->getHeader();
+
+        $to = To::getChildrenOfClass($header->toXML());
+        Assert::count($to, 1, 'Missing To in SOAP Header.');
+        $to = array_pop($to);
+
+        $action = Action::getChildrenOfClass($header->toXML());
+        Assert::count($action, 1, 'Missing Action in SOAP Header.');
+        $action = array_pop($action);
+
+        $messageid = MessageID::getChildrenOfClass($header->toXML());
+        Assert::count($messageid, 1, 'Missing MessageID in SOAP Header.');
+        $messageid = array_pop($messageid);
+
+        $security = Security::getChildrenOfClass($header->toXML());
+        Assert::count($security, 1, 'Missing Security in SOAP Header.');
+        $security = array_pop($security);
+
+        // Parse the SOAP-body
+        $body = $soapEnvelope->getBody();
+
+        $requestSecurityToken = RequestSecurityToken::getChildrenOfClass($body->toXML());
+        Assert::count($requestSecurityToken, 1, 'Missing RequestSecurityToken in SOAP Body.');
+        $requestSecurityToken = array_pop($requestSecurityToken);
+
+        $appliesTo = AppliesTo::getChildrenOfClass($requestSecurityToken->toXML());
+        Assert::count($appliesTo, 1, 'Missing AppliesTo in RequestSecurityToken.');
+        $appliesTo = array_pop($appliesTo);
+
+        $endpointReference = EndpointReference::getChildrenOfClass($appliesTo->toXML());
+        Assert::count($endpointReference, 1, 'Missing EndpointReference in AppliesTo.');
+        $endpointReference = array_pop($endpointReference);
+
+        // Make sure the message was addressed to us.
+        if ($to === null || $request->server->get('SCRIPT_URI') !== $to->getContent()) {
+            throw new Error\BadRequest('This server is not the audience for the message received.');
+        }
+
+        // Ensure we know the issuer
+        $issuer = $endpointReference->getAddress()->getContent();
+        //$idp = IdP::getById($this->config, 'adfs:' . $issuer);
+
+        $metadata = MetaDataStorageHandler::getMetadataHandler(Configuration::getInstance());
+        $spMetadata = $metadata->getMetaDataConfig($issuer, 'adfs-sp-remote');
+
+        $usernameToken = UsernameToken::getChildrenOfClass($security->toXML());
+        Assert::count($usernameToken, 1, 'Missing UsernameToken in Security.');
+        $usernameToken = array_pop($usernameToken);
+
+        $username = $usernameToken->getUsername();
+        $password = Password::getChildrenOfClass($usernameToken->toXML());
+        $password = array_pop($password);
+
+        if ($username === null || $password === null) {
+            throw new Error\BadRequest('Missing username or password in SOAP header.');
+        } else {
+            $_SERVER['PHP_AUTH_USER'] = $username->getContent();
+            $_SERVER['PHP_AUTH_PW'] = $password->getContent();
+        }
+
+        $state = [
+            'Responder' => [ADFS::class, 'sendPassiveResponse'],
+            'SPMetadata' => $spMetadata->toArray(),
+            // Dirty hack to leverage the SAML ECP logics
+            'saml:Binding' => C::BINDING_PAOS,
+        ];
+
+        return new StreamedResponse(
+            function () use ($idp, &$state) {
+                $idp->handleAuthenticationRequest($state);
+            },
+        );
+    }
+
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \SimpleSAML\IdP $idp
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
@@ -397,6 +487,16 @@ class ADFS
         }
 
         return $metadata;
+    }
+
+
+    /**
+     * @param array $state
+     * @throws \Exception
+     */
+    public static function sendPassiveResponse(array $state): void
+    {
+        \SimpleSAML\Logger::debug(var_export($state, true));
     }
 
 
