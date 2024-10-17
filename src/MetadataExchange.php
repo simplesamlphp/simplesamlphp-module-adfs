@@ -74,8 +74,8 @@ class MetadataExchange
         return new Definitions(
             targetNamespace: 'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
             name: 'SecurityTokenService',
-            import: [],
-            types: $this->getTypes(),
+//            import: [],
+//            types: $this->getTypes(),
             message: $this->getMessages(),
             portType: $this->getPortTypes(),
             binding: $this->getBindings(),
@@ -97,7 +97,7 @@ class MetadataExchange
 
         return array_merge(
             $policy2005->getPolicies(),
-            $policy13->getPolicies(),
+//            $policy13->getPolicies(),
         );
     }
 
@@ -158,6 +158,7 @@ IMPORT;
                     ),
                 )],
             ),
+/*
             new Message(
                 'IWSTrust13Async_Trust13IssueAsync_InputMessage',
                 [new Part(
@@ -180,6 +181,7 @@ IMPORT;
                     ),
                 )],
             ),
+*/
         ];
     }
 
@@ -219,6 +221,7 @@ IMPORT;
                     ),
                 ),
             ]),
+/*
             new PortType('IWSTrust13Async', [
                 new PortTypeOperation(
                     name: 'Trust13IssueAsync',
@@ -246,6 +249,7 @@ IMPORT;
                     ),
                 ),
             ]),
+*/
         ];
     }
 
@@ -423,6 +427,7 @@ IMPORT;
                     new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
                 ],
             ),
+/*
             new Binding(
                 name: 'CertificateWSTrustBinding_IWSTrust13Async',
                 type: 'tns:IWSTrust13Async',
@@ -555,6 +560,7 @@ IMPORT;
                     new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
                 ],
             ),
+*/
         ];
     }
 
@@ -566,7 +572,7 @@ IMPORT;
      */
     private function getServices(): array
     {
-        $defaultEndpoint = Module::getModuleURL('adfs/services/trust/');
+        $defaultEndpoint = Module::getModuleURL('adfs/ws-trust/2005/services/');
 
         return [
             new Service(
@@ -576,9 +582,9 @@ IMPORT;
                         name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async',
                         binding: 'tns:CertificateWSTrustBinding_IWSTrustFeb2005Async',
                         elements: [
-                            new Soap12Address($defaultEndpoint . '2005/certificatemixed'),
+                            new Soap12Address($defaultEndpoint . 'certificatemixed'),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '2005/certificatemixed'),
+                                new Address($defaultEndpoint . 'certificatemixed'),
                             ),
                         ],
                     ),
@@ -586,9 +592,9 @@ IMPORT;
                         name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async1',
                         binding: 'tns:CertificateWSTrustBinding_IWSTrustFeb2005Async1',
                         elements: [
-                            new Soap12Address($defaultEndpoint . '2005/certificatetransport'),
+                            new Soap12Address($defaultEndpoint . 'certificatetransport'),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '2005/certificatetransport'),
+                                new Address($defaultEndpoint . 'certificatetransport'),
                             ),
                         ],
                     ),
@@ -596,9 +602,9 @@ IMPORT;
                         name: 'UserNameWSTrustBinding_IWSTrustFeb2005Async',
                         binding: 'tns:UserNameWSTrustBinding_IWSTrustFeb2005Async',
                         elements: [
-                            new Soap12Address($defaultEndpoint . '2005/usernamemixed'),
+                            new Soap12Address($defaultEndpoint . 'usernamemixed'),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '2005/usernamemixed'),
+                                new Address($defaultEndpoint . 'usernamemixed'),
                             ),
                         ],
                     ),
@@ -606,9 +612,9 @@ IMPORT;
                         name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async',
                         binding: 'tns:IssuedTokenWSTrustBinding_IWSTrustFeb2005Async',
                         elements: [
-                            new Soap12Address($defaultEndpoint . '2005/issuedtokenmixedasymmetricbasic256'),
+                            new Soap12Address($defaultEndpoint . 'issuedtokenmixedasymmetricbasic256'),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '2005/issuedtokenmixedasymmetricbasic256'),
+                                new Address($defaultEndpoint . 'issuedtokenmixedasymmetricbasic256'),
                             ),
                         ],
                     ),
@@ -616,12 +622,13 @@ IMPORT;
                         name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1',
                         binding: 'tns:IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1',
                         elements: [
-                            new Soap12Address($defaultEndpoint . '2005/issuedtokenmixedsymmetricbasic256'),
+                            new Soap12Address($defaultEndpoint . 'issuedtokenmixedsymmetricbasic256'),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '2005/issuedtokenmixedsymmetricbasic256'),
+                                new Address($defaultEndpoint . 'issuedtokenmixedsymmetricbasic256'),
                             ),
                         ],
                     ),
+/*
                     new Port(
                         name: 'CertificateWSTrustBinding_IWSTrust13Async',
                         binding: 'tns:CertificateWSTrustBinding_IWSTrust13Async',
@@ -662,6 +669,7 @@ IMPORT;
                             ),
                         ],
                     ),
+*/
                 ],
             ),
         ];
