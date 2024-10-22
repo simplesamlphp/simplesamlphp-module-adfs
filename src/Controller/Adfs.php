@@ -108,8 +108,8 @@ class Adfs
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
         $idp = IdP::getById('adfs:' . $idpEntityId);
 
-        if ($request->query->has('wa')) {
-            $wa = $request->query->get('wa');
+        if ($request->get('wa', null) !== null) {
+            $wa = $request->get('wa');
             if ($wa === 'wsignout1.0') {
                 return new StreamedResponse(
                     function () use ($idp) {
@@ -120,12 +120,12 @@ class Adfs
                 return ADFS_IDP::receiveAuthnRequest($request, $idp);
             }
             throw new SspError\BadRequest("Unsupported value for 'wa' specified in request.");
-        } elseif ($request->query->has('assocId')) {
+        } elseif ($request->get('assocId', null) !== null) {
             // logout response from ADFS SP
             // Association ID of the SP that sent the logout response
-            $assocId = $request->query->get('assocId');
+            $assocId = $request->get('assocId');
             // Data that was sent in the logout request to the SP. Can be null
-            $relayState = $request->query->get('relayState');
+            $relayState = $request->get('relayState');
             // null on success, or an instance of a \SimpleSAML\Error\Exception on failure.
             $logoutError = null;
 
