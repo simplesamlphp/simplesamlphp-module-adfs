@@ -7,15 +7,13 @@ namespace SimpleSAML\Module\adfs\Controller;
 use Exception;
 use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
-use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
+use SimpleSAML\Module\adfs\IdP\PassiveIdP;
 use SimpleSAML\Module\adfs\MetadataExchange;
 use SimpleSAML\SOAP\XML\env_200305\Envelope;
 use SimpleSAML\XML\DOMDocumentFactory;
 use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
-
-use function array_pop;
 
 /**
  * Controller class for the adfs module.
@@ -175,25 +173,25 @@ class Adfs
         $document->setAttributeNS(
             'http://www.w3.org/2000/xmlns/',
             'xmlns:soapenc',
-            'http://schemas.xmlsoap.org/soap/encoding/'
+            'http://schemas.xmlsoap.org/soap/encoding/',
         );
 
         $document->setAttributeNS(
             'http://www.w3.org/2000/xmlns/',
             'xmlns:msc',
-            'http://schemas.microsoft.com/ws/2005/12/wsdl/contract'
+            'http://schemas.microsoft.com/ws/2005/12/wsdl/contract',
         );
 
         $document->setAttributeNS(
             'http://www.w3.org/2000/xmlns/',
             'xmlns:wsam',
-            'http://www.w3.org/2007/05/addressing/metadata'
+            'http://www.w3.org/2007/05/addressing/metadata',
         );
 
         $document->setAttributeNS(
             'http://www.w3.org/2000/xmlns/',
             'xmlns:wsap',
-            'http://schemas.xmlsoap.org/ws/2004/08/addressing/policy'
+            'http://schemas.xmlsoap.org/ws/2004/08/addressing/policy',
         );
 
         $metaxml = $document->ownerDocument->saveXML();
@@ -230,7 +228,7 @@ class Adfs
         $soapEnvelope = Envelope::fromXML($domDocument->documentElement);
 
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
-        $idp = IdP::getById('adfs:' . $idpEntityId);
+        $idp = PassiveIdP::getById('adfs:' . $idpEntityId);
 
         return ADFS_IDP::receivePassiveAuthnRequest($request, $soapEnvelope, $idp);
     }

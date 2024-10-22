@@ -40,8 +40,9 @@ use SimpleSAML\WSSecurity\XML\wst_200512\{
     RequestSecurityTokenResponseCollection as RequestSecurityTokenResponseCollection13,
 };
 use SimpleSAML\XML\Attribute as XMLAttribute;
-use SimpleSAML\XML\Chunk;
-use SimpleSAML\XML\DOMDocumentFactory;
+
+//use SimpleSAML\XML\Chunk;
+//use SimpleSAML\XML\DOMDocumentFactory;
 
 use function array_merge;
 use function sprintf;
@@ -74,8 +75,8 @@ class MetadataExchange
         return new Definitions(
             targetNamespace: 'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
             name: 'SecurityTokenService',
-//            import: [],
-//            types: $this->getTypes(),
+            //import: [],
+            //types: $this->getTypes(),
             message: $this->getMessages(),
             portType: $this->getPortTypes(),
             binding: $this->getBindings(),
@@ -97,7 +98,7 @@ class MetadataExchange
 
         return array_merge(
             $policy2005->getPolicies(),
-//            $policy13->getPolicies(),
+            //$policy13->getPolicies(),
         );
     }
 
@@ -106,7 +107,6 @@ class MetadataExchange
      * This method builds the wsdl:types elements
      *
      * @param \SimpleSAML\WSSecurity\XML\wsdl\Types[]
-     */
     private function getTypes(): array
     {
         $defaultEndpoint = Module::getModuleURL('adfs/services/trust/mex');
@@ -126,6 +126,7 @@ IMPORT;
             ]),
         ];
     }
+     */
 
 
     /**
@@ -628,7 +629,7 @@ IMPORT;
                             ),
                         ],
                     ),
-/*
+                /*
                     new Port(
                         name: 'CertificateWSTrustBinding_IWSTrust13Async',
                         binding: 'tns:CertificateWSTrustBinding_IWSTrust13Async',
@@ -669,7 +670,7 @@ IMPORT;
                             ),
                         ],
                     ),
-*/
+                */
                 ],
             ),
         ];
