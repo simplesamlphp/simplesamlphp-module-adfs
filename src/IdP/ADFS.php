@@ -439,17 +439,20 @@ class ADFS
 
         $assertion = ADFS::generateAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
-        $configUtils = new Utils\Config();
-        $privateKeyFile = $configUtils->getCertPath($idpMetadata->getOptionalString('privatekey', null));
-        $certificateFile = $configUtils->getCertPath($idpMetadata->getOptionalString('certificate', null));
-        $passphrase = $idpMetadata->getOptionalString('privatekey_pass', null);
+        $privateKeyCfg = $idpMetadata->getOptionalString('privatekey', null);
+        $certificateCfg = $idpMetadata->getOptionalString('certificate', null);
 
-        $algo = $spMetadata->getOptionalString('signature.algorithm', null);
-        if ($algo === null) {
-            $algo = $idpMetadata->getOptionalString('signature.algorithm', C::SIG_RSA_SHA256);
-        }
+        if ($privateKeyCfg !== null && $certificateCfg !== null) {
+            $configUtils = new Utils\Config();
+            $privateKeyFile = $configUtils->getCertPath($privateKeyCfg);
+            $certificateFile = $configUtils->getCertPath($certificateCfg);
+            $passphrase = $idpMetadata->getOptionalString('privatekey_pass', null);
 
-        if ($privateKeyFile !== null && $certificateFile !== null && $algo !== null) {
+            $algo = $spMetadata->getOptionalString('signature.algorithm', null);
+            if ($algo === null) {
+                $algo = $idpMetadata->getOptionalString('signature.algorithm', C::SIG_RSA_SHA256);
+            }
+
             $assertion = ADFS::signAssertion($assertion, $privateKeyFile, $certificateFile, $algo, $passphrase);
             $assertion = Assertion::fromXML($assertion->toXML());
         }
