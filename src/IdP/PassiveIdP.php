@@ -112,9 +112,9 @@ class PassiveIdP
      * @param \SimpleSAML\Configuration $config The Configuration
      * @param string $id The identifier of the IdP.
      *
-     * @return \SimpleSAML\IdP The IdP.
+     * @return \SimpleSAML\Module\adfs\IdP\PassiveIdP The IdP.
      */
-    public static function getById(Configuration $config, string $id): IdP
+    public static function getById(Configuration $config, string $id): PassiveIdP
     {
         if (isset(self::$idpCache[$id])) {
             return self::$idpCache[$id];
@@ -132,9 +132,9 @@ class PassiveIdP
      * @param \SimpleSAML\Configuration $config The Configuration.
      * @param array &$state The state array.
      *
-     * @return \SimpleSAML\IdP The IdP.
+     * @return \SimpleSAML\Module\adfs\IdP\PassiveIdP The IdP.
      */
-    public static function getByState(Configuration $config, array &$state): IdP
+    public static function getByState(Configuration $config, array &$state): PassiveIdP
     {
         Assert::notNull($state['core:IdP']);
 
