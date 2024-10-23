@@ -52,13 +52,13 @@ class ADFS
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \SimpleSAML\SOAP\XML\env_200305\Envelope $soapEnvelope
-     * @param \SimpleSAML\IdP $idp
+     * @param \SimpleSAML\Module\adfs\IdP\PassiveIdP $idp
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
     public static function receivePassiveAuthnRequest(
         Request $request,
         Envelope $soapEnvelope,
-        IdP $idp,
+        PassiveIdP $idp,
     ): StreamedResponse {
         // Parse the SOAP-header
         $header = $soapEnvelope->getHeader();
