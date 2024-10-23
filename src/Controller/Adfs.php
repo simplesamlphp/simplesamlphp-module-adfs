@@ -228,7 +228,7 @@ class Adfs
         $soapEnvelope = Envelope::fromXML($domDocument->documentElement);
 
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
-        $idp = PassiveIdP::getById('adfs:' . $idpEntityId);
+        $idp = PassiveIdP::getById($this->config, 'adfs:' . $idpEntityId);
 
         return ADFS_IDP::receivePassiveAuthnRequest($request, $soapEnvelope, $idp);
     }
