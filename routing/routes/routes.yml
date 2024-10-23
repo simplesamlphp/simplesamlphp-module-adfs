@@ -12,7 +12,7 @@ adfs-prp:
   defaults: {
     _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::prp'
   }
-  methods: [GET]
+  methods: [GET, POST]
 
 adfs-metadata-legacy:
   path: /idp/metadata.php
@@ -26,4 +26,4 @@ adfs-prp-legacy:
   defaults: {
     _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::prp'
   }
-  methods: [GET]
+  methods: [GET, POST]

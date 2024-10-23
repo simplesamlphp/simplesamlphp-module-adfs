@@ -4,21 +4,46 @@ declare(strict_types=1);
 
 namespace SimpleSAML\Module\adfs\IdP;
 
+use DateInterval;
+use DateTimeImmutable;
+use DateTimeZone;
 use Exception;
-use RobRichards\XMLSecLibs\XMLSecurityDSig;
-use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\IdP;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module;
-use SimpleSAML\SAML2\Constants;
+use SimpleSAML\SAML11\Constants as C;
+use SimpleSAML\SAML11\XML\saml\Assertion;
+use SimpleSAML\SAML11\XML\saml\Attribute;
+use SimpleSAML\SAML11\XML\saml\AttributeStatement;
+use SimpleSAML\SAML11\XML\saml\AttributeValue;
+use SimpleSAML\SAML11\XML\saml\Audience;
+use SimpleSAML\SAML11\XML\saml\AudienceRestrictionCondition;
+use SimpleSAML\SAML11\XML\saml\AuthenticationStatement;
+use SimpleSAML\SAML11\XML\saml\Conditions;
+use SimpleSAML\SAML11\XML\saml\NameIdentifier;
+use SimpleSAML\SAML11\XML\saml\Subject;
 use SimpleSAML\Utils;
+use SimpleSAML\WSSecurity\XML\wsa_200508\Address;
+use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
+use SimpleSAML\WSSecurity\XML\wsp\AppliesTo;
+use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken;
+use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityTokenResponse;
 use SimpleSAML\XHTML\Template;
-use SimpleSAML\XML\DOMDocumentFactory;
+use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
+use SimpleSAML\XMLSecurity\Key\PrivateKey;
+use SimpleSAML\XMLSecurity\Key\X509Certificate as PublicKey;
+use SimpleSAML\XMLSecurity\XML\ds\KeyInfo;
+use SimpleSAML\XMLSecurity\XML\ds\X509Certificate;
+use SimpleSAML\XMLSecurity\XML\ds\X509Data;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+
+use function base64_encode;
+use function chunk_split;
+use function trim;
 
 class ADFS
 {
@@ -38,6 +63,7 @@ class ADFS
 
         Logger::info('ADFS - IdP.prp: Incoming Authentication request: ' . $issuer . ' id ' . $requestid);
 
+        $username = null;
         if ($request->query->has('username')) {
             $username = (string) $request->query->get('username');
         }
@@ -74,52 +100,49 @@ class ADFS
      * @param string $nameid
      * @param array $attributes
      * @param int $assertionLifetime
-     * @return string
+     * @return \SimpleSAML\SAML11\XML\saml\Assertion
      */
-    private static function generateResponse(
+    private static function generateAssertion(
         string $issuer,
         string $target,
         string $nameid,
         array $attributes,
         int $assertionLifetime,
-    ): string {
+    ): Assertion {
         $httpUtils = new Utils\HTTP();
         $randomUtils = new Utils\Random();
         $timeUtils = new Utils\Time();
 
         $issueInstant = $timeUtils->generateTimestamp();
-        $notBefore = $timeUtils->generateTimestamp(time() - 30);
-        $assertionExpire = $timeUtils->generateTimestamp(time() + $assertionLifetime);
+        $notBefore = DateInterval::createFromDateString('30 seconds');
+        $notOnOrAfter = DateInterval::createFromDateString(sprintf('%d seconds', $assertionLifetime));
         $assertionID = $randomUtils->generateID();
         $nameidFormat = 'http://schemas.xmlsoap.org/claims/UPN';
         $nameid = htmlspecialchars($nameid);
+        $now = new DateTimeImmutable('now', new DateTimeZone('Z'));
 
         if ($httpUtils->isHTTPS()) {
-            $method = Constants::AC_PASSWORD_PROTECTED_TRANSPORT;
+            $method = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport';
         } else {
-            $method = Constants::AC_PASSWORD;
+            $method = C::AC_PASSWORD;
         }
 
-        $result = <<<MSG
-<wst:RequestSecurityTokenResponse xmlns:wst="http://schemas.xmlsoap.org/ws/2005/02/trust">
-    <wst:RequestedSecurityToken>
-        <saml:Assertion Issuer="$issuer" IssueInstant="$issueInstant" AssertionID="$assertionID" MinorVersion="1" MajorVersion="1" xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion">
-            <saml:Conditions NotOnOrAfter="$assertionExpire" NotBefore="$notBefore">
-                <saml:AudienceRestrictionCondition>
-                    <saml:Audience>$target</saml:Audience>
-                </saml:AudienceRestrictionCondition>
-            </saml:Conditions>
-            <saml:AuthenticationStatement AuthenticationMethod="$method" AuthenticationInstant="$issueInstant">
-                <saml:Subject>
-                    <saml:NameIdentifier Format="$nameidFormat">$nameid</saml:NameIdentifier>
-                </saml:Subject>
-            </saml:AuthenticationStatement>
-            <saml:AttributeStatement>
-                <saml:Subject>
-                    <saml:NameIdentifier Format="$nameidFormat">$nameid</saml:NameIdentifier>
-                </saml:Subject>
-MSG;
+        $audience = new Audience($target);
+        $audienceRestrictionCondition = new AudienceRestrictionCondition([$audience]);
+        $conditions = new Conditions(
+            [$audienceRestrictionCondition],
+            [],
+            [],
+            $now->sub($notBefore),
+            $now->add($notOnOrAfter),
+        );
 
+        $nameIdentifier = new NameIdentifier($nameid, null, $nameidFormat);
+        $subject = new Subject(null, $nameIdentifier);
+
+        $authenticationStatement = new AuthenticationStatement($subject, $method, $now);
+
+        $attrs = [];
         $attrUtils = new Utils\Attributes();
         foreach ($attributes as $name => $values) {
             if ((!is_array($values)) || (count($values) == 0)) {
@@ -130,86 +153,64 @@ MSG;
                 $name,
                 'http://schemas.xmlsoap.org/claims',
             );
+
             $namespace = htmlspecialchars($namespace);
             $name = htmlspecialchars($name);
+            $attrValue = [];
             foreach ($values as $value) {
                 if ((!isset($value)) || ($value === '')) {
                     continue;
                 }
-                $value = htmlspecialchars($value);
-
-                $result .= <<<MSG
-                <saml:Attribute AttributeNamespace="$namespace" AttributeName="$name">
-                    <saml:AttributeValue>$value</saml:AttributeValue>
-                </saml:Attribute>
-MSG;
+                $attrValue[] = new AttributeValue($value);
             }
+            $attrs[] = new Attribute($name, $namespace, $attrValue);
         }
+        $attributeStatement = new AttributeStatement($subject, $attrs);
 
-        $result .= <<<MSG
-            </saml:AttributeStatement>
-        </saml:Assertion>
-   </wst:RequestedSecurityToken>
-   <wsp:AppliesTo xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
-       <wsa:EndpointReference xmlns:wsa="http://www.w3.org/2005/08/addressing">
-           <wsa:Address>$target</wsa:Address>
-       </wsa:EndpointReference>
-   </wsp:AppliesTo>
-</wst:RequestSecurityTokenResponse>
-MSG;
-
-        return $result;
+        return new Assertion(
+            $assertionID,
+            $issuer,
+            $now,
+            $conditions,
+            null, // Advice
+            [$authenticationStatement, $attributeStatement],
+        );
     }
 
 
     /**
-     * @param string $response
+     * @param \SimpleSAML\SAML11\XML\saml\Assertion $assertion
      * @param string $key
      * @param string $cert
      * @param string $algo
      * @param string|null $passphrase
-     * @return string
+     * @return \SimpleSAML\SAML11\XML\saml\Assertion
      */
-    private static function signResponse(
-        string $response,
+    private static function signAssertion(
+        Assertion $assertion,
         string $key,
         string $cert,
         string $algo,
         #[\SensitiveParameter]
         string $passphrase = null,
-    ): string {
-        $objXMLSecDSig = new XMLSecurityDSig();
-        $objXMLSecDSig->idKeys = ['AssertionID'];
-        $objXMLSecDSig->setCanonicalMethod(XMLSecurityDSig::EXC_C14N);
-        $responsedom = DOMDocumentFactory::fromString(str_replace("\r", "", $response));
-        $firstassertionroot = $responsedom->getElementsByTagName('Assertion')->item(0);
+    ): Assertion {
+        $key = PrivateKey::fromFile($key, $passphrase);
+        $pubkey = PublicKey::fromFile($cert);
+        $keyInfo = new KeyInfo([
+            new X509Data(
+                [new X509Certificate(
+                    trim(chunk_split(base64_encode($pubkey->getPEM()->data()))),
+                )],
+            ),
+        ]);
 
-        if (is_null($firstassertionroot)) {
-            throw new Exception("No assertion found in response.");
-        }
-
-        $objXMLSecDSig->addReferenceList(
-            [$firstassertionroot],
-            XMLSecurityDSig::SHA256,
-            ['http://www.w3.org/2000/09/xmldsig#enveloped-signature', XMLSecurityDSig::EXC_C14N],
-            ['id_name' => 'AssertionID'],
+        $signer = (new SignatureAlgorithmFactory())->getAlgorithm(
+            $algo,
+            $key,
         );
 
-        $objKey = new XMLSecurityKey($algo, ['type' => 'private']);
-        if (is_string($passphrase)) {
-            $objKey->passphrase = $passphrase;
-        }
-        $objKey->loadKey($key, true);
-        $objXMLSecDSig->sign($objKey);
-        if ($cert) {
-            $public_cert = file_get_contents($cert);
-            $objXMLSecDSig->add509Cert($public_cert, true);
-        }
-
-        /** @var \DOMElement $objXMLSecDSig->sigNode */
-        $newSig = $responsedom->importNode($objXMLSecDSig->sigNode, true);
-        $firstassertionroot->appendChild($newSig);
-        return $responsedom->saveXML();
+        $assertion->sign($signer, C::C14N_EXCLUSIVE_WITHOUT_COMMENTS, $keyInfo);
+        return $assertion;
     }
 
 
@@ -235,32 +236,68 @@ MSG;
      * Get the metadata of a given hosted ADFS IdP.
      *
      * @param string $entityid The entity ID of the hosted ADFS IdP whose metadata we want to fetch.
-     *
+     * @param \SimpleSAML\Metadata\MetaDataStorageHandler $handler Optionally the metadata storage to use,
+     *        if omitted the configured handler will be used.
      * @return array
+     *
      * @throws \SimpleSAML\Error\Exception
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
-    public static function getHostedMetadata(string $entityid): array
+    public static function getHostedMetadata(string $entityid, MetaDataStorageHandler $handler = null): array
     {
-        $handler = MetaDataStorageHandler::getMetadataHandler();
         $cryptoUtils = new Utils\Crypto();
+
+        $globalConfig = Configuration::getInstance();
+        if ($handler === null) {
+            $handler = MetaDataStorageHandler::getMetadataHandler($globalConfig);
+        }
         $config = $handler->getMetaDataConfig($entityid, 'adfs-idp-hosted');
 
-        $endpoint = Module::getModuleURL('adfs/idp/prp.php');
+        $host = Module::getModuleURL('adfs/idp/prp.php');
+
+        // configure endpoints
+        $ssob = $handler->getGenerated('SingleSignOnServiceBinding', 'adfs-idp-hosted', $host);
+        $slob = $handler->getGenerated('SingleLogoutServiceBinding', 'adfs-idp-hosted', $host);
+        $ssol = $handler->getGenerated('SingleSignOnService', 'adfs-idp-hosted', $host);
+        $slol = $handler->getGenerated('SingleLogoutService', 'adfs-idp-hosted', $host);
+
+        $sso = [];
+        if (is_array($ssob)) {
+            foreach ($ssob as $binding) {
+                $sso[] = [
+                    'Binding'  => $binding,
+                    'Location' => $ssol,
+                ];
+            }
+        } else {
+            $sso[] = [
+                'Binding'  => $ssob,
+                'Location' => $ssol,
+            ];
+        }
+
+        $slo = [];
+        if (is_array($slob)) {
+            foreach ($slob as $binding) {
+                $slo[] = [
+                    'Binding'  => $binding,
+                    'Location' => $slol,
+                ];
+            }
+        } else {
+            $slo[] = [
+                'Binding'  => $slob,
+                'Location' => $slol,
+            ];
+        }
+
+
         $metadata = [
             'metadata-set' => 'adfs-idp-hosted',
             'entityid' => $entityid,
-            'SingleSignOnService' => [
-                [
-                    'Binding' => Constants::BINDING_HTTP_REDIRECT,
-                    'Location' => $endpoint,
-                ],
-            ],
-            'SingleLogoutService' => [
-                'Binding' => Constants::BINDING_HTTP_REDIRECT,
-                'Location' => $endpoint,
-            ],
-            'NameIDFormat' => $config->getOptionalString('NameIDFormat', Constants::NAMEID_TRANSIENT),
+            'SingleSignOnService' => $sso,
+            'SingleLogoutService' => $slo,
+            'NameIDFormat' => $config->getOptionalArrayizeString('NameIDFormat', [C::NAMEID_TRANSIENT]),
             'contacts' => [],
         ];
 
@@ -400,19 +437,32 @@ MSG;
             $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
         }
 
-        $response = ADFS::generateResponse($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
+        $assertion = ADFS::generateAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
-        $configUtils = new Utils\Config();
-        $privateKeyFile = $configUtils->getCertPath($idpMetadata->getString('privatekey'));
-        $certificateFile = $configUtils->getCertPath($idpMetadata->getString('certificate'));
-        $passphrase = $idpMetadata->getOptionalString('privatekey_pass', null);
+        $privateKeyCfg = $idpMetadata->getOptionalString('privatekey', null);
+        $certificateCfg = $idpMetadata->getOptionalString('certificate', null);
 
-        $algo = $spMetadata->getOptionalString('signature.algorithm', null);
-        if ($algo === null) {
-            $algo = $idpMetadata->getOptionalString('signature.algorithm', XMLSecurityKey::RSA_SHA256);
+        if ($privateKeyCfg !== null && $certificateCfg !== null) {
+            $configUtils = new Utils\Config();
+            $privateKeyFile = $configUtils->getCertPath($privateKeyCfg);
+            $certificateFile = $configUtils->getCertPath($certificateCfg);
+            $passphrase = $idpMetadata->getOptionalString('privatekey_pass', null);
+
+            $algo = $spMetadata->getOptionalString('signature.algorithm', null);
+            if ($algo === null) {
+                $algo = $idpMetadata->getOptionalString('signature.algorithm', C::SIG_RSA_SHA256);
+            }
+
+            $assertion = ADFS::signAssertion($assertion, $privateKeyFile, $certificateFile, $algo, $passphrase);
+            $assertion = Assertion::fromXML($assertion->toXML());
         }
-        $wresult = ADFS::signResponse($response, $privateKeyFile, $certificateFile, $algo, $passphrase);
 
+        $requestSecurityToken = new RequestSecurityToken(null, [$assertion]);
+        $appliesTo = new AppliesTo([new EndpointReference(new Address($spEntityId))]);
+        $requestSecurityTokenResponse = new RequestSecurityTokenResponse(null, [$requestSecurityToken, $appliesTo]);
+
+        $xmlResponse = $requestSecurityTokenResponse->toXML();
+        $wresult = $xmlResponse->ownerDocument->saveXML($xmlResponse);
         $wctx = $state['adfs:wctx'];
         $wreply = $state['adfs:wreply'] ? : $spMetadata->getValue('prp');
         ADFS::postResponse($wreply, $wresult, $wctx);
