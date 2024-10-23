@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\IdP;
 
 use Exception;
-use SimpleSAML\{Auth, Configuration, Error, Utils};
+use SimpleSAML\{Auth, Configuration, Error, Session, Utils};
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\IdP\{IFrameLogoutHandler, LogoutHandlerInterface, TraditionalLogoutHandler};
 use SimpleSAML\Metadata\MetaDataStorageHandler;
