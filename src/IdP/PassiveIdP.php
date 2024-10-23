@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SimpleSAML\Module\adfs;
+namespace SimpleSAML\Module\adfs\IdP;
 
 use Exception;
 use SimpleSAML\{Auth, Configuration, Error, Utils};
