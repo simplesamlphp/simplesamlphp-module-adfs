@@ -268,7 +268,7 @@ class PassiveIdP
 
         $state['core:SP'] = $spEntityId;
         $state['IdPMetadata'] = $this->getConfig()->toArray();
-        $state['ReturnCallback'] = ['\SimpleSAML\Module\saml\IdP\PassiveIdP', 'postAuth'];
+        $state['ReturnCallback'] = ['\SimpleSAML\Module\adfs\IdP\PassiveIdP', 'postAuth'];
 
         try {
             return $this->authenticate($state);
