@@ -42,10 +42,6 @@ use SimpleSAML\XMLSecurity\XML\ds\X509Certificate;
 use SimpleSAML\XMLSecurity\XML\ds\X509Data;
 use Symfony\Component\HttpFoundation\{Request, StreamedResponse};
 
-use function base64_encode;
-use function chunk_split;
-use function trim;
-
 use function array_pop;
 use function base64_encode;
 use function chunk_split;
