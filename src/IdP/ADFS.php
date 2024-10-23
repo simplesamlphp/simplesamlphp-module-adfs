@@ -125,7 +125,7 @@ class ADFS
             'Responder' => [ADFS::class, 'sendPassiveResponse'],
             'SPMetadata' => $spMetadata->toArray(),
             // Dirty hack to leverage the SAML ECP logics
-            'saml:Binding' => C::BINDING_PAOS,
+            'saml:Binding' => SAML2_C::BINDING_PAOS,
         ];
 
         return new StreamedResponse(
