@@ -198,7 +198,7 @@ class PassiveIdP
      */
     public static function postAuth(array $state): Response
     {
-        $idp = IdP::getByState(Configuration::getInstance(), $state);
+        $idp = PassiveIdP::getByState(Configuration::getInstance(), $state);
 
         if (!$idp->isAuthenticated()) {
             throw new Error\Exception('Not authenticated.');
