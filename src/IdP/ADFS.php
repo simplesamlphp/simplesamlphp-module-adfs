@@ -192,7 +192,7 @@ class ADFS
      * @param int $assertionLifetime
      * @return \SimpleSAML\SAML11\XML\saml\Assertion
      */
-    private static function generateAssertion(
+    private static function generateActiveAssertion(
         string $issuer,
         string $target,
         string $nameid,
@@ -255,6 +255,79 @@ class ADFS
             }
             $attrs[] = new Attribute($name, $namespace, $attrValue);
         }
+        $attributeStatement = new AttributeStatement($subject, $attrs);
+
+        return new Assertion(
+            $assertionID,
+            $issuer,
+            $now,
+            $conditions,
+            null, // Advice
+            [$authenticationStatement, $attributeStatement],
+        );
+    }
+
+
+    /**
+     * @param string $issuer
+     * @param string $target
+     * @param string $nameid
+     * @param array $attributes
+     * @param int $assertionLifetime
+     * @return \SimpleSAML\SAML11\XML\saml\Assertion
+     */
+    private static function generatePassiveAssertion(
+        string $issuer,
+        string $target,
+        string $nameid,
+        array $attributes,
+        int $assertionLifetime,
+    ): Assertion {
+        $httpUtils = new Utils\HTTP();
+        $randomUtils = new Utils\Random();
+        $timeUtils = new Utils\Time();
+
+        $issueInstant = $timeUtils->generateTimestamp();
+        $notBefore = DateInterval::createFromDateString('30 seconds');
+        $notOnOrAfter = DateInterval::createFromDateString(sprintf('%d seconds', $assertionLifetime));
+        $assertionID = $randomUtils->generateID();
+//        $nameidFormat = 'http://schemas.xmlsoap.org/claims/UPN';
+//        $nameid = htmlspecialchars($nameid);
+        $now = new DateTimeImmutable('now', new DateTimeZone('Z'));
+
+        if ($httpUtils->isHTTPS()) {
+            $method = SAML2_C::AC_PASSWORD_PROTECTED_TRANSPORT;
+        } else {
+            $method = C::AC_PASSWORD;
+        }
+
+        $audience = new Audience($target);
+        $audienceRestrictionCondition = new AudienceRestrictionCondition([$audience]);
+        $conditions = new Conditions(
+            [$audienceRestrictionCondition],
+            [],
+            [],
+            $now->sub($notBefore),
+            $now->add($notOnOrAfter),
+        );
+
+        $nameIdentifier = new NameIdentifier($nameid, null, C::NAMEID_UNSPECIFIED);
+        $subject = new Subject(null, $nameIdentifier);
+
+        $authenticationStatement = new AuthenticationStatement($subject, $method, $now);
+
+        $attrs = [];
+        $attrs[] = new Attribute(
+            'UPN',
+            'http://schemas.xmlsoap.org/claims',
+            $attributes['userPrincipalName'][0],
+        );
+        $attrs[] = new Attribute(
+            'ImmutableID',
+            'http://schemas.microsoft.com/LiveID/Federation/2008/05',
+            $attributes['ms-DS-ConsistencyGuid'][0],
+        );
+
         $attributeStatement = new AttributeStatement($subject, $attrs);
 
         return new Assertion(
@@ -492,7 +565,45 @@ class ADFS
      */
     public static function sendPassiveResponse(array $state): void
     {
-        \SimpleSAML\Logger::debug(var_export($state, true));
+        $idp = IdP::getByState($state);
+        $idpMetadata = $idp->getConfig();
+        $idpEntityId = $idpMetadata->getString('entityid');
+
+        $spMetadata = $state['SPMetadata'];
+        $spEntityId = $spMetadata['entityid'];
+        $spMetadata = Configuration::loadFromArray(
+            $spMetadata,
+            '$metadata[' . var_export($spEntityId, true) . ']',
+        );
+
+        $assertionLifetime = $spMetadata->getOptionalInteger('assertion.lifetime', null);
+        if ($assertionLifetime === null) {
+            $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
+        }
+
+        $attributes = $state['Attributes'];
+        $nameid = $attributes['ms-DS-ConsistencyGuid'][0];
+
+        $assertion = ADFS::generateActiveAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
+
+        $privateKeyCfg = $idpMetadata->getOptionalString('privatekey', null);
+        $certificateCfg = $idpMetadata->getOptionalString('certificate', null);
+
+        if ($privateKeyCfg !== null && $certificateCfg !== null) {
+            $configUtils = new Utils\Config();
+            $privateKeyFile = $configUtils->getCertPath($privateKeyCfg);
+            $certificateFile = $configUtils->getCertPath($certificateCfg);
+            $passphrase = $idpMetadata->getOptionalString('privatekey_pass', null);
+
+            $algo = $spMetadata->getOptionalString('signature.algorithm', null);
+            if ($algo === null) {
+                $algo = $idpMetadata->getOptionalString('signature.algorithm', C::SIG_RSA_SHA256);
+            }
+
+            $assertion = ADFS::signAssertion($assertion, $privateKeyFile, $certificateFile, $algo, $passphrase);
+            $assertion = Assertion::fromXML($assertion->toXML());
+        }
+        \SimpleSAML\Logger::debug($assertion->toXML()->ownerDocument->saveXML());
     }
 
 
@@ -502,7 +613,7 @@ class ADFS
      */
     public static function sendResponse(array $state): void
     {
-        $spMetadata = $state["SPMetadata"];
+        $spMetadata = $state['SPMetadata'];
         $spEntityId = $spMetadata['entityid'];
         $spMetadata = Configuration::loadFromArray(
             $spMetadata,
@@ -537,7 +648,7 @@ class ADFS
             $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
         }
 
-        $assertion = ADFS::generateAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
+        $assertion = ADFS::generateActiveAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
 
         $privateKeyCfg = $idpMetadata->getOptionalString('privatekey', null);
         $certificateCfg = $idpMetadata->getOptionalString('certificate', null);
