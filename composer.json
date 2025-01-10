@@ -43,7 +43,7 @@
         "simplesamlphp/assert": "~1.8.0",
         "simplesamlphp/saml11": "~1.2.0",
         "simplesamlphp/saml2": "^5@dev",
-        "simplesamlphp/simplesamlphp": "~2.4.0",
+        "simplesamlphp/simplesamlphp": "^2.4",
         "simplesamlphp/ws-security": "~1.8.0",
         "simplesamlphp/xml-common": "~1.24.0",
         "simplesamlphp/xml-security": "~1.13.0",
@@ -63,6 +63,5 @@
         "branch-alias": {
             "dev-master": "3.0.x-dev"
         }
-    },
-    "version": "2.4.0"
+    }
 }
