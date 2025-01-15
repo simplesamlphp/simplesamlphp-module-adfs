@@ -169,7 +169,7 @@ class PassiveIdP
      *
      * @param array $state The authentication request state array.
      */
-    public static function postAuthProc(array $state): Response
+    public static function postAuthProc(array $state): void
     {
         Assert::isCallable($state['Responder']);
 
@@ -183,9 +183,8 @@ class PassiveIdP
             );
         }
 
-        $response = call_user_func($state['Responder'], $state);
-        Assert::isInstanceOf($response, Response::class);
-        return $response;
+        call_user_func($state['Responder'], $state);
+        Assert::true(false);
     }
 
 

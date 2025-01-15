@@ -44,7 +44,6 @@
         "simplesamlphp/saml11": "~1.2.0",
         "simplesamlphp/saml2": "^5@dev",
         "simplesamlphp/simplesamlphp": "^2.4",
-        "simplesamlphp/ws-security": "~1.8.0",
         "simplesamlphp/xml-common": "~1.24.0",
         "simplesamlphp/xml-security": "~1.13.0",
         "simplesamlphp/xml-soap": "~1.7.0",

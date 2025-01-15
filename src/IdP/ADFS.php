@@ -26,14 +26,19 @@ use SimpleSAML\SAML11\XML\saml\AudienceRestrictionCondition;
 use SimpleSAML\SAML11\XML\saml\AuthenticationStatement;
 use SimpleSAML\SAML11\XML\saml\Conditions;
 use SimpleSAML\SAML11\XML\saml\NameIdentifier;
-use SimpleSAML\SAML11\XML\saml\Subject;
-use SimpleSAML\SOAP\XML\env_200305\Envelope;
+use SimpleSAML\SAML11\XML\saml\{ConfirmationMethod, Subject, SubjectConfirmation};
+use SimpleSAML\SOAP\Constants as SOAP_C;
+use SimpleSAML\SOAP\XML\env_200305\{Body, Envelope, Header};
 use SimpleSAML\Utils;
-use SimpleSAML\WSSecurity\XML\wsa_200508\{Action, Address, EndpointReference, MessageID, To};
+use SimpleSAML\WSSecurity\XML\wsa_200508\{Action, Address, EndpointReference, MessageID, RelatesTo, To};
 use SimpleSAML\WSSecurity\XML\wsp\AppliesTo;
-use SimpleSAML\WSSecurity\XML\wsse\{Password, Security, Username, UsernameToken};
-use SimpleSAML\WSSecurity\XML\wst_200502\{RequestSecurityToken, RequestSecurityTokenResponse};
+use SimpleSAML\WSSecurity\XML\wsse\{KeyIdentifier, Password, Security, SecurityTokenReference, Username, UsernameToken};
+use SimpleSAML\WSSecurity\XML\wst_200502\{KeyType, KeyTypeEnum, Lifetime, RequestType, RequestTypeEnum, TokenType};
+use SimpleSAML\WSSecurity\XML\wst_200502\{RequestedSecurityToken, RequestSecurityToken, RequestSecurityTokenResponse};
+use SimpleSAML\WSSecurity\XML\wst_200502\{RequestedAttachedReference, RequestedUnattachedReference};
+use SimpleSAML\WSSecurity\XML\wsu\{Created, Expires, Timestamp};
 use SimpleSAML\XHTML\Template;
+use SimpleSAML\XML\Attribute as XMLAttribute;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
 use SimpleSAML\XMLSecurity\Key\PrivateKey;
 use SimpleSAML\XMLSecurity\Key\X509Certificate as PublicKey;
@@ -124,6 +129,7 @@ class ADFS
         $state = [
             'Responder' => [ADFS::class, 'sendPassiveResponse'],
             'SPMetadata' => $spMetadata->toArray(),
+            'MessageID' => $messageid->getContent(),
             // Dirty hack to leverage the SAML ECP logics
             'saml:Binding' => SAML2_C::BINDING_PAOS,
         ];
@@ -291,8 +297,6 @@ class ADFS
         $notBefore = DateInterval::createFromDateString('30 seconds');
         $notOnOrAfter = DateInterval::createFromDateString(sprintf('%d seconds', $assertionLifetime));
         $assertionID = $randomUtils->generateID();
-//        $nameidFormat = 'http://schemas.xmlsoap.org/claims/UPN';
-//        $nameid = htmlspecialchars($nameid);
         $now = new DateTimeImmutable('now', new DateTimeZone('Z'));
 
         if ($httpUtils->isHTTPS()) {
@@ -312,7 +316,7 @@ class ADFS
         );
 
         $nameIdentifier = new NameIdentifier($nameid, null, C::NAMEID_UNSPECIFIED);
-        $subject = new Subject(null, $nameIdentifier);
+        $subject = new Subject(new SubjectConfirmation([new ConfirmationMethod(C::CM_BEARER)]), $nameIdentifier);
 
         $authenticationStatement = new AuthenticationStatement($subject, $method, $now);
 
@@ -320,12 +324,12 @@ class ADFS
         $attrs[] = new Attribute(
             'UPN',
             'http://schemas.xmlsoap.org/claims',
-            $attributes['userPrincipalName'][0],
+            [new AttributeValue($attributes['http://schemas.xmlsoap.org/claims/UPN'][0])],
         );
         $attrs[] = new Attribute(
             'ImmutableID',
             'http://schemas.microsoft.com/LiveID/Federation/2008/05',
-            $attributes['ms-DS-ConsistencyGuid'][0],
+            [new AttributeValue($attributes['http://schemas.microsoft.com/LiveID/Federation/2008/05/ImmutableID'][0])],
         );
 
         $attributeStatement = new AttributeStatement($subject, $attrs);
@@ -336,7 +340,7 @@ class ADFS
             $now,
             $conditions,
             null, // Advice
-            [$authenticationStatement, $attributeStatement],
+            [$attributeStatement, $authenticationStatement],
         );
     }
 
@@ -581,10 +585,14 @@ class ADFS
             $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
         }
 
-        $attributes = $state['Attributes'];
-        $nameid = $attributes['ms-DS-ConsistencyGuid'][0];
+        $now = new DateTimeImmutable('now', new DateTimeZone('Z'));
+        $created = $now->sub(DateInterval::createFromDateString(sprintf('30 seconds')));
+        $expires = $now->add(DateInterval::createFromDateString(sprintf('%d seconds', $assertionLifetime)));
 
-        $assertion = ADFS::generateActiveAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
+        $attributes = $state['Attributes'];
+        $nameid = $state['saml:NameID'][SAML2_C::NAMEID_UNSPECIFIED];
+
+        $assertion = ADFS::generatePassiveAssertion($idpEntityId, $spEntityId, $nameid->getValue(), $attributes, $assertionLifetime);
 
         $privateKeyCfg = $idpMetadata->getOptionalString('privatekey', null);
         $certificateCfg = $idpMetadata->getOptionalString('certificate', null);
@@ -603,7 +611,65 @@ class ADFS
             $assertion = ADFS::signAssertion($assertion, $privateKeyFile, $certificateFile, $algo, $passphrase);
             $assertion = Assertion::fromXML($assertion->toXML());
         }
-        \SimpleSAML\Logger::debug($assertion->toXML()->ownerDocument->saveXML());
+
+        $requestedSecurityToken = new RequestedSecurityToken($assertion);
+        $lifetime = new LifeTime(new Created($created), new Expires($expires));
+        $appliesTo = new AppliesTo([new EndpointReference(new Address($spEntityId))]);
+
+        $requestedAttachedReference = new RequestedAttachedReference(
+            new SecurityTokenReference(null, null, [
+                new KeyIdentifier(
+                    $assertion->getId(),
+                    'http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID',
+                ),
+            ]),
+        );
+        $requestedUnattachedReference = new RequestedUnattachedReference(
+            new SecurityTokenReference(null, null, [
+                new KeyIdentifier(
+                    $assertion->getId(),
+                    'http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID',
+                ),
+            ]),
+        );
+        $tokenType = new TokenType(C::NS_SAML);
+        $requestType = new RequestType([RequestTypeEnum::Issue]);
+        $keyType = new KeyType(['http://schemas.xmlsoap.org/ws/2005/05/identity/NoProofKey']);
+
+        $requestSecurityTokenResponse = new RequestSecurityTokenResponse(null, [
+            $lifetime,
+            $appliesTo,
+            $requestedSecurityToken,
+            $requestedAttachedReference,
+            $requestedUnattachedReference,
+            $tokenType,
+            $requestType,
+            $keyType,
+        ]);
+
+        // Build envelope
+        $mustUnderstand = new XMLAttribute(SOAP_C::NS_SOAP_ENV_12, 'env', 'mustUnderstand', '1');
+        $header = new Header([
+            new Action('http://schemas.xmlsoap.org/ws/2005/02/trust/RSTR/Issue', [$mustUnderstand]),
+            new RelatesTo($state['MessageID'], null),
+            new Security(
+                [
+                    new Timestamp(
+                        new Created($created),
+                        new Expires($expires),
+                    ),
+                ],
+                [$mustUnderstand],
+            ),
+        ]);
+        $body = new Body(null, [$requestSecurityTokenResponse]);
+        $envelope = new Envelope($body, $header);
+
+        $xmlResponse = $envelope->toXML();
+        \SimpleSAML\Logger::debug($xmlResponse->ownerDocument->saveXML($xmlResponse));
+
+        echo $xmlResponse->ownerDocument->saveXML($xmlResponse);
+        exit();
     }
 
 
