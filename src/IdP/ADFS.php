@@ -753,6 +753,7 @@ class ADFS
 
         $xmlResponse = $requestSecurityTokenResponse->toXML();
         $wresult = $xmlResponse->ownerDocument->saveXML($xmlResponse);
+        Logger::debug($wresult);
         $wctx = $state['adfs:wctx'];
         $wreply = $state['adfs:wreply'] ? : $spMetadata->getValue('prp');
         ADFS::postResponse($wreply, $wresult, $wctx);
