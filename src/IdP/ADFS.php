@@ -164,6 +164,11 @@ class ADFS
             $username = (string) $request->query->get('username');
         }
 
+        $wauth = null;
+        if ($request->query->has('wauth')) {
+            $wauth = (string) $request->query->get('wauth');
+        }
+
         $state = [
             'Responder' => [ADFS::class, 'sendResponse'],
             'SPMetadata' => $spMetadata->toArray(),
@@ -175,6 +180,10 @@ class ADFS
 
         if ($username !== null) {
             $state['core:username'] = $username;
+        }
+
+        if ($wauth !== null) {
+            $state['saml:RequestedAuthnContext'] = ['AuthnContextClassRef' => [$wauth]];
         }
 
         if (isset($query['wreply']) && !empty($query['wreply'])) {
@@ -196,6 +205,7 @@ class ADFS
      * @param string $nameid
      * @param array $attributes
      * @param int $assertionLifetime
+     * @param string $method
      * @return \SimpleSAML\SAML11\XML\saml\Assertion
      */
     private static function generateActiveAssertion(
@@ -204,6 +214,7 @@ class ADFS
         string $nameid,
         array $attributes,
         int $assertionLifetime,
+        string $method,
     ): Assertion {
         $httpUtils = new Utils\HTTP();
         $randomUtils = new Utils\Random();
@@ -216,12 +227,6 @@ class ADFS
         $nameidFormat = 'http://schemas.xmlsoap.org/claims/UPN';
         $nameid = htmlspecialchars($nameid);
         $now = new DateTimeImmutable('now', new DateTimeZone('Z'));
-
-        if ($httpUtils->isHTTPS()) {
-            $method = SAML2_C::AC_PASSWORD_PROTECTED_TRANSPORT;
-        } else {
-            $method = C::AC_PASSWORD;
-        }
 
         $audience = new Audience($target);
         $audienceRestrictionCondition = new AudienceRestrictionCondition([$audience]);
@@ -714,7 +719,15 @@ class ADFS
             $assertionLifetime = $idpMetadata->getOptionalInteger('assertion.lifetime', 300);
         }
 
-        $assertion = ADFS::generateActiveAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime);
+        if (isset($state['saml:AuthnContextClassRef'])) {
+            $method = $state['saml:AuthnContextClassRef'];
+        } elseif ((new Utils\HTTP())->isHTTPS()) {
+            $method = SAML2_C::AC_PASSWORD_PROTECTED_TRANSPORT;
+        } else {
+            $method = C::AC_PASSWORD;
+        }
+
+        $assertion = ADFS::generateActiveAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime, $method);
 
         $privateKeyCfg = $idpMetadata->getOptionalString('privatekey', null);
         $certificateCfg = $idpMetadata->getOptionalString('certificate', null);
