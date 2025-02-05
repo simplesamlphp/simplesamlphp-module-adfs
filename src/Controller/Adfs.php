@@ -13,7 +13,7 @@ use SimpleSAML\Module\adfs\IdP\PassiveIdP;
 use SimpleSAML\Module\adfs\MetadataExchange;
 use SimpleSAML\SOAP\XML\env_200305\Envelope;
 use SimpleSAML\XML\DOMDocumentFactory;
-use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
+use Symfony\Component\HttpFoundation\{RedirectResponse, Request, Response, StreamedResponse};
 
 /**
  * Controller class for the adfs module.
@@ -104,9 +104,9 @@ class Adfs
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function prp(Request $request): Response
+    public function logout(Request $request): Response
     {
-        Logger::info('ADFS - IdP.prp: Accessing ADFS IdP endpoint prp');
+        Logger::info('ADFS - logout.prp: Accessing ADFS IdP logout endpoint');
 
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
         $idp = IdP::getById('adfs:' . $idpEntityId);
@@ -119,7 +119,28 @@ class Adfs
                         ADFS_IDP::receiveLogoutMessage($idp);
                     },
                 );
-            } elseif ($wa === 'wsignin1.0') {
+            }
+            throw new SspError\BadRequest("Unsupported value for 'wa' specified in request.");
+        }
+
+        throw new SspError\BadRequest("Missing parameter 'wsignout1.0' in request.");
+    }
+
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function prp(Request $request): Response
+    {
+        Logger::info('ADFS - IdP.prp: Accessing ADFS IdP prp endpoint');
+
+        $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
+        $idp = IdP::getById('adfs:' . $idpEntityId);
+
+        if ($request->get('wa', null) !== null) {
+            $wa = $request->get('wa');
+            if ($wa === 'wsignin1.0') {
                 return ADFS_IDP::receiveAuthnRequest($request, $idp);
             }
             throw new SspError\BadRequest("Unsupported value for 'wa' specified in request.");
