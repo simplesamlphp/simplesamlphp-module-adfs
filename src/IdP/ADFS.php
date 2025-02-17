@@ -50,6 +50,7 @@ use Symfony\Component\HttpFoundation\{Request, StreamedResponse};
 use function array_pop;
 use function base64_encode;
 use function chunk_split;
+use function str_replace;
 use function trim;
 
 class ADFS
@@ -106,7 +107,6 @@ class ADFS
 
         // Ensure we know the issuer
         $issuer = $endpointReference->getAddress()->getContent();
-        //$idp = IdP::getById($this->config, 'adfs:' . $issuer);
 
         $metadata = MetaDataStorageHandler::getMetadataHandler(Configuration::getInstance());
         $spMetadata = $metadata->getMetaDataConfig($issuer, 'adfs-sp-remote');
@@ -125,6 +125,10 @@ class ADFS
             $_SERVER['PHP_AUTH_USER'] = $username->getContent();
             $_SERVER['PHP_AUTH_PW'] = $password->getContent();
         }
+
+        $requestSecurityTokenStr = $requestSecurityToken->toXML()->ownerDocument->saveXML();
+        $requestSecurityTokenStr = str_replace($password->getContent(), '*****', $requestSecurityTokenStr);
+        Logger::debug($requestSecurityTokenStr);
 
         $state = [
             'Responder' => [ADFS::class, 'sendPassiveResponse'],
@@ -754,6 +758,7 @@ class ADFS
         $xmlResponse = $requestSecurityTokenResponse->toXML();
         $wresult = $xmlResponse->ownerDocument->saveXML($xmlResponse);
         Logger::debug($wresult);
+
         $wctx = $state['adfs:wctx'];
         $wreply = $state['adfs:wreply'] ? : $spMetadata->getValue('prp');
         ADFS::postResponse($wreply, $wresult, $wctx);
