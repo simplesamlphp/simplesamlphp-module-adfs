@@ -9,6 +9,10 @@ use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
 use SimpleSAML\Error as SspError;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
+use SimpleSAML\Module\adfs\IdP\PassiveIdP;
+use SimpleSAML\Module\adfs\MetadataExchange;
+use SimpleSAML\SOAP\XML\env_200305\Envelope;
+use SimpleSAML\XML\DOMDocumentFactory;
 use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
 
 /**
@@ -77,7 +81,6 @@ class Adfs
             // Some products like DirX are known to break on pretty-printed XML
             $document->ownerDocument->formatOutput = false;
             $document->ownerDocument->encoding = 'UTF-8';
-
             $metaxml = $document->ownerDocument->saveXML();
 
             $response = new Response();
@@ -136,5 +139,97 @@ class Adfs
             );
         }
         throw new SspError\BadRequest("Missing parameter 'wa' or 'assocId' in request.");
+    }
+
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function mex(Request $request): Response
+    {
+        if (!$this->config->getOptionalBoolean('enable.adfs-idp', false)) {
+            throw new SspError\Error('NOACCESS');
+        }
+
+        // check if valid local session exists
+        $authUtils = new Utils\Auth();
+        if ($this->config->getOptionalBoolean('admin.protectmetadata', false) && !$authUtils->isAdmin()) {
+            return new StreamedResponse([$authUtils, 'requireAdmin']);
+        }
+
+        $mexBuilder = new MetadataExchange();
+        $document = $mexBuilder->buildDocument()->toXML();
+        // Some products like DirX are known to break on pretty-printed XML
+        $document->ownerDocument->formatOutput = false;
+        $document->ownerDocument->encoding = 'UTF-8';
+
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:tns',
+            'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+        );
+
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:soapenc',
+            'http://schemas.xmlsoap.org/soap/encoding/',
+        );
+
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:msc',
+            'http://schemas.microsoft.com/ws/2005/12/wsdl/contract',
+        );
+
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:wsam',
+            'http://www.w3.org/2007/05/addressing/metadata',
+        );
+
+        $document->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:wsap',
+            'http://schemas.xmlsoap.org/ws/2004/08/addressing/policy',
+        );
+
+        $metaxml = $document->ownerDocument->saveXML();
+
+        $response = new Response();
+        $response->setEtag(hash('sha256', $metaxml));
+        $response->setPublic();
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+        $response->headers->set('Content-Type', 'text/xml');
+        $response->setContent($metaxml);
+
+        return $response;
+    }
+
+
+    /**
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function usernamemixed(Request $request): Response
+    {
+        if (!$this->config->getOptionalBoolean('enable.adfs-idp', false)) {
+            throw new SspError\Error('NOACCESS');
+        }
+
+        $soapMessage = $request->getContent();
+        if ($soapMessage === false) {
+            throw new SspError\BadRequest('Missing SOAP-content.');
+        }
+
+        $domDocument = DOMDocumentFactory::fromString($soapMessage);
+        $soapEnvelope = Envelope::fromXML($domDocument->documentElement);
+
+        $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
+        $idp = PassiveIdP::getById($this->config, 'adfs:' . $idpEntityId);
+
+        return ADFS_IDP::receivePassiveAuthnRequest($request, $soapEnvelope, $idp);
     }
 }
