@@ -52,7 +52,7 @@
         "symfony/http-foundation": "^6.4"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp-test-framework": "~1.8.0"
+        "simplesamlphp/simplesamlphp-test-framework": "~1.9.2"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
