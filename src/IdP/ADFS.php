@@ -368,7 +368,7 @@ class ADFS
         string $cert,
         string $algo,
         #[\SensitiveParameter]
-        string $passphrase = null,
+        ?string $passphrase = null,
     ): Assertion {
         $key = PrivateKey::fromFile($key, $passphrase);
         $pubkey = PublicKey::fromFile($cert);
