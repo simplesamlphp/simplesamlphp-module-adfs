@@ -119,7 +119,7 @@ class ADFS
         $password = Password::getChildrenOfClass($usernameToken->toXML());
         $password = array_pop($password);
 
-        if ($username === null || $password === null) {
+        if ($password === null) {
             throw new Error\BadRequest('Missing username or password in SOAP header.');
         } else {
             $_SERVER['PHP_AUTH_USER'] = $username->getContent();
@@ -207,7 +207,7 @@ class ADFS
      * @param string $issuer
      * @param string $target
      * @param string $nameid
-     * @param array $attributes
+     * @param array<mixed> $attributes
      * @param int $assertionLifetime
      * @param string $method
      * @return \SimpleSAML\SAML11\XML\saml\Assertion
@@ -287,7 +287,7 @@ class ADFS
      * @param string $issuer
      * @param string $target
      * @param string $nameid
-     * @param array $attributes
+     * @param array<mixed> $attributes
      * @param int $assertionLifetime
      * @return \SimpleSAML\SAML11\XML\saml\Assertion
      */
@@ -409,7 +409,7 @@ class ADFS
 
 
     /**
-     * @param array $state
+     * @param array<mixed> $state
      * @throws \Exception
      */
     public static function sendPassiveResponse(array $state): void
@@ -519,7 +519,7 @@ class ADFS
 
 
     /**
-     * @param array $state
+     * @param array<mixed> $state
      * @throws \Exception
      */
     public static function sendResponse(array $state): void
@@ -603,7 +603,7 @@ class ADFS
 
     /**
      * @param \SimpleSAML\IdP $idp
-     * @param array $state
+     * @param array<mixed> $state
      */
     public static function sendLogoutResponse(IdP $idp, array $state): void
     {
@@ -645,7 +645,7 @@ class ADFS
      * accepts an association array, and returns a URL that can be accessed to terminate the association
      *
      * @param \SimpleSAML\IdP $idp
-     * @param array $association
+     * @param array<mixed> $association
      * @param string $relayState
      * @return string
      */

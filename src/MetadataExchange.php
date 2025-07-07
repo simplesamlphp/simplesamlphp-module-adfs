@@ -56,9 +56,6 @@ class MetadataExchange
 {
     /**
      * Constructor.
-     *
-     * @param \SimpleSAML\Configuration $config The general configuration
-     * @param \SimpleSAML\Configuration $metadata The metadata configuration
      */
     public function __construct()
     {
@@ -68,7 +65,7 @@ class MetadataExchange
     /**
      * Build a mex document
      *
-     * @return \SimpleSAML\WSSecurity\XML\wsdl\Definitions
+     * @return \SimpleSAML\WSDL\XML\wsdl\Definitions
      */
     public function buildDocument(): Definitions
     {
@@ -89,7 +86,7 @@ class MetadataExchange
     /**
      * This method builds the wsp:Policy elements
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsp\Policy[]
+     * @return \SimpleSAML\WSSecurity\XML\wsp\Policy[]
      */
     private function getPolicies(): array
     {
@@ -106,7 +103,7 @@ class MetadataExchange
     /**
      * This method builds the wsdl:types elements
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsdl\Types[]
+     * @return \SimpleSAML\WSSL\XML\wsdl\Types[]
     private function getTypes(): array
     {
         $defaultEndpoint = Module::getModuleURL('adfs/services/trust/mex');
@@ -132,7 +129,7 @@ IMPORT;
     /**
      * This method builds the wsdl:message elements
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsdl\Message[]
+     * @return \SimpleSAML\WSDL\XML\wsdl\Message[]
      */
     private function getMessages(): array
     {
@@ -190,7 +187,7 @@ IMPORT;
     /**
      * This method builds the wsdl:portType elements
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsdl\PortType[]
+     * @return \SimpleSAML\WSDL\XML\wsdl\PortType[]
      */
     private function getPortTypes(): array
     {
@@ -258,7 +255,7 @@ IMPORT;
     /**
      * This method builds the wsdl:binding elements
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsdl\Binding[]
+     * @return \SimpleSAML\WSDL\XML\wsdl\Binding[]
      */
     private function getBindings(): array
     {
@@ -569,7 +566,7 @@ IMPORT;
     /**
      * This method builds the wsdl:service elements
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsdl\Service[]
+     * @return \SimpleSAML\WSDL\XML\wsdl\Service[]
      */
     private function getServices(): array
     {
