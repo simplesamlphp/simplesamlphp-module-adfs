@@ -37,7 +37,7 @@ final class DefinitionsTest extends TestCase
 
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public static function provideMex(): array
     {

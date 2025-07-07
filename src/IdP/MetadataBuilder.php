@@ -99,7 +99,7 @@ class MetadataBuilder
     {
         $cryptoUtils = new Utils\Crypto();
 
-        /** @var array $keyArray */
+        /** @var array<mixed> $keyArray */
         $keyArray = $cryptoUtils->loadPrivateKey($this->config, true, 'metadata.sign.');
         $certArray = $cryptoUtils->loadPublicKey($this->config, false, 'metadata.sign.');
         $algo = $this->config->getOptionalString('metadata.sign.algorithm', C::SIG_RSA_SHA256);
@@ -123,6 +123,8 @@ class MetadataBuilder
 
     /**
      * This method builds the md:Organization element, if any
+     *
+     * @return \SimpleSAML\SAML2\XML\md\Organization
      */
     private function getOrganization(): ?Organization
     {
@@ -157,6 +159,8 @@ class MetadataBuilder
 
     /**
      * This method builds the role descriptor elements
+     *
+     * @return \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptor[]
      */
     private function getRoleDescriptor(): array
     {
@@ -177,6 +181,8 @@ class MetadataBuilder
 
     /**
      * This method builds the SecurityTokenService element
+     *
+     * @return \SimpleSAML\WSSecurity\XML\fed\SecurityTokenServiceType
      */
     public function getSecurityTokenService(): SecurityTokenServiceType
     {
@@ -202,6 +208,8 @@ class MetadataBuilder
 
     /**
      * This method builds the md:KeyDescriptor elements, if any
+     *
+     * @return \SimpleSAML\SAML2\XML\md\KeyDescriptor[]
      */
     private function getKeyDescriptor(): array
     {
@@ -238,6 +246,8 @@ class MetadataBuilder
 
     /**
      * This method builds the md:ContactPerson elements, if any
+     *
+     * @return \SimpleSAML\SAML2\XML\md\ContactPerson[]
      */
     private function getContactPerson(): array
     {
@@ -255,6 +265,8 @@ class MetadataBuilder
 
     /**
      * This method builds the md:Extensions, if any
+     *
+     * @return \SimpleSAML\SAML2\XML\md\Extensions|null
      */
     private function getExtensions(): ?Extensions
     {
@@ -332,6 +344,13 @@ class MetadataBuilder
     }
 
 
+    /**
+     * @param string $use
+     * @param string $x509Cert
+     * @param string|null $keyName
+     *
+     * @return \SimpleSAML\SAML2\XML\md\KeyDescriptor
+     */
     private static function buildKeyDescriptor(string $use, string $x509Cert, ?string $keyName): KeyDescriptor
     {
         Assert::oneOf($use, ['encryption', 'signing']);

@@ -17,7 +17,7 @@ use function dirname;
 /**
  */
 #[CoversClass(Controller\Adfs::class)]
-class AdfsControllerTest extends TestCase
+final class AdfsControllerTest extends TestCase
 {
     /** @var \SimpleSAML\Configuration */
     protected Configuration $config;

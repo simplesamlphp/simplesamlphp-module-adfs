@@ -53,9 +53,6 @@ class Policy2005
 {
     /**
      * Constructor.
-     *
-     * @param \SimpleSAML\Configuration $config The general configuration
-     * @param \SimpleSAML\Configuration $metadata The metadata configuration
      */
     public function __construct()
     {
@@ -65,7 +62,7 @@ class Policy2005
     /**
      * This method builds the wsp:Policy elements
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsp\Policy[]
+     * @return \SimpleSAML\WSSecurity\XML\wsp\Policy[]
      */
     public function getPolicies(): array
     {
@@ -82,7 +79,7 @@ class Policy2005
     /**
      * This method builds the CertificateWSTrustBinding policy.
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsp\Policy
+     * @return \SimpleSAML\WSSecurity\XML\wsp\Policy
      */
     private function getCertificateWSTrustBinding(): Policy
     {
@@ -186,7 +183,7 @@ class Policy2005
     /**
      * This method builds the CertificateWSTrustBinding1 policy.
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsp\Policy
+     * @return \SimpleSAML\WSSecurity\XML\wsp\Policy
      */
     private function getCertificateWSTrustBinding1(): Policy
     {
@@ -231,7 +228,7 @@ class Policy2005
     /**
      * This method builds the UserNameWSTrustBinding policy.
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsp\Policy
+     * @return \SimpleSAML\WSSecurity\XML\wsp\Policy
      */
     private function getUserNameWSTrustBindingPolicy(): Policy
     {
@@ -334,7 +331,7 @@ class Policy2005
     /**
      * This method builds the IssuedTokenWSTrustBinding policy.
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsp\Policy
+     * @return \SimpleSAML\WSSecurity\XML\wsp\Policy
      */
     private function getIssuedTokenWSTrustBinding(): Policy
     {
@@ -445,7 +442,7 @@ class Policy2005
     /**
      * This method builds the IssuedTokenWSTrustBinding1 policy.
      *
-     * @param \SimpleSAML\WSSecurity\XML\wsp\Policy
+     * @return \SimpleSAML\WSSecurity\XML\wsp\Policy
      */
     private function getIssuedTokenWSTrustBinding1(): Policy
     {

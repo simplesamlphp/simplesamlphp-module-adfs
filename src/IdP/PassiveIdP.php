@@ -29,7 +29,7 @@ class PassiveIdP
     /**
      * A cache for resolving IdP id's.
      *
-     * @var array
+     * @var \SimpleSAML\Module\adfs\IdP\PassiveIdP[]
      */
     private static array $idpCache = [];
 
@@ -130,7 +130,7 @@ class PassiveIdP
      * Retrieve the IdP "owning" the state.
      *
      * @param \SimpleSAML\Configuration $config The Configuration.
-     * @param array &$state The state array.
+     * @param array<mixed> &$state The state array.
      *
      * @return \SimpleSAML\Module\adfs\IdP\PassiveIdP The IdP.
      */
@@ -167,7 +167,7 @@ class PassiveIdP
     /**
      * Called after authproc has run.
      *
-     * @param array $state The authentication request state array.
+     * @param array<mixed> $state The authentication request state array.
      */
     public static function postAuthProc(array $state): void
     {
@@ -191,7 +191,7 @@ class PassiveIdP
     /**
      * The user is authenticated.
      *
-     * @param array $state The authentication request state array.
+     * @param array<mixed> $state The authentication request state array.
      *
      * @throws \SimpleSAML\Error\Exception If we are not authenticated.
      */
@@ -238,7 +238,7 @@ class PassiveIdP
      *
      * This function authenticates the user.
      *
-     * @param array &$state The authentication request state.
+     * @param array<mixed> &$state The authentication request state.
      */
     private function authenticate(array &$state): Response
     {
@@ -249,7 +249,7 @@ class PassiveIdP
     /**
      * Process authentication requests.
      *
-     * @param array &$state The authentication request state.
+     * @param array<mixed> &$state The authentication request state.
      */
     public function handleAuthenticationRequest(array &$state): Response
     {
@@ -314,7 +314,7 @@ class PassiveIdP
      *
      * This function will never return.
      *
-     * @param array &$state The logout request state.
+     * @param array<mixed> &$state The logout request state.
      */
     public function finishLogout(array &$state): Response
     {
