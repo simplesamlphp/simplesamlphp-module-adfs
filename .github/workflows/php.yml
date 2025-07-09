@@ -196,7 +196,6 @@ jobs:
       - name: PHP Code Sniffer
         run: phpcs
 
-
       - name: PHPStan
         run: |
           vendor/bin/phpstan analyze -c phpstan.neon
