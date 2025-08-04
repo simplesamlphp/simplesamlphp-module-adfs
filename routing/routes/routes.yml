@@ -14,6 +14,13 @@ adfs-prp:
   }
   methods: [GET, POST]
 
+adfs-logout:
+  path: /logout
+  defaults: {
+    _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::prp'
+  }
+  methods: [GET, POST]
+
 adfs-metadata-legacy:
   path: /idp/metadata.php
   defaults: {
@@ -23,6 +30,13 @@ adfs-metadata-legacy:
 
 adfs-prp-legacy:
   path: /idp/prp.php
+  defaults: {
+    _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::prp'
+  }
+  methods: [GET, POST]
+
+adfs-logout-legacy:
+  path: /idp/logout.php
   defaults: {
     _controller: 'SimpleSAML\Module\adfs\Controller\Adfs::prp'
   }
