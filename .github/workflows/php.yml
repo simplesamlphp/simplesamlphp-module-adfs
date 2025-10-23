@@ -194,7 +194,7 @@ jobs:
         run: composer-unused
 
       - name: PHP Code Sniffer
-        run: phpcs
+        run: vendor/bin/phpcs
 
       - name: PHPStan
         run: |
