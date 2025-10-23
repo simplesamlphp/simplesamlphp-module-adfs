@@ -416,7 +416,7 @@ class ADFS
     {
         $idp = IdP::getByState($state);
         $idpMetadata = $idp->getConfig();
-        $idpEntityId = $idpMetadata->getString('entityid');
+        $idpEntityId = $state['IdPMetadata']['entityid'];
 
         $spMetadata = $state['SPMetadata'];
         $spEntityId = $spMetadata['entityid'];
@@ -546,7 +546,7 @@ class ADFS
 
         $idp = IdP::getByState($state);
         $idpMetadata = $idp->getConfig();
-        $idpEntityId = $idpMetadata->getString('entityid');
+        $idpEntityId = $state['IdPMetadata']['entityid'];
 
         $idp->addAssociation([
             'id' => 'adfs:' . $spEntityId,
