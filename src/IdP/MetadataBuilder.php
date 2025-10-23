@@ -7,8 +7,10 @@ namespace SimpleSAML\Module\adfs\IdP;
 use Beste\Clock\LocalizedClock;
 use Exception;
 use Psr\Clock\ClockInterface;
-use SimpleSAML\{Configuration, Logger, Module, Utils};
 use SimpleSAML\Assert\Assert;
+use SimpleSAML\Configuration;
+use SimpleSAML\Logger;
+use SimpleSAML\Module;
 use SimpleSAML\SAML2\Exception\ArrayValidationException;
 use SimpleSAML\SAML2\XML\md\AbstractMetadataDocument;
 use SimpleSAML\SAML2\XML\md\ContactPerson;
@@ -18,22 +20,27 @@ use SimpleSAML\SAML2\XML\md\KeyDescriptor;
 use SimpleSAML\SAML2\XML\md\Organization;
 use SimpleSAML\SAML2\XML\mdattr\EntityAttributes;
 use SimpleSAML\SAML2\XML\mdrpi\RegistrationInfo;
-use SimpleSAML\SAML2\XML\mdui\{DiscoHints, UIInfo};
-use SimpleSAML\SAML2\XML\saml\{Attribute, AttributeValue};
+use SimpleSAML\SAML2\XML\mdui\DiscoHints;
+use SimpleSAML\SAML2\XML\mdui\UIInfo;
+use SimpleSAML\SAML2\XML\saml\Attribute;
+use SimpleSAML\SAML2\XML\saml\AttributeValue;
 use SimpleSAML\SAML2\XML\shibmd\Scope;
+use SimpleSAML\Utils;
+use SimpleSAML\WSSecurity\Constants as C;
+use SimpleSAML\WSSecurity\XML\fed\PassiveRequestorEndpoint;
+use SimpleSAML\WSSecurity\XML\fed\SecurityTokenServiceEndpoint;
+use SimpleSAML\WSSecurity\XML\fed\SecurityTokenServiceType;
+use SimpleSAML\WSSecurity\XML\fed\TokenType;
+use SimpleSAML\WSSecurity\XML\fed\TokenTypesOffered;
+use SimpleSAML\WSSecurity\XML\wsa_200508\Address;
+use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
 use SimpleSAML\XML\Chunk;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
 use SimpleSAML\XMLSecurity\Key\PrivateKey;
-use SimpleSAML\XMLSecurity\XML\ds\{KeyInfo, KeyName, X509Certificate, X509Data};
-use SimpleSAML\WSSecurity\Constants as C;
-use SimpleSAML\WSSecurity\XML\fed\{
-    PassiveRequestorEndpoint,
-    SecurityTokenServiceEndpoint,
-    SecurityTokenServiceType,
-    TokenTypesOffered,
-    TokenType,
-};
-use SimpleSAML\WSSecurity\XML\wsa_200508\{Address, EndpointReference};
+use SimpleSAML\XMLSecurity\XML\ds\KeyInfo;
+use SimpleSAML\XMLSecurity\XML\ds\KeyName;
+use SimpleSAML\XMLSecurity\XML\ds\X509Certificate;
+use SimpleSAML\XMLSecurity\XML\ds\X509Data;
 
 use function array_key_exists;
 use function preg_match;
@@ -47,6 +54,7 @@ class MetadataBuilder
 {
     /** @var \Psr\Clock\ClockInterface */
     protected ClockInterface $clock;
+
 
     /**
      * Constructor.

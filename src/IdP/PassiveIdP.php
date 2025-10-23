@@ -5,11 +5,16 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\IdP;
 
 use Exception;
-use SimpleSAML\{Auth, Configuration, Error, Session, Utils};
 use SimpleSAML\Assert\Assert;
-use SimpleSAML\IdP\{IFrameLogoutHandler, LogoutHandlerInterface, TraditionalLogoutHandler};
+use SimpleSAML\Auth;
+use SimpleSAML\Configuration;
+use SimpleSAML\Error;
+use SimpleSAML\IdP\IFrameLogoutHandler;
+use SimpleSAML\IdP\LogoutHandlerInterface;
+use SimpleSAML\IdP\TraditionalLogoutHandler;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
-use Symfony\Component\HttpFoundation\{RedirectResponse, Response};
+use SimpleSAML\Session;
+use Symfony\Component\HttpFoundation\Response;
 
 use function call_user_func;
 use function substr;
@@ -145,7 +150,7 @@ class PassiveIdP
     /**
      * Retrieve the configuration for this IdP.
      *
-     * @return Configuration The configuration object.
+     * @return \SimpleSAML\Configuration The configuration object.
      */
     public function getConfig(): Configuration
     {

@@ -10,7 +10,8 @@ use SimpleSAML\Configuration;
 use SimpleSAML\Error;
 use SimpleSAML\Module\adfs\Controller;
 use SimpleSAML\Session;
-use Symfony\Component\HttpFoundation\{Request, StreamedResponse};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use function dirname;
 

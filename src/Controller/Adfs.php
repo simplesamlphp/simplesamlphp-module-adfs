@@ -5,15 +5,22 @@ declare(strict_types=1);
 namespace SimpleSAML\Module\adfs\Controller;
 
 use Exception;
-use SimpleSAML\{Configuration, IdP, Logger, Metadata, Module, Session, Utils};
+use SimpleSAML\Configuration;
 use SimpleSAML\Error as SspError;
+use SimpleSAML\IdP;
+use SimpleSAML\Logger;
+use SimpleSAML\Metadata;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
 use SimpleSAML\Module\adfs\IdP\PassiveIdP;
 use SimpleSAML\Module\adfs\MetadataExchange;
+use SimpleSAML\Session;
 use SimpleSAML\SOAP\XML\env_200305\Envelope;
+use SimpleSAML\Utils;
 use SimpleSAML\XML\DOMDocumentFactory;
-use Symfony\Component\HttpFoundation\{Request, Response, StreamedResponse};
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Controller class for the adfs module.
@@ -35,6 +42,7 @@ class Adfs
 
     /** @var \SimpleSAML\Utils\Crypto */
     protected Utils\Crypto $cryptoUtils;
+
 
     /**
      * AdfsController constructor.

@@ -6,44 +6,35 @@ namespace SimpleSAML\Module\adfs;
 
 use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\Trust;
-use SimpleSAML\WSDL\XML\soap12\{
-    Address as Soap12Address,
-    Binding as Soap12Binding,
-    Body as Soap12Body,
-    Operation as Soap12Operation,
-};
-use SimpleSAML\WSDL\XML\wsdl\{
-    Binding,
-    BindingOperation,
-    BindingOperationInput,
-    BindingOperationOutput,
-    Definitions,
-    Input,
-    Message,
-    Output,
-    Part,
-    Port,
-    PortType,
-    PortTypeOperation,
-    Service,
-    Types,
-};
+use SimpleSAML\WSDL\XML\soap12\Address as Soap12Address;
+use SimpleSAML\WSDL\XML\soap12\Binding as Soap12Binding;
+use SimpleSAML\WSDL\XML\soap12\Body as Soap12Body;
+use SimpleSAML\WSDL\XML\soap12\Operation as Soap12Operation;
+use SimpleSAML\WSDL\XML\wsdl\Binding;
+use SimpleSAML\WSDL\XML\wsdl\BindingOperation;
+use SimpleSAML\WSDL\XML\wsdl\BindingOperationInput;
+use SimpleSAML\WSDL\XML\wsdl\BindingOperationOutput;
+use SimpleSAML\WSDL\XML\wsdl\Definitions;
+use SimpleSAML\WSDL\XML\wsdl\Input;
+use SimpleSAML\WSDL\XML\wsdl\Message;
+use SimpleSAML\WSDL\XML\wsdl\Output;
+use SimpleSAML\WSDL\XML\wsdl\Part;
+use SimpleSAML\WSDL\XML\wsdl\Port;
+use SimpleSAML\WSDL\XML\wsdl\PortType;
+use SimpleSAML\WSDL\XML\wsdl\PortTypeOperation;
+use SimpleSAML\WSDL\XML\wsdl\Service;
 use SimpleSAML\WSSecurity\Constants as C;
-use SimpleSAML\WSSecurity\XML\wsa_200508\{Address, EndpointReference};
+use SimpleSAML\WSSecurity\XML\wsa_200508\Address;
+use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
 use SimpleSAML\WSSecurity\XML\wsp\PolicyReference;
-use SimpleSAML\WSSecurity\XML\wst_200502\{
-    RequestSecurityToken as RequestSecurityToken2005,
-    RequestSecurityTokenResponse as RequestSecurityTokenResponse2005,
-};
-use SimpleSAML\WSSecurity\XML\wst_200512\{
-    RequestSecurityToken as RequestSecurityToken13,
-    RequestSecurityTokenResponseCollection as RequestSecurityTokenResponseCollection13,
-};
+use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken as RequestSecurityToken2005;
+use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityTokenResponse as RequestSecurityTokenResponse2005;
+//use SimpleSAML\WSSecurity\XML\wst_200512\RequestSecurityToken as RequestSecurityToken13;
+//use SimpleSAML\WSSecurity\XML\wst_200512\RequestSecurityTokenResponseCollection as RequestSecurityTokenResponseCollection13;
 use SimpleSAML\XML\Attribute as XMLAttribute;
 
 //use SimpleSAML\XML\Chunk;
 //use SimpleSAML\XML\DOMDocumentFactory;
-
 use function array_merge;
 use function sprintf;
 
