@@ -587,9 +587,9 @@ class ADFS
             $assertion = Assertion::fromXML($assertion->toXML());
         }
 
-        $requestSecurityToken = new RequestSecurityToken(null, [$assertion]);
+        $requestedSecurityToken = new RequestedSecurityToken($assertion);
         $appliesTo = new AppliesTo([new EndpointReference(new Address($spEntityId))]);
-        $requestSecurityTokenResponse = new RequestSecurityTokenResponse(null, [$requestSecurityToken, $appliesTo]);
+        $requestSecurityTokenResponse = new RequestSecurityTokenResponse(null, [$requestedSecurityToken, $appliesTo]);
 
         $xmlResponse = $requestSecurityTokenResponse->toXML();
         $wresult = $xmlResponse->ownerDocument->saveXML($xmlResponse);
