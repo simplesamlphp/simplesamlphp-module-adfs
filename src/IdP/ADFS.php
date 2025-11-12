@@ -645,16 +645,20 @@ class ADFS
      * accepts an association array, and returns a URL that can be accessed to terminate the association
      *
      * @param \SimpleSAML\IdP $idp
-     * @param array $association
-     * @param string $relayState
+     * @param array<mixed> $association
+     * @param string|null $relayState
      * @return string
      */
-    public static function getLogoutURL(IdP $idp, array $association, string $relayState): string
+    public static function getLogoutURL(IdP $idp, array $association, ?string $relayState = null): string
     {
         $metadata = MetaDataStorageHandler::getMetadataHandler();
         $spMetadata = $metadata->getMetaDataConfig($association['adfs:entityID'], 'adfs-sp-remote');
+        $params = ['assocId' => urlencode($association['id'])];
+        if ($relayState !== null) {
+            $params['relayState'] = urlencode($relayState);
+        }
         $returnTo = Module::getModuleURL(
-            'adfs/idp/prp.php?assocId=' . urlencode($association["id"]) . '&relayState=' . urlencode($relayState),
+            'adfs/idp/prp.php', $params
         );
         return $spMetadata->getValue('prp') . '?wa=wsignoutcleanup1.0&wreply=' . urlencode($returnTo);
     }
