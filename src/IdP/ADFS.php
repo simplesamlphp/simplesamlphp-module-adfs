@@ -48,6 +48,7 @@ use SimpleSAML\WSSecurity\XML\wsse\SecurityTokenReference;
 use SimpleSAML\WSSecurity\XML\wsse\UsernameToken;
 use SimpleSAML\WSSecurity\XML\wst_200502\KeyType;
 use SimpleSAML\WSSecurity\XML\wst_200502\Lifetime;
+use SimpleSAML\WSSecurity\XML\wst_200502\RequestedAttachedReference;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestedSecurityToken;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestedUnattachedReference;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken;
