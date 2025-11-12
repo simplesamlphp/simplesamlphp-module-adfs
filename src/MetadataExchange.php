@@ -30,7 +30,8 @@ use SimpleSAML\WSSecurity\XML\wsp\PolicyReference;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken as RequestSecurityToken2005;
 use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityTokenResponse as RequestSecurityTokenResponse2005;
 //use SimpleSAML\WSSecurity\XML\wst_200512\RequestSecurityToken as RequestSecurityToken13;
-//use SimpleSAML\WSSecurity\XML\wst_200512\RequestSecurityTokenResponseCollection as RequestSecurityTokenResponseCollection13;
+//use SimpleSAML\WSSecurity\XML\wst_200512\RequestSecurityTokenResponseCollection as \
+//RequestSecurityTokenResponseCollection13;
 use SimpleSAML\XML\Attribute as XMLAttribute;
 
 //use SimpleSAML\XML\Chunk;

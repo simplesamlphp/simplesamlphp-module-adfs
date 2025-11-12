@@ -460,7 +460,13 @@ class ADFS
         $attributes = $state['Attributes'];
         $nameid = $state['saml:NameID'][SAML2_C::NAMEID_UNSPECIFIED];
 
-        $assertion = ADFS::generatePassiveAssertion($idpEntityId, $spEntityId, $nameid->getValue(), $attributes, $assertionLifetime);
+        $assertion = ADFS::generatePassiveAssertion(
+            $idpEntityId,
+            $spEntityId,
+            $nameid->getValue(),
+            $attributes,
+            $assertionLifetime,
+        );
 
         $privateKeyCfg = $idpMetadata->getOptionalString('privatekey', null);
         $certificateCfg = $idpMetadata->getOptionalString('certificate', null);
@@ -590,7 +596,14 @@ class ADFS
             $method = C::AC_PASSWORD;
         }
 
-        $assertion = ADFS::generateActiveAssertion($idpEntityId, $spEntityId, $nameid, $attributes, $assertionLifetime, $method);
+        $assertion = ADFS::generateActiveAssertion(
+            $idpEntityId,
+            $spEntityId,
+            $nameid,
+            $attributes,
+            $assertionLifetime,
+            $method,
+        );
 
         $privateKeyCfg = $idpMetadata->getOptionalString('privatekey', null);
         $certificateCfg = $idpMetadata->getOptionalString('certificate', null);
@@ -681,7 +694,8 @@ class ADFS
             $params['relayState'] = urlencode($relayState);
         }
         $returnTo = Module::getModuleURL(
-            'adfs/idp/prp.php', $params
+            'adfs/idp/prp.php',
+            $params,
         );
         return $spMetadata->getValue('prp') . '?wa=wsignoutcleanup1.0&wreply=' . urlencode($returnTo);
     }
