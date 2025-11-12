@@ -419,7 +419,7 @@ class ADFS
      * @throws \SimpleSAML\Error\Exception
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
-    public static function getHostedMetadata(string $entityid, MetaDataStorageHandler $handler = null): array
+    public static function getHostedMetadata(string $entityid, ?MetaDataStorageHandler $handler = null): array
     {
         $cryptoUtils = new Utils\Crypto();
 
