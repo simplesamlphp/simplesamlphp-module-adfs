@@ -35,24 +35,29 @@
         }
     },
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "ext-dom": "*",
 
         "beste/clock": "^3.0",
         "psr/clock": "^1.0",
-        "simplesamlphp/assert": "~1.8",
-        "simplesamlphp/saml11": "~1.2",
-        "simplesamlphp/saml2": "^5.0",
-        "simplesamlphp/simplesamlphp": "^2.4",
-        "simplesamlphp/xml-common": "~1.24",
-        "simplesamlphp/xml-security": "~1.13",
-        "simplesamlphp/xml-soap": "~1.7",
-        "simplesamlphp/xml-wsdl": "~1.2",
-        "simplesamlphp/ws-security": "~1.9",
-        "symfony/http-foundation": "^6.4"
+        "simplesamlphp/assert": "^1.9",
+        "simplesamlphp/saml11": "^2.1",
+        "simplesamlphp/saml2": "^6.0",
+        "simplesamlphp/simplesamlphp": "^2.5@dev",
+        "simplesamlphp/xml-common": "^2.5",
+        "simplesamlphp/xml-security": "^2.1",
+        "simplesamlphp/xml-soap": "^2.1",
+        "simplesamlphp/xml-wsdl": "^2.1",
+        "simplesamlphp/xml-wss-core": "^1.2",
+        "simplesamlphp/xml-ws-addressing": "^1.1",
+        "simplesamlphp/xml-ws-federation": "^1.0",
+        "simplesamlphp/xml-ws-policy": "^1.1",
+        "simplesamlphp/xml-ws-security-policy": "^1.0",
+        "simplesamlphp/xml-ws-trust": "^1.0",
+        "symfony/http-foundation": "^7.4"
     },
     "require-dev": {
-        "simplesamlphp/simplesamlphp-test-framework": "~1.10"
+        "simplesamlphp/simplesamlphp-test-framework": "~1.11"
     },
     "support": {
         "issues": "https://github.com/simplesamlphp/simplesamlphp-module-adfs/issues",
@@ -60,7 +65,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0.x-dev"
+            "dev-master": "3.1.x-dev"
         }
     }
 }
