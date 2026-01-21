@@ -11,7 +11,13 @@ use SimpleSAML\Assert\Assert;
 use SimpleSAML\Configuration;
 use SimpleSAML\Logger;
 use SimpleSAML\Module;
+use SimpleSAML\SAML2\Constants as C_SAML2;
 use SimpleSAML\SAML2\Exception\ArrayValidationException;
+use SimpleSAML\SAML2\Type\EntityIDValue;
+use SimpleSAML\SAML2\Type\KeyTypesValue;
+use SimpleSAML\SAML2\Type\SAMLAnyURIListValue;
+use SimpleSAML\SAML2\Type\SAMLAnyURIValue;
+use SimpleSAML\SAML2\Type\SAMLStringValue;
 use SimpleSAML\SAML2\XML\md\AbstractMetadataDocument;
 use SimpleSAML\SAML2\XML\md\ContactPerson;
 use SimpleSAML\SAML2\XML\md\EntityDescriptor;
@@ -26,16 +32,23 @@ use SimpleSAML\SAML2\XML\saml\Attribute;
 use SimpleSAML\SAML2\XML\saml\AttributeValue;
 use SimpleSAML\SAML2\XML\shibmd\Scope;
 use SimpleSAML\Utils;
-use SimpleSAML\WSSecurity\Constants as C;
-use SimpleSAML\WSSecurity\XML\fed\PassiveRequestorEndpoint;
-use SimpleSAML\WSSecurity\XML\fed\SecurityTokenServiceEndpoint;
-use SimpleSAML\WSSecurity\XML\fed\SecurityTokenServiceType;
-use SimpleSAML\WSSecurity\XML\fed\TokenType;
-use SimpleSAML\WSSecurity\XML\fed\TokenTypesOffered;
-use SimpleSAML\WSSecurity\XML\wsa_200508\Address;
-use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
+use SimpleSAML\WebServices\Addressing\XML\wsa_200508\Address;
+use SimpleSAML\WebServices\Addressing\XML\wsa_200508\EndpointReference;
+use SimpleSAML\WebServices\Federation\Constants as C_FED;
+use SimpleSAML\WebServices\Federation\XML\fed\PassiveRequestorEndpoint;
+use SimpleSAML\WebServices\Federation\XML\fed\SecurityTokenServiceEndpoint;
+use SimpleSAML\WebServices\Federation\XML\fed\SecurityTokenServiceType;
+use SimpleSAML\WebServices\Federation\XML\fed\TokenType;
+use SimpleSAML\WebServices\Federation\XML\fed\TokenTypesOffered;
+use SimpleSAML\WebServices\Trust\Constants as C_TRUST;
 use SimpleSAML\XML\Chunk;
+use SimpleSAML\XMLSchema\Type\AnyURIValue;
+use SimpleSAML\XMLSchema\Type\BooleanValue;
+use SimpleSAML\XMLSchema\Type\IDValue;
+use SimpleSAML\XMLSchema\Type\NCNameValue;
+use SimpleSAML\XMLSchema\Type\QNameValue;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
+use SimpleSAML\XMLSecurity\Constants as C_XMLSEC;
 use SimpleSAML\XMLSecurity\Key\PrivateKey;
 use SimpleSAML\XMLSecurity\XML\ds\KeyInfo;
 use SimpleSAML\XMLSecurity\XML\ds\KeyName;
@@ -81,11 +94,13 @@ class MetadataBuilder
         $contactPerson = $this->getContactPerson();
         $organization = $this->getOrganization();
         $roleDescriptor = $this->getRoleDescriptor();
+        $extensions = $this->getExtensions();
 
         $randomUtils = new Utils\Random();
         $entityDescriptor = new EntityDescriptor(
-            id: $randomUtils->generateID(),
-            entityId: $entityId,
+            id: IDValue::fromString($randomUtils->generateID()),
+            extensions: $extensions,
+            entityId: EntityIDValue::fromString($entityId),
             contactPerson: $contactPerson,
             organization: $organization,
             roleDescriptor: $roleDescriptor,
@@ -110,7 +125,7 @@ class MetadataBuilder
         /** @var array<mixed> $keyArray */
         $keyArray = $cryptoUtils->loadPrivateKey($this->config, true, 'metadata.sign.');
         $certArray = $cryptoUtils->loadPublicKey($this->config, false, 'metadata.sign.');
-        $algo = $this->config->getOptionalString('metadata.sign.algorithm', C::SIG_RSA_SHA256);
+        $algo = $this->config->getOptionalString('metadata.sign.algorithm', C_XMLSEC::SIG_RSA_SHA256);
 
         $key = PrivateKey::fromFile($keyArray['PEM'], $keyArray['password'] ?? '');
         $signer = (new SignatureAlgorithmFactory())->getAlgorithm($algo, $key);
@@ -124,7 +139,7 @@ class MetadataBuilder
             ]);
         }
 
-        $document->sign($signer, C::C14N_EXCLUSIVE_WITHOUT_COMMENTS, $keyInfo);
+        $document->sign($signer, C_XMLSEC::C14N_EXCLUSIVE_WITHOUT_COMMENTS, $keyInfo);
         return $document;
     }
 
@@ -190,24 +205,35 @@ class MetadataBuilder
     /**
      * This method builds the SecurityTokenService element
      *
-     * @return \SimpleSAML\WSSecurity\XML\fed\SecurityTokenServiceType
+     * @return \SimpleSAML\WebServices\Federation\XML\fed\SecurityTokenServiceType
      */
     public function getSecurityTokenService(): SecurityTokenServiceType
     {
         $defaultEndpoint = Module::getModuleURL('adfs') . '/idp/prp.php';
 
         return new SecurityTokenServiceType(
-            protocolSupportEnumeration: [C::NS_TRUST_200512, C::NS_TRUST_200502, C::NS_FED],
+            QNameValue::fromParts(
+                NCNameValue::fromString(SecurityTokenServiceType::getLocalName()),
+                AnyURIValue::fromString(SecurityTokenServiceType::NS),
+                NCNameValue::fromString(SecurityTokenServiceType::NS_PREFIX),
+            ),
+            protocolSupportEnumeration: SAMLAnyURIListValue::fromArray(
+                [C_TRUST::NS_TRUST_200512, C_TRUST::NS_TRUST_200502, C_FED::NS_FED],
+            ),
             keyDescriptors: $this->getKeyDescriptor(),
-            tokenTypesOffered: new TokenTypesOffered([new TokenType('urn:oasis:names:tc:SAML:1.0:assertion')]),
+            tokenTypesOffered: new TokenTypesOffered(
+                [
+                    new TokenType(AnyURIValue::fromString('urn:oasis:names:tc:SAML:1.0:assertion')),
+                ],
+            ),
             securityTokenServiceEndpoint: [
                 new SecurityTokenServiceEndpoint([
-                    new EndpointReference(new Address($defaultEndpoint)),
+                    new EndpointReference(new Address(AnyURIValue::fromString($defaultEndpoint))),
                 ]),
             ],
             passiveRequestorEndpoint: [
                 new PassiveRequestorEndpoint([
-                    new EndpointReference(new Address($defaultEndpoint)),
+                    new EndpointReference(new Address(AnyURIValue::fromString($defaultEndpoint))),
                 ]),
             ],
         );
@@ -282,8 +308,11 @@ class MetadataBuilder
 
         if ($this->metadata->hasValue('scope')) {
             foreach ($this->metadata->getArray('scope') as $scopetext) {
-                $isRegexpScope = (1 === preg_match('/[\$\^\)\(\*\|\\\\]/', $scopetext));
-                $extensions[] = new Scope($scopetext, $isRegexpScope);
+                $isRegexpScope = 1 === preg_match('/[\$\^\)\(\*\|\\\\]/', $scopetext);
+                $extensions[] = new Scope(
+                    SAMLStringValue::fromString($scopetext),
+                    BooleanValue::fromBoolean($isRegexpScope),
+                );
             }
         }
 
@@ -298,14 +327,16 @@ class MetadataBuilder
                 // Attribute names that is not URI is prefixed as this: '{nameformat}name'
                 if (preg_match('/^\{(.*?)\}(.*)$/', $attributeName, $matches)) {
                     $attr[] = new Attribute(
-                        name: $matches[2],
-                        nameFormat: $matches[1] === C::NAMEFORMAT_UNSPECIFIED ? null : $matches[1],
+                        name: SAMLStringValue::fromString($matches[2]),
+                        nameFormat: SAMLAnyURIValue::fromString(
+                            $matches[1] === C_SAML2::NAMEFORMAT_UNSPECIFIED ? null : $matches[1],
+                        ),
                         attributeValue: $attrValues,
                     );
                 } else {
                     $attr[] = new Attribute(
-                        name: $attributeName,
-                        nameFormat: C::NAMEFORMAT_UNSPECIFIED,
+                        name: SAMLStringValue::fromString($attributeName),
+                        nameFormat: SAMLAnyURIValue::fromString(C_SAML2::NAMEFORMAT_UNSPECIFIED),
                         attributeValue: $attrValues,
                     );
                 }
@@ -364,17 +395,17 @@ class MetadataBuilder
         Assert::oneOf($use, ['encryption', 'signing']);
         $info = [
             new X509Data([
-                new X509Certificate($x509Cert),
+                X509Certificate::fromString($x509Cert),
             ]),
         ];
 
         if ($keyName !== null) {
-            $info[] = new KeyName($keyName);
+            $info[] = KeyName::fromString($keyName);
         }
 
         return new KeyDescriptor(
             new KeyInfo($info),
-            $use,
+            KeyTypesValue::fromString($use),
         );
     }
 }

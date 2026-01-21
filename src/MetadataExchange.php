@@ -6,6 +6,19 @@ namespace SimpleSAML\Module\adfs;
 
 use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\Trust;
+use SimpleSAML\WebServices\Addressing\Constants as C;
+use SimpleSAML\WebServices\Addressing\XML\wsa_200508\Address;
+use SimpleSAML\WebServices\Addressing\XML\wsa_200508\EndpointReference;
+use SimpleSAML\WebServices\Policy\XML\wsp_200409\PolicyReference;
+use SimpleSAML\WebServices\Trust\XML\wst_200502\RequestSecurityToken as RequestSecurityToken2005;
+use SimpleSAML\WebServices\Trust\XML\wst_200502\RequestSecurityTokenResponse as RequestSecurityTokenResponse2005;
+//use SimpleSAML\WebServices\Trust\XML\wst_200512\RequestSecurityToken as RequestSecurityToken13;
+//use SimpleSAML\WebServices\Trust\XML\wst_200512\RequestSecurityTokenResponseCollection as \
+//RequestSecurityTokenResponseCollection13;
+use SimpleSAML\WSDL\Enumeration\StyleChoiceEnum;
+use SimpleSAML\WSDL\Enumeration\UseChoiceEnum;
+use SimpleSAML\WSDL\Type\StyleChoiceValue;
+use SimpleSAML\WSDL\Type\UseChoiceValue;
 use SimpleSAML\WSDL\XML\soap12\Address as Soap12Address;
 use SimpleSAML\WSDL\XML\soap12\Binding as Soap12Binding;
 use SimpleSAML\WSDL\XML\soap12\Body as Soap12Body;
@@ -23,21 +36,14 @@ use SimpleSAML\WSDL\XML\wsdl\Port;
 use SimpleSAML\WSDL\XML\wsdl\PortType;
 use SimpleSAML\WSDL\XML\wsdl\PortTypeOperation;
 use SimpleSAML\WSDL\XML\wsdl\Service;
-use SimpleSAML\WSSecurity\Constants as C;
-use SimpleSAML\WSSecurity\XML\wsa_200508\Address;
-use SimpleSAML\WSSecurity\XML\wsa_200508\EndpointReference;
-use SimpleSAML\WSSecurity\XML\wsp\PolicyReference;
-use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityToken as RequestSecurityToken2005;
-use SimpleSAML\WSSecurity\XML\wst_200502\RequestSecurityTokenResponse as RequestSecurityTokenResponse2005;
-//use SimpleSAML\WSSecurity\XML\wst_200512\RequestSecurityToken as RequestSecurityToken13;
-//use SimpleSAML\WSSecurity\XML\wst_200512\RequestSecurityTokenResponseCollection as \
-//RequestSecurityTokenResponseCollection13;
 use SimpleSAML\XML\Attribute as XMLAttribute;
+use SimpleSAML\XMLSchema\Type\AnyURIValue;
+use SimpleSAML\XMLSchema\Type\NCNameValue;
+use SimpleSAML\XMLSchema\Type\QNameValue;
 
 //use SimpleSAML\XML\Chunk;
 //use SimpleSAML\XML\DOMDocumentFactory;
 use function array_merge;
-use function sprintf;
 
 /**
  * Common code for building MetaExchange (mex) documents based on the available configuration.
@@ -62,8 +68,10 @@ class MetadataExchange
     public function buildDocument(): Definitions
     {
         return new Definitions(
-            targetNamespace: 'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
-            name: 'SecurityTokenService',
+            targetNamespace: AnyURIValue::fromString(
+                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+            ),
+            name: NCNameValue::fromString('SecurityTokenService'),
             //import: [],
             //types: $this->getTypes(),
             message: $this->getMessages(),
@@ -78,7 +86,7 @@ class MetadataExchange
     /**
      * This method builds the wsp:Policy elements
      *
-     * @return \SimpleSAML\WSSecurity\XML\wsp\Policy[]
+     * @return \SimpleSAML\WebServices\Policy\XML\wsp_200409\Policy[]
      */
     private function getPolicies(): array
     {
@@ -127,47 +135,47 @@ IMPORT;
     {
         return [
             new Message(
-                'IWSTrustFeb2005Async_TrustFeb2005IssueAsync_InputMessage',
+                NCNameValue::fromString('IWSTrustFeb2005Async_TrustFeb2005IssueAsync_InputMessage'),
                 [new Part(
-                    'request',
-                    sprintf(
-                        "%s:%s",
-                        RequestSecurityToken2005::getNamespacePrefix(),
-                        RequestSecurityToken2005::getLocalName(),
+                    NCNameValue::fromString('request'),
+                    QNameValue::fromParts(
+                        NCNameValue::fromString(RequestSecurityToken2005::getLocalName()),
+                        AnyURIValue::fromString(RequestSecurityToken2005::getNamespaceUri()),
+                        NCNameValue::fromString(RequestSecurityToken2005::getNamespacePrefix()),
                     ),
                 )],
             ),
             new Message(
-                'IWSTrustFeb2005Async_TrustFeb2005IssueAsync_OutputMessage',
+                NCNameValue::fromString('IWSTrustFeb2005Async_TrustFeb2005IssueAsync_OutputMessage'),
                 [new Part(
-                    'TrustFeb2005IssueAsyncResult',
-                    sprintf(
-                        "%s:%s",
-                        RequestSecurityTokenResponse2005::getNamespacePrefix(),
-                        RequestSecurityTokenResponse2005::getLocalName(),
+                    NCNameValue::fromString('TrustFeb2005IssueAsyncResult'),
+                    QNameValue::fromParts(
+                        NCNameValue::fromString(RequestSecurityTokenResponse2005::getLocalName()),
+                        AnyURIValue::fromString(RequestSecurityTokenResponse2005::getNamespaceUri()),
+                        NCNameValue::fromString(RequestSecurityTokenResponse2005::getNamespacePrefix()),
                     ),
                 )],
             ),
 /*
             new Message(
-                'IWSTrust13Async_Trust13IssueAsync_InputMessage',
+                NCNameValue::fromString('IWSTrust13Async_Trust13IssueAsync_InputMessage'),
                 [new Part(
-                    'request',
-                    sprintf(
-                        "%s:%s",
-                        RequestSecurityToken13::getNamespacePrefix(),
-                        RequestSecurityToken13::getLocalName(),
+                    NCNameValue::fromString('request'),
+                    QNameValue::fromParts(
+                        NCNameValue::fromString(RequestSecurityToken13::getLocalName()),
+                        AnyURIValue::fromString(RequestSecurityToken13::getNamespaceUri()),
+                        NCNameValue::fromString(RequestSecurityToken13::getNamespacePrefix()),
                     ),
                 )],
             ),
             new Message(
-                'IWSTrust13Async_Trust13IssueAsync_OutputMessage',
+                NCNameValue::fromString('IWSTrust13Async_Trust13IssueAsync_OutputMessage'),
                 [new Part(
-                    'Trust13IssueAsyncResult',
-                    sprintf(
-                        "%s:%s",
-                        RequestSecurityTokenResponseCollection13::getNamespacePrefix(),
-                        RequestSecurityTokenResponseCollection13::getLocalName(),
+                    NCNameValue::fromString('Trust13IssueAsyncResult'),
+                    QNameValue::fromParts(
+                        NCNameValue::fromString(RequestSecurityTokenResponseCollection13::getLocalName()),
+                        AnyURIValue::fromString(RequestSecurityTokenResponseCollection13::getNamespaceUri()),
+                        NCNameValue::fromString(RequestSecurityTokenResponseCollection13::getNamespacePrefix()),
                     ),
                 )],
             ),
@@ -184,61 +192,91 @@ IMPORT;
     private function getPortTypes(): array
     {
         return [
-            new PortType('IWSTrustFeb2005Async', [
-                new PortTypeOperation(
-                    name: 'TrustFeb2005IssueAsync',
-                    input: new Input(
-                        message: 'tns:IWSTrustFeb2005Async_TrustFeb2005IssueAsync_InputMessage',
-                        attributes: [
-                            new XMLAttribute(
-                                C::NS_WSDL_ADDR,
-                                'wsaw',
-                                'Action',
-                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+            new PortType(
+                NCNameValue::fromString('IWSTrustFeb2005Async'),
+                [
+                    new PortTypeOperation(
+                        name: NCNameValue::fromString('TrustFeb2005IssueAsync'),
+                        input: new Input(
+                            message: QNameValue::fromParts(
+                                NCNameValue::fromString('IWSTrustFeb2005Async_TrustFeb2005IssueAsync_InputMessage'),
+                                AnyURIValue::fromString(
+                                    'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                                ),
+                                NCNameValue::fromString('tns'),
                             ),
-                        ],
-                    ),
-                    output: new Output(
-                        message: 'tns:IWSTrustFeb2005Async_TrustFeb2005IssueAsync_OutputMessage',
-                        attributes: [
-                            new XMLAttribute(
-                                C::NS_WSDL_ADDR,
-                                'wsaw',
-                                'Action',
-                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RSTR/Issue',
+                            attributes: [
+                                new XMLAttribute(
+                                    C::NS_ADDR_WSDL,
+                                    'wsaw',
+                                    'Action',
+                                    AnyURIValue::fromString('http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue'),
+                                ),
+                            ],
+                        ),
+                        output: new Output(
+                            message: QNameValue::fromParts(
+                                NCNameValue::fromString('IWSTrustFeb2005Async_TrustFeb2005IssueAsync_OutputMessage'),
+                                AnyURIValue::fromString(
+                                    'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                                ),
+                                NCNameValue::fromString('tns'),
                             ),
-                        ],
+                            attributes: [
+                                new XMLAttribute(
+                                    C::NS_ADDR_WSDL,
+                                    'wsaw',
+                                    'Action',
+                                    AnyURIValue::fromString('http://schemas.xmlsoap.org/ws/2005/02/trust/RSTR/Issue'),
+                                ),
+                            ],
+                        ),
                     ),
-                ),
-            ]),
+                ],
+            ),
 /*
-            new PortType('IWSTrust13Async', [
-                new PortTypeOperation(
-                    name: 'Trust13IssueAsync',
-                    input: new Input(
-                        message: 'tns:IWSTrust13Async_Trust13IssueAsync_InputMessage',
-                        attributes: [
-                            new XMLAttribute(
-                                C::NS_WSDL_ADDR,
-                                'wsaw',
-                                'Action',
-                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
+            new PortType(
+                NCNameValue::fromString('IWSTrust13Async'),
+                [
+                    new PortTypeOperation(
+                        name: NCNameValue::fromString('Trust13IssueAsync'),
+                        input: new Input(
+                            message: QNameValue::fromParts(
+                                NCNameValue::fromString('IWSTrust13Async_Trust13IssueAsync_InputMessage'),
+                                AnyURIValue::fromString(
+                                    'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                                ),
+                                NCNameValue::fromString('tns'),
                             ),
-                        ],
-                    ),
-                    output: new Output(
-                        message: 'tns:IWSTrust13Async_Trust13IssueAsync_OutputMessage',
-                        attributes: [
-                            new XMLAttribute(
-                                C::NS_WSDL_ADDR,
-                                'wsaw',
-                                'Action',
-                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal',
+                            attributes: [
+                                new XMLAttribute(
+                                    C::NS_ADDR_WSDL,
+                                    'wsaw',
+                                    'Action',
+                                    'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
+                                ),
+                            ],
+                        ),
+                        output: new Output(
+                            message: QNameValue::fromParts(
+                                NCNameValue::fromString('IWSTrust13Async_Trust13IssueAsync_OutputMessage'),
+                                AnyURIValue::fromString(
+                                    'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                                ),
+                                NCNameValue::fromString('tns'),
                             ),
-                        ],
+                            attributes: [
+                                new XMLAttribute(
+                                    C::NS_ADDR_WSDL,
+                                    'wsaw',
+                                    'Action',
+                                    'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal',
+                                ),
+                            ],
+                        ),
                     ),
-                ),
-            ]),
+                ],
+            ),
 */
         ];
     }
@@ -253,301 +291,377 @@ IMPORT;
     {
         return [
             new Binding(
-                name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async',
-                type: 'tns:IWSTrustFeb2005Async',
+                name: NCNameValue::fromString('CertificateWSTrustBinding_IWSTrustFeb2005Async'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrustFeb2005Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
-                        name: 'TrustFeb2005IssueAsync',
+                        name: NCNameValue::fromString('TrustFeb2005IssueAsync'),
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#CertificateWSTrustBinding_IWSTrustFeb2005Async_policy',
-                        DigestAlgorithm: null,
+                        AnyURIValue::fromString('#CertificateWSTrustBinding_IWSTrustFeb2005Async_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(
+                        AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http'),
+                    ),
                 ],
             ),
             new Binding(
-                name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async1',
-                type: 'tns:IWSTrustFeb2005Async',
+                name: NCNameValue::fromString('CertificateWSTrustBinding_IWSTrustFeb2005Async1'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrustFeb2005Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
-                        name: 'TrustFeb2005IssueAsync',
+                        name: NCNameValue::fromString('TrustFeb2005IssueAsync'),
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#CertificateWSTrustBinding_IWSTrustFeb2005Async1_policy',
-                        DigestAlgorithm: null,
+                        URI: AnyURIValue::fromString('#CertificateWSTrustBinding_IWSTrustFeb2005Async1_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(
+                        AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http'),
+                    ),
                 ],
             ),
             new Binding(
-                name: 'UserNameWSTrustBinding_IWSTrustFeb2005Async',
-                type: 'tns:IWSTrustFeb2005Async',
+                name: NCNameValue::fromString('UserNameWSTrustBinding_IWSTrustFeb2005Async'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrustFeb2005Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
-                        name: 'TrustFeb2005IssueAsync',
+                        name: NCNameValue::fromString('TrustFeb2005IssueAsync'),
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#UserNameWSTrustBinding_IWSTrustFeb2005Async_policy',
-                        DigestAlgorithm: null,
+                        URI: AnyURIValue::fromString('#UserNameWSTrustBinding_IWSTrustFeb2005Async_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http')),
                 ],
             ),
             new Binding(
-                name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async',
-                type: 'tns:IWSTrustFeb2005Async',
+                name: NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrustFeb2005Async'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrustFeb2005Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
-                        name: 'TrustFeb2005IssueAsync',
+                        name: NCNameValue::fromString('TrustFeb2005IssueAsync'),
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#IssuedTokenWSTrustBinding_IWSTrustFeb2005Async_policy',
-                        DigestAlgorithm: null,
+                        URI: AnyURIValue::fromString('#IssuedTokenWSTrustBinding_IWSTrustFeb2005Async_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http')),
                 ],
             ),
             new Binding(
-                name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1',
-                type: 'tns:IWSTrustFeb2005Async',
+                name: NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrustFeb2005Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
-                        name: 'TrustFeb2005IssueAsync',
+                        name: NCNameValue::fromString('TrustFeb2005IssueAsync'),
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1_policy',
-                        DigestAlgorithm: null,
+                        URI: AnyURIValue::fromString('#IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http')),
                 ],
             ),
 /*
             new Binding(
-                name: 'CertificateWSTrustBinding_IWSTrust13Async',
-                type: 'tns:IWSTrust13Async',
+                name: NCNameValue::fromString('CertificateWSTrustBinding_IWSTrust13Async'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrust13Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
-                        name: 'Trust13IssueAsync',
+                        name: NCNameValue::fromString('Trust13IssueAsync'),
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#CertificateWSTrustBinding_IWSTrust13Async_policy',
-                        DigestAlgorithm: null,
+                        URI: AnyURIValue::fromString('#CertificateWSTrustBinding_IWSTrust13Async_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http')),
                 ],
             ),
             new Binding(
-                name: 'UserNameWSTrustBinding_IWSTrust13Async',
-                type: 'tns:IWSTrust13Async',
+                name: NCNameValue::fromString('UserNameWSTrustBinding_IWSTrust13Async'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrust13Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
-                        name: 'Trust13IssueAsync',
+                        name: NCNameValue::fromString('Trust13IssueAsync'),
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#UserNameWSTrustBinding_IWSTrust13Async_policy',
-                        DigestAlgorithm: null,
+                        URI: AnyURIValue::fromString('#UserNameWSTrustBinding_IWSTrust13Async_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http')),
                 ],
             ),
             new Binding(
-                name: 'IssuedTokenWSTrustBinding_IWSTrust13Async',
-                type: 'tns:IWSTrust13Async',
+                name: NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrust13Async'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrust13Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
                         name: 'Trust13IssueAsync',
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#IssuedTokenWSTrustBinding_IWSTrust13Async_policy',
-                        DigestAlgorithm: null,
+                        URI: AnyURIValue::fromString('#IssuedTokenWSTrustBinding_IWSTrust13Async_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http')),
                 ],
             ),
             new Binding(
-                name: 'IssuedTokenWSTrustBinding_IWSTrust13Async1',
-                type: 'tns:IWSTrust13Async',
+                name: NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrust13Async1'),
+                type: QNameValue::fromParts(
+                    NCNameValue::fromString('IWSTrust13Async'),
+                    AnyURIValue::fromString('http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice'),
+                    NCNameValue::fromString('tns'),
+                ),
                 operation: [
                     new BindingOperation(
                         name: 'Trust13IssueAsync',
                         input: new BindingOperationInput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         output: new BindingOperationOutput(
                             elements: [
-                                new Soap12Body(null, null, 'literal'),
+                                new Soap12Body(
+                                    use: UseChoiceValue::fromEnum(UseChoiceEnum::Literal),
+                                ),
                             ],
                         ),
                         elements: [
                             new Soap12Operation(
-                                'http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue',
-                                null,
-                                'document',
+                                soapAction: AnyURIValue::fromString(
+                                    'http://schemas.xmlsoap.org/ws/2005/02/trust/RST/Issue',
+                                ),
+                                style: StyleChoiceValue::fromEnum(StyleChoiceEnum::Document),
                             ),
                         ],
                     ),
                 ],
                 elements: [
                     new PolicyReference(
-                        URI: '#IssuedTokenWSTrustBinding_IWSTrust13Async1_policy',
-                        DigestAlgorithm: null,
+                        URI: AnyURIValue::fromString('#IssuedTokenWSTrustBinding_IWSTrust13Async1_policy'),
                     ),
-                    new Soap12Binding('http://schemas.xmlsoap.org/soap/http'),
+                    new Soap12Binding(AnyURIValue::fromString('http://schemas.xmlsoap.org/soap/http')),
                 ],
             ),
 */
@@ -566,96 +680,166 @@ IMPORT;
 
         return [
             new Service(
-                name: 'SecurityTokenService',
+                name: NCNameValue::fromString('SecurityTokenService'),
                 ports: [
                     new Port(
-                        name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async',
-                        binding: 'tns:CertificateWSTrustBinding_IWSTrustFeb2005Async',
+                        name: NCNameValue::fromString('CertificateWSTrustBinding_IWSTrustFeb2005Async'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('CertificateWSTrustBinding_IWSTrustFeb2005Async'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . 'certificatemixed'),
+                            new Soap12Address(AnyURIValue::fromString($defaultEndpoint . 'certificatemixed')),
                             new EndpointReference(
-                                new Address($defaultEndpoint . 'certificatemixed'),
+                                new Address(AnyURIValue::fromString($defaultEndpoint . 'certificatemixed')),
                             ),
                         ],
                     ),
                     new Port(
-                        name: 'CertificateWSTrustBinding_IWSTrustFeb2005Async1',
-                        binding: 'tns:CertificateWSTrustBinding_IWSTrustFeb2005Async1',
+                        name: NCNameValue::fromString('CertificateWSTrustBinding_IWSTrustFeb2005Async1'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('CertificateWSTrustBinding_IWSTrustFeb2005Async1'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . 'certificatetransport'),
+                            new Soap12Address(AnyURIValue::fromString($defaultEndpoint . 'certificatetransport')),
                             new EndpointReference(
-                                new Address($defaultEndpoint . 'certificatetransport'),
+                                new Address(AnyURIValue::fromString($defaultEndpoint . 'certificatetransport')),
                             ),
                         ],
                     ),
                     new Port(
-                        name: 'UserNameWSTrustBinding_IWSTrustFeb2005Async',
-                        binding: 'tns:UserNameWSTrustBinding_IWSTrustFeb2005Async',
+                        name: NCNameValue::fromString('UserNameWSTrustBinding_IWSTrustFeb2005Async'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('UserNameWSTrustBinding_IWSTrustFeb2005Async'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . 'usernamemixed'),
+                            new Soap12Address(AnyURIValue::fromString($defaultEndpoint . 'usernamemixed')),
                             new EndpointReference(
-                                new Address($defaultEndpoint . 'usernamemixed'),
+                                new Address(AnyURIValue::fromString($defaultEndpoint . 'usernamemixed')),
                             ),
                         ],
                     ),
                     new Port(
-                        name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async',
-                        binding: 'tns:IssuedTokenWSTrustBinding_IWSTrustFeb2005Async',
+                        name: NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrustFeb2005Async'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrustFeb2005Async'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . 'issuedtokenmixedasymmetricbasic256'),
+                            new Soap12Address(
+                                AnyURIValue::fromString($defaultEndpoint . 'issuedtokenmixedasymmetricbasic256'),
+                            ),
                             new EndpointReference(
-                                new Address($defaultEndpoint . 'issuedtokenmixedasymmetricbasic256'),
+                                new Address(
+                                    AnyURIValue::fromString($defaultEndpoint . 'issuedtokenmixedasymmetricbasic256'),
+                                ),
                             ),
                         ],
                     ),
                     new Port(
-                        name: 'IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1',
-                        binding: 'tns:IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1',
+                        name: NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrustFeb2005Async1'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . 'issuedtokenmixedsymmetricbasic256'),
+                            new Soap12Address(
+                                AnyURIValue::fromString($defaultEndpoint . 'issuedtokenmixedsymmetricbasic256'),
+                            ),
                             new EndpointReference(
-                                new Address($defaultEndpoint . 'issuedtokenmixedsymmetricbasic256'),
+                                new Address(
+                                    AnyURIValue::fromString($defaultEndpoint . 'issuedtokenmixedsymmetricbasic256'),
+                                ),
                             ),
                         ],
                     ),
                 /*
                     new Port(
-                        name: 'CertificateWSTrustBinding_IWSTrust13Async',
-                        binding: 'tns:CertificateWSTrustBinding_IWSTrust13Async',
+                        name: NCNameValue::fromString('CertificateWSTrustBinding_IWSTrust13Async'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('CertificateWSTrustBinding_IWSTrust13Async'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . '13/certificatemixed'),
+                            new Soap12Address(AnyURIValue::fromString($defaultEndpoint . '13/certificatemixed')),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '13/certificatemixed'),
+                                new Address(AnyURIValue::fromString($defaultEndpoint . '13/certificatemixed')),
                             ),
                         ],
                     ),
                     new Port(
-                        name: 'UserNameWSTrustBinding_IWSTrust13Async',
-                        binding: 'tns:UserNameWSTrustBinding_IWSTrust13Async',
+                        name: NCNameValue::fromString('UserNameWSTrustBinding_IWSTrust13Async'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('UserNameWSTrustBinding_IWSTrust13Async'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . '13/usernamemixed'),
+                            new Soap12Address(AnyURIValue::fromString($defaultEndpoint . '13/usernamemixed')),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '13/usernamemixed'),
+                                new Address(AnyURIValue::fromString($defaultEndpoint . '13/usernamemixed')),
                             ),
                         ],
                     ),
                     new Port(
-                        name: 'IssuedTokenWSTrustBinding_IWSTrust13Async',
-                        binding: 'tns:IssuedTokenWSTrustBinding_IWSTrust13Async',
+                        name: NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrust13Async'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrust13Async'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . '13/issuedtokenmixedasymmetricbasic256'),
+                            new Soap12Address(
+                                AnyURIValue::fromString($defaultEndpoint . '13/issuedtokenmixedasymmetricbasic256'),
+                            ),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '13/issuedtokenmixedasymmetricbasic256'),
+                                new Address(
+                                    AnyURIValue::fromString($defaultEndpoint . '13/issuedtokenmixedasymmetricbasic256'),
+                                ),
                             ),
                         ],
                     ),
                     new Port(
-                        name: 'IssuedTokenWSTrustBinding_IWSTrust13Async1',
-                        binding: 'tns:IssuedTokenWSTrustBinding_IWSTrust13Async1',
+                        name: NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrust13Async1'),
+                        binding: QNameValue::fromParts(
+                            NCNameValue::fromString('IssuedTokenWSTrustBinding_IWSTrust13Async1'),
+                            AnyURIValue::fromString(
+                                'http://schemas.microsoft.com/ws/2008/06/identity/securitytokenservice',
+                            ),
+                            NCNameValue::fromString('tns'),
+                        ),
                         elements: [
-                            new Soap12Address($defaultEndpoint . '13/issuedtokenmixedsymmetricbasic256'),
+                            new Soap12Address(
+                                AnyURIValue::fromString($defaultEndpoint . '13/issuedtokenmixedsymmetricbasic256'),
+                            ),
                             new EndpointReference(
-                                new Address($defaultEndpoint . '13/issuedtokenmixedsymmetricbasic256'),
+                                new Address(
+                                    AnyURIValue::fromString($defaultEndpoint . '13/issuedtokenmixedsymmetricbasic256'),
+                                ),
                             ),
                         ],
                     ),

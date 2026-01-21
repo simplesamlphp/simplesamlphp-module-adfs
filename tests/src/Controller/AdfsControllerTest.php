@@ -66,7 +66,7 @@ final class AdfsControllerTest extends TestCase
 
         $this->expectException(Error\BadRequest::class);
         $this->expectExceptionMessage(
-            "BADREQUEST('%REASON%' => 'Missing parameter \'wa\' or \'assocId\' in request.')",
+            "Missing parameter 'wa' or 'assocId' in request.",
         );
 
         $c->prp($request);
@@ -87,7 +87,7 @@ final class AdfsControllerTest extends TestCase
         $c = new Controller\Adfs($this->config, $this->session);
 
         $this->expectException(Error\MetadataNotFound::class);
-        $this->expectExceptionMessage("METADATANOTFOUND('%ENTITYID%' => 'urn:example-sp')");
+        $this->expectExceptionMessage('{"errorCode":"METADATANOTFOUND","%ENTITYID%":"urn:example-sp"}');
 
         $c->prp($request);
     }

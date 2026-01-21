@@ -15,7 +15,7 @@ use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
 use SimpleSAML\Module\adfs\IdP\PassiveIdP;
 use SimpleSAML\Module\adfs\MetadataExchange;
 use SimpleSAML\Session;
-use SimpleSAML\SOAP\XML\env_200305\Envelope;
+use SimpleSAML\SOAP12\XML\Envelope;
 use SimpleSAML\Utils;
 use SimpleSAML\XML\DOMDocumentFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,7 +53,7 @@ class Adfs
     public function __construct(Configuration $config, Session $session)
     {
         $this->config = $config;
-        $this->metadata = Metadata\MetaDataStorageHandler::getMetadataHandler($config);
+        $this->metadata = Metadata\MetaDataStorageHandler::getMetadataHandler();
         $this->session = $session;
         $this->cryptoUtils = new Utils\Crypto();
     }
@@ -227,6 +227,7 @@ class Adfs
             throw new SspError\Error('NOACCESS');
         }
 
+        /** @var string|false $soapMessage */
         $soapMessage = $request->getContent();
         if ($soapMessage === false) {
             throw new SspError\BadRequest('Missing SOAP-content.');

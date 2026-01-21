@@ -78,9 +78,9 @@ class PassiveIdP
     private function __construct(Configuration $config, string $id)
     {
         $this->id = $id;
-
         $this->globalConfig = $config;
-        $metadata = MetaDataStorageHandler::getMetadataHandler($this->globalConfig);
+
+        $metadata = MetaDataStorageHandler::getMetadataHandler();
 
         if (substr($id, 0, 5) === 'adfs:') {
             if (!$this->globalConfig->getOptionalBoolean('enable.adfs-idp', false)) {
@@ -200,7 +200,7 @@ class PassiveIdP
      *
      * @throws \SimpleSAML\Error\Exception If we are not authenticated.
      */
-    public static function postAuth(array $state): Response
+    public static function postAuth(array $state): void
     {
         $idp = PassiveIdP::getByState(Configuration::getInstance(), $state);
 
@@ -234,7 +234,7 @@ class PassiveIdP
 
         $pc->processState($state);
 
-        return self::postAuthProc($state);
+        self::postAuthProc($state);
     }
 
 
@@ -245,9 +245,9 @@ class PassiveIdP
      *
      * @param array<mixed> &$state The authentication request state.
      */
-    private function authenticate(array &$state): Response
+    private function authenticate(array &$state): void
     {
-        return $this->authSource->login($state);
+        $this->authSource->login($state);
     }
 
 
@@ -275,7 +275,7 @@ class PassiveIdP
         $state['ReturnCallback'] = ['\SimpleSAML\Module\adfs\IdP\PassiveIdP', 'postAuth'];
 
         try {
-            return $this->authenticate($state);
+            $this->authenticate($state);
         } catch (Error\Exception $e) {
             Auth\State::throwException($state, $e);
         } catch (Exception $e) {
@@ -309,7 +309,6 @@ class PassiveIdP
                 throw new Error\Exception('Unknown logout handler: ' . var_export($logouttype, true));
         }
 
-        /** @var \SimpleSAML\IdP\LogoutHandlerInterface */
         return new $handler($this);
     }
 

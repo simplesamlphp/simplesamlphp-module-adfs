@@ -1,0 +1,13 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$idp of class SimpleSAML\\IdP\\IFrameLogoutHandler constructor expects SimpleSAML\\IdP, \$this\(SimpleSAML\\Module\\adfs\\IdP\\PassiveIdP\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/IdP/PassiveIdP.php
+
+		-
+			message: '#^Parameter \#1 \$idp of class SimpleSAML\\IdP\\TraditionalLogoutHandler constructor expects SimpleSAML\\IdP, \$this\(SimpleSAML\\Module\\adfs\\IdP\\PassiveIdP\) given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/IdP/PassiveIdP.php
