@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 use SimpleSAML\Assert\Assert;
 use SimpleSAML\SAML2\Constants as C;
-use SimpleSAML\{Configuration, Utils, Logger, Module};
+use SimpleSAML\Configuration;
+use SimpleSAML\Utils;
+use SimpleSAML\Logger;
+use SimpleSAML\Module;
 use SimpleSAML\Locale\Translate;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 
+/**
+ * @param array<mixed> $hookinfo
+ */
 function adfs_hook_generate_metadata(array &$hookinfo): void
 {
     if ($hookinfo['set'] === 'adfs-idp-hosted') {
