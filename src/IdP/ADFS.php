@@ -352,7 +352,7 @@ class ADFS
             $method = C_SAML2::AC_PASSWORD;
         }
 
-        $audience = new Audience(SAMLAnyURIValue::fromString($target));
+        $audience = Audience::fromString($target);
         $audienceRestrictionCondition = new AudienceRestrictionCondition([$audience]);
         $conditions = new Conditions(
             [$audienceRestrictionCondition],
@@ -439,9 +439,9 @@ class ADFS
         $pubkey = PublicKey::fromFile($cert);
         $keyInfo = new KeyInfo([
             new X509Data(
-                [new X509Certificate(
-                    Base64BinaryValue::fromString(trim(chunk_split(base64_encode($pubkey->getPEM()->data())))),
-                )],
+                [
+                    X509Certificate::fromString(trim(chunk_split(base64_encode($pubkey->getPEM()->data())))),
+                ],
             ),
         ]);
 
