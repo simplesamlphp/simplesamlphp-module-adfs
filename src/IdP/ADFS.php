@@ -65,7 +65,6 @@ use SimpleSAML\WebServices\Trust\XML\wst_200502\RequestTypeEnum;
 use SimpleSAML\WebServices\Trust\XML\wst_200502\TokenType;
 use SimpleSAML\XHTML\Template;
 use SimpleSAML\XMLSchema\Type\AnyURIValue;
-use SimpleSAML\XMLSchema\Type\Base64BinaryValue;
 use SimpleSAML\XMLSchema\Type\IDValue;
 use SimpleSAML\XMLSchema\Type\NonNegativeIntegerValue;
 use SimpleSAML\XMLSchema\Type\StringValue;
