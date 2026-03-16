@@ -165,12 +165,18 @@ class MetadataBuilder
 
         try {
             $org = Organization::fromArray([
-                'OrganizationName' => $arrayUtils->arrayize($this->metadata->getArray('OrganizationName'), 'en'),
+                'OrganizationName' => $arrayUtils->arrayize(
+                    $this->metadata->getArray('OrganizationName'),
+                    'en',
+                ),
                 'OrganizationDisplayName' => $arrayUtils->arrayize(
                     $this->metadata->getArray('OrganizationDisplayName'),
                     'en',
                 ),
-                'OrganizationURL' => $arrayUtils->arrayize($this->metadata->getArray('OrganizationURL'), 'en'),
+                'OrganizationURL' => $arrayUtils->arrayize(
+                    $this->metadata->getArray('OrganizationURL'),
+                    'en',
+                ),
             ]);
         } catch (ArrayValidationException $e) {
             Logger::error('Federation: invalid content found in contact: ' . $e->getMessage());
