@@ -1,4 +1,7 @@
-### php-cs-fixer ###
+1
+2
+3
+.phplint.cachce/
 .idea/
 .php_cs.cache
 .phpunit.cache/
