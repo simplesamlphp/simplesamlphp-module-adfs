@@ -43,6 +43,7 @@ use SimpleSAML\WebServices\Federation\XML\fed\TokenTypesOffered;
 use SimpleSAML\WebServices\Trust\Constants as C_TRUST;
 use SimpleSAML\XML\Chunk;
 use SimpleSAML\XMLSchema\Type\AnyURIValue;
+use SimpleSAML\XMLSchema\Type\Base64BinaryValue;
 use SimpleSAML\XMLSchema\Type\BooleanValue;
 use SimpleSAML\XMLSchema\Type\IDValue;
 use SimpleSAML\XMLSchema\Type\NCNameValue;
@@ -134,7 +135,7 @@ class MetadataBuilder
         if ($certArray !== null) {
             $keyInfo = new KeyInfo([
                 new X509Data([
-                    new X509Certificate($certArray['certData']),
+                    new X509Certificate(Base64BinaryValue::fromString($certArray['certData'])),
                 ]),
             ]);
         }
