@@ -89,13 +89,13 @@ class ADFS
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \SimpleSAML\SOAP12\XML\Envelope $soapEnvelope
-     * @param \SimpleSAML\Module\adfs\IdP\PassiveIdP $idp
+     * @param \SimpleSAML\Module\adfs\IdP\ActiveIdP $idp
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
-    public static function receivePassiveAuthnRequest(
+    public static function receiveActiveAuthnRequest(
         Request $request,
         Envelope $soapEnvelope,
-        PassiveIdP $idp,
+        ActiveIdP $idp,
     ): StreamedResponse {
         // Parse the SOAP-header
         $header = $soapEnvelope->getHeader();
@@ -162,7 +162,7 @@ class ADFS
         Logger::debug($requestSecurityTokenStr);
 
         $state = [
-            'Responder' => [ADFS::class, 'sendPassiveResponse'],
+            'Responder' => [ADFS::class, 'sendActiveResponse'],
             'SPMetadata' => $spMetadata->toArray(),
             'MessageID' => $messageid->getContent()->getValue(),
             // Dirty hack to leverage the SAML ECP logics
@@ -182,7 +182,7 @@ class ADFS
      * @param \SimpleSAML\IdP $idp
      * @throws \SimpleSAML\Error\MetadataNotFound
      */
-    public static function receiveAuthnRequest(Request $request, IdP $idp): StreamedResponse
+    public static function receivePassiveAuthnRequest(Request $request, IdP $idp): StreamedResponse
     {
         parse_str($request->server->get('QUERY_STRING'), $query);
 
@@ -243,7 +243,7 @@ class ADFS
      * @param string $method
      * @return \SimpleSAML\SAML11\XML\saml\Assertion
      */
-    private static function generateActiveAssertion(
+    private static function generatePassiveAssertion(
         string $issuer,
         string $target,
         string $nameid,
@@ -328,7 +328,7 @@ class ADFS
      * @param int $assertionLifetime
      * @return \SimpleSAML\SAML11\XML\saml\Assertion
      */
-    private static function generatePassiveAssertion(
+    private static function generateActiveAssertion(
         string $issuer,
         string $target,
         string $nameid,
@@ -637,7 +637,7 @@ class ADFS
      * @param array<mixed> $state
      * @throws \Exception
      */
-    public static function sendPassiveResponse(array $state): void
+    public static function sendActiveResponse(array $state): void
     {
         $idp = IdP::getByState($state);
         $idpMetadata = $idp->getConfig();
@@ -662,7 +662,7 @@ class ADFS
         $attributes = $state['Attributes'];
         $nameid = $state['saml:NameID'][C_SAML2::NAMEID_UNSPECIFIED];
 
-        $assertion = ADFS::generatePassiveAssertion(
+        $assertion = ADFS::generateActiveAssertion(
             $idpEntityId,
             $spEntityId,
             $nameid->getValue(),
@@ -763,7 +763,7 @@ class ADFS
      * @param array<mixed> $state
      * @throws \Exception
      */
-    public static function sendResponse(array $state): void
+    public static function sendPassiveResponse(array $state): void
     {
         $spMetadata = $state['SPMetadata'];
         $spEntityId = $spMetadata['entityid'];
@@ -808,7 +808,7 @@ class ADFS
             $method = C_SAML2::AC_PASSWORD;
         }
 
-        $assertion = ADFS::generateActiveAssertion(
+        $assertion = ADFS::generatePassiveAssertion(
             $idpEntityId,
             $spEntityId,
             $nameid,

@@ -10,9 +10,9 @@ use SimpleSAML\Error as SspError;
 use SimpleSAML\IdP;
 use SimpleSAML\Logger;
 use SimpleSAML\Metadata;
+use SimpleSAML\Module\adfs\IdP\ActiveIdP;
 use SimpleSAML\Module\adfs\IdP\ADFS as ADFS_IDP;
 use SimpleSAML\Module\adfs\IdP\MetadataBuilder;
-use SimpleSAML\Module\adfs\IdP\PassiveIdP;
 use SimpleSAML\Module\adfs\MetadataExchange;
 use SimpleSAML\Session;
 use SimpleSAML\SOAP12\XML\Envelope;
@@ -128,7 +128,7 @@ class Adfs
                     },
                 );
             } elseif ($wa === 'wsignin1.0') {
-                return ADFS_IDP::receiveAuthnRequest($request, $idp);
+                return ADFS_IDP::receivePassiveAuthnRequest($request, $idp);
             }
             throw new SspError\BadRequest("Unsupported value for 'wa' specified in request.");
         } elseif ($request->get('assocId', null) !== null) {
@@ -237,8 +237,8 @@ class Adfs
         $soapEnvelope = Envelope::fromXML($domDocument->documentElement);
 
         $idpEntityId = $this->metadata->getMetaDataCurrentEntityID('adfs-idp-hosted');
-        $idp = PassiveIdP::getById($this->config, 'adfs:' . $idpEntityId);
+        $idp = ActiveIdP::getById($this->config, 'adfs:' . $idpEntityId);
 
-        return ADFS_IDP::receivePassiveAuthnRequest($request, $soapEnvelope, $idp);
+        return ADFS_IDP::receiveActiveAuthnRequest($request, $soapEnvelope, $idp);
     }
 }

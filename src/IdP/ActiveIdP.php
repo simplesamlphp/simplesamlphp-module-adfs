@@ -29,12 +29,12 @@ use function var_export;
  * @package simplesamlphp/simplesamlphp-module-adfs
  */
 
-class PassiveIdP
+class ActiveIdP
 {
     /**
      * A cache for resolving IdP id's.
      *
-     * @var \SimpleSAML\Module\adfs\IdP\PassiveIdP[]
+     * @var \SimpleSAML\Module\adfs\IdP\ActiveIdP[]
      */
     private static array $idpCache = [];
 
@@ -91,7 +91,7 @@ class PassiveIdP
             throw new Exception("Protocol not implemented.");
         }
 
-        $auth = $this->config->getString('passiveAuth');
+        $auth = $this->config->getString('activeAuth');
         if (Auth\Source::getById($auth) !== null) {
             $this->authSource = new Auth\Simple($auth);
         } else {
@@ -117,9 +117,9 @@ class PassiveIdP
      * @param \SimpleSAML\Configuration $config The Configuration
      * @param string $id The identifier of the IdP.
      *
-     * @return \SimpleSAML\Module\adfs\IdP\PassiveIdP The IdP.
+     * @return \SimpleSAML\Module\adfs\IdP\ActiveIdP The IdP.
      */
-    public static function getById(Configuration $config, string $id): PassiveIdP
+    public static function getById(Configuration $config, string $id): ActiveIdP
     {
         if (isset(self::$idpCache[$id])) {
             return self::$idpCache[$id];
@@ -137,9 +137,9 @@ class PassiveIdP
      * @param \SimpleSAML\Configuration $config The Configuration.
      * @param array<mixed> &$state The state array.
      *
-     * @return \SimpleSAML\Module\adfs\IdP\PassiveIdP The IdP.
+     * @return \SimpleSAML\Module\adfs\IdP\ActiveIdP The IdP.
      */
-    public static function getByState(Configuration $config, array &$state): PassiveIdP
+    public static function getByState(Configuration $config, array &$state): ActiveIdP
     {
         Assert::notNull($state['core:IdP']);
 
@@ -202,7 +202,7 @@ class PassiveIdP
      */
     public static function postAuth(array $state): void
     {
-        $idp = PassiveIdP::getByState(Configuration::getInstance(), $state);
+        $idp = ActiveIdP::getByState(Configuration::getInstance(), $state);
 
         if (!$idp->isAuthenticated()) {
             throw new Error\Exception('Not authenticated.');
@@ -228,7 +228,7 @@ class PassiveIdP
 
         $pc = new Auth\ProcessingChain($idpMetadata, $spMetadata, 'idp');
 
-        $state['ReturnCall'] = ['\SimpleSAML\Module\adfs\IdP\PassiveIdP', 'postAuthProc'];
+        $state['ReturnCall'] = ['\SimpleSAML\Module\adfs\IdP\ActiveIdP', 'postAuthProc'];
         $state['Destination'] = $spMetadata;
         $state['Source'] = $idpMetadata;
 
@@ -272,7 +272,7 @@ class PassiveIdP
 
         $state['core:SP'] = $spEntityId;
         $state['IdPMetadata'] = $this->getConfig()->toArray();
-        $state['ReturnCallback'] = ['\SimpleSAML\Module\adfs\IdP\PassiveIdP', 'postAuth'];
+        $state['ReturnCallback'] = ['\SimpleSAML\Module\adfs\IdP\ActiveIdP', 'postAuth'];
 
         try {
             $this->authenticate($state);
