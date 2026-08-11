@@ -205,7 +205,7 @@ class ADFS
         }
 
         $state = [
-            'Responder' => [ADFS::class, 'sendResponse'],
+            'Responder' => [ADFS::class, 'sendPassiveResponse'],
             'SPMetadata' => $spMetadata->toArray(),
             'ForceAuthn' => false,
             'isPassive' => false,
