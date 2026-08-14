@@ -490,40 +490,36 @@ class ADFS
         $handler = $handler ?? MetaDataStorageHandler::getMetadataHandler();
         $config = $handler->getMetaDataConfig($entityid, 'adfs-idp-hosted');
 
-        $host = Module::getModuleURL('adfs/idp/prp.php');
+        $endpoint = Module::getModuleURL('adfs/idp/prp.php');
 
-        // configure endpoints
-        $ssob = $handler->getGenerated('SingleSignOnServiceBinding', 'adfs-idp-hosted', $host);
-        $slob = $handler->getGenerated('SingleLogoutServiceBinding', 'adfs-idp-hosted', $host);
-        $ssol = $handler->getGenerated('SingleSignOnService', 'adfs-idp-hosted', $host);
-        $slol = $handler->getGenerated('SingleLogoutService', 'adfs-idp-hosted', $host);
+        // configure endpoints; the metadata entry may override any of these
+        $ssol = $config->getOptionalString('SingleSignOnService', $endpoint);
+        $slol = $config->getOptionalString('SingleLogoutService', $endpoint);
+
+        /** @var string[] $ssob */
+        $ssob = $config->getOptionalArrayizeString(
+            'SingleSignOnServiceBinding',
+            [C_SAML2::BINDING_HTTP_REDIRECT],
+        );
+
+        /** @var string[] $slob */
+        $slob = $config->getOptionalArrayizeString(
+            'SingleLogoutServiceBinding',
+            [C_SAML2::BINDING_HTTP_REDIRECT],
+        );
 
         $sso = [];
-        if (is_array($ssob)) {
-            foreach ($ssob as $binding) {
-                $sso[] = [
-                    'Binding'  => $binding,
-                    'Location' => $ssol,
-                ];
-            }
-        } else {
+        foreach ($ssob as $binding) {
             $sso[] = [
-                'Binding'  => $ssob,
+                'Binding'  => $binding,
                 'Location' => $ssol,
             ];
         }
 
         $slo = [];
-        if (is_array($slob)) {
-            foreach ($slob as $binding) {
-                $slo[] = [
-                    'Binding'  => $binding,
-                    'Location' => $slol,
-                ];
-            }
-        } else {
+        foreach ($slob as $binding) {
             $slo[] = [
-                'Binding'  => $slob,
+                'Binding'  => $binding,
                 'Location' => $slol,
             ];
         }

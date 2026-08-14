@@ -10,8 +10,11 @@ use ReflectionFunction;
 use SimpleSAML\Configuration;
 use SimpleSAML\IdP;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
+use SimpleSAML\Module;
 use SimpleSAML\Module\adfs\IdP\ADFS;
+use SimpleSAML\SAML2\Constants as C_SAML2;
 use SimpleSAML\Session;
+use SimpleSAML\XMLSecurity\TestUtils\PEMCertificatesMock;
 use Symfony\Component\HttpFoundation\Request;
 
 use function dirname;
@@ -82,5 +85,69 @@ final class ADFSTest extends TestCase
         $this->assertIsArray($state);
         $this->assertArrayHasKey('Responder', $state);
         $this->assertIsCallable($state['Responder']);
+    }
+
+
+    /**
+     * Test that hosted metadata falls back to the module's own endpoint.
+     */
+    public function testHostedMetadataDefaultsToModuleEndpoint(): void
+    {
+        $handler = MetaDataStorageHandler::getMetadataHandler();
+        $entityId = $handler->getMetaDataCurrentEntityID('adfs-idp-hosted');
+
+        $metadata = ADFS::getHostedMetadata($entityId, $handler);
+
+        $endpoint = Module::getModuleURL('adfs/idp/prp.php');
+        $this->assertStringEndsWith('/module.php/adfs/idp/prp.php', $endpoint);
+
+        $expected = [['Binding' => C_SAML2::BINDING_HTTP_REDIRECT, 'Location' => $endpoint]];
+        $this->assertSame($expected, $metadata['SingleSignOnService']);
+        $this->assertSame($expected, $metadata['SingleLogoutService']);
+    }
+
+
+    /**
+     * Test that endpoints configured on the metadata entry take precedence over the defaults.
+     */
+    public function testHostedMetadataHonoursConfiguredEndpoints(): void
+    {
+        $resourceDir = dirname(__DIR__, 3) . '/vendor/simplesamlphp/xml-security/';
+
+        $handler = $this->createStub(MetaDataStorageHandler::class);
+        $handler->method('getMetaDataConfig')
+            ->willReturn(Configuration::loadFromArray(
+                [
+                    'privatekey_pass' => PEMCertificatesMock::PASSPHRASE,
+                    'privatekey' => $resourceDir . PEMCertificatesMock::KEYS_DIR
+                        . '/' . PEMCertificatesMock::PRIVATE_KEY,
+                    'certificate' => $resourceDir . PEMCertificatesMock::CERTS_DIR
+                        . '/' . PEMCertificatesMock::CERTIFICATE,
+                    'SingleSignOnService' => 'https://idp.example.org/wsfed/sso',
+                    // A list of bindings yields one endpoint per binding.
+                    'SingleSignOnServiceBinding' => [
+                        C_SAML2::BINDING_HTTP_REDIRECT,
+                        C_SAML2::BINDING_HTTP_POST,
+                    ],
+                    'SingleLogoutService' => 'https://idp.example.org/wsfed/slo',
+                    // A single binding does not have to be wrapped in an array.
+                    'SingleLogoutServiceBinding' => C_SAML2::BINDING_HTTP_POST,
+                ],
+                'adfs-idp-hosted',
+            ));
+
+        $metadata = ADFS::getHostedMetadata('urn:example:adfs', $handler);
+
+        $this->assertSame(
+            [
+                ['Binding' => C_SAML2::BINDING_HTTP_REDIRECT, 'Location' => 'https://idp.example.org/wsfed/sso'],
+                ['Binding' => C_SAML2::BINDING_HTTP_POST, 'Location' => 'https://idp.example.org/wsfed/sso'],
+            ],
+            $metadata['SingleSignOnService'],
+        );
+        $this->assertSame(
+            [['Binding' => C_SAML2::BINDING_HTTP_POST, 'Location' => 'https://idp.example.org/wsfed/slo']],
+            $metadata['SingleLogoutService'],
+        );
     }
 }
