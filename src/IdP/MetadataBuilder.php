@@ -46,7 +46,6 @@ use SimpleSAML\XMLSchema\Type\AnyURIValue;
 use SimpleSAML\XMLSchema\Type\Base64BinaryValue;
 use SimpleSAML\XMLSchema\Type\BooleanValue;
 use SimpleSAML\XMLSchema\Type\IDValue;
-use SimpleSAML\XMLSchema\Type\NCNameValue;
 use SimpleSAML\XMLSchema\Type\QNameValue;
 use SimpleSAML\XMLSecurity\Alg\Signature\SignatureAlgorithmFactory;
 use SimpleSAML\XMLSecurity\Constants as C_XMLSEC;
@@ -219,10 +218,12 @@ class MetadataBuilder
         $defaultEndpoint = Module::getModuleURL('adfs') . '/idp/prp.php';
 
         return new SecurityTokenServiceType(
+            // The first argument is the xsi:type, not the element's own name. getLocalName()/NS/NS_PREFIX
+            // describe the element this serialises to — md:RoleDescriptor — so they yield the wrong QName.
             QNameValue::fromParts(
-                NCNameValue::fromString(SecurityTokenServiceType::getLocalName()),
-                AnyURIValue::fromString(SecurityTokenServiceType::NS),
-                NCNameValue::fromString(SecurityTokenServiceType::NS_PREFIX),
+                SecurityTokenServiceType::getXsiTypeName(),
+                SecurityTokenServiceType::getXsiTypeNamespaceURI(),
+                SecurityTokenServiceType::getXsiTypePrefix(),
             ),
             protocolSupportEnumeration: SAMLAnyURIListValue::fromArray(
                 [C_TRUST::NS_TRUST_200512, C_TRUST::NS_TRUST_200502, C_FED::NS_FED],
