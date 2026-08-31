@@ -38,7 +38,7 @@
         "php": "^8.3",
         "ext-dom": "*",
 
-        "beste/clock": "^3.0",
+        "beste/clock": "^4.0",
         "psr/clock": "^1.0",
         "simplesamlphp/assert": "^2.0",
         "simplesamlphp/saml11": "^2.3",
