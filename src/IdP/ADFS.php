@@ -832,7 +832,7 @@ class ADFS
         }
 
         $requestedSecurityToken = new RequestedSecurityToken($assertion);
-        $appliesTo = new AppliesTo([new EndpointReference(new Address($spEntityId))]);
+        $appliesTo = new AppliesTo([new EndpointReference(new Address(AnyURIValue::fromString($spEntityId)))]);
         $requestSecurityTokenResponse = new RequestSecurityTokenResponse(null, [$requestedSecurityToken, $appliesTo]);
 
         $xmlResponse = $requestSecurityTokenResponse->toXML();
